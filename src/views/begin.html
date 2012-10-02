@@ -1,0 +1,28 @@
+<!--<script type='text/javascript'>	LABKEY.requiresExt4ClientAPI(); </script>-->
+<script src='//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
+<script src='//ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js'></script>
+
+<script type='text/javascript'>
+
+    var initOpenCytoPreprocessing = function()
+    {
+        var webPartDiv = <%=webpartContext%>.wrapperDivId;
+
+        var OpenCytoPreprocessing = new LABKEY.ext.OpenCytoPreprocessing({
+            webPartDivId: webPartDiv
+        });
+
+        var resizeModule = function(w, h) {
+
+            LABKEY.Utils.resizeToViewport( OpenCytoPreprocessing, w, -1, null, null, 0 );
+
+            OpenCytoPreprocessing.resize();
+        };
+
+        Ext.EventManager.onWindowResize( resizeModule );
+        Ext.EventManager.fireWindowResize();
+    }
+
+    Ext.onReady( initOpenCytoPreprocessing );
+
+</script>

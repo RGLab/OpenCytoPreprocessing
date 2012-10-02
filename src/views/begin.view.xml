@@ -1,0 +1,15 @@
+<view xmlns="http://labkey.org/data/xml/view" title="OpenCyto Preprocessing">
+    <dependencies>
+        <dependency path='Ext.ux.form.LovCombo.css'/>
+        <dependency path='OpenCytoPreprocessing/jQuery/css/base/jquery-ui.css'/>
+        <dependency path='OpenCytoPreprocessing/SuperBoxSelect/superboxselect-gray-extend.css'/>
+        <dependency path='OpenCytoPreprocessing.css'/>
+        <dependency path='Ext.ux.form.LovCombo.js'/>
+        <dependency path='OpenCytoPreprocessing/ResizableCombo.js'/>
+        <dependency path='OpenCytoPreprocessing/ResizableLovCombo.js'/>
+        <dependency path='OpenCytoPreprocessing/SuperBoxSelect/SuperBoxSelect.js'/>
+        <dependency path='OpenCytoPreprocessing/GridPanelHeaderResize.js'/>
+        <dependency path='OpenCytoPreprocessing/ColumnModelChromePatch.js'/>
+        <dependency path='OpenCytoPreprocessing.js'/>
+    </dependencies>
+</view>

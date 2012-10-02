@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/tor/stedi/!svn/ver/20570/trunk/server/customModules/reagent/resources/schemas/dbscripts/postgresql
+END
+reagent-10.20-10.30.sql
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/tor/stedi/!svn/ver/20570/trunk/server/customModules/reagent/resources/schemas/dbscripts/postgresql/reagent-10.20-10.30.sql
+END
+reagent-0.00-10.10.sql
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/tor/stedi/!svn/ver/20570/trunk/server/customModules/reagent/resources/schemas/dbscripts/postgresql/reagent-0.00-10.10.sql
+END
