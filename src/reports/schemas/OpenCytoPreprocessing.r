@@ -25,14 +25,14 @@ if ( path != '' & name!= '' ) {
             gh <- G[[1]];
             popNames <- getNodes( gh, isPath = T );
             nodeNames <- getNodes( gh );
-            res <- lapply( 1:length(nodeNames), function(i) {
+            res <- lapply( 1:length(nodeNames), function(i){
                 curPop <- popNames[i];
                 curpNode <- nodeNames[i];
 
                 #store the children gate projections
                 curChildrens <- getChildren( gh, curpNode );
-                if ( length( curChildrens ) > 0 ) {
-                    prjlist <- lapply( curChildrens, function(curChildren) {
+                if ( length( curChildrens ) > 0 ){
+                    prjlist <- lapply( curChildrens, function(curChildren){
                         g <- getGate( gh, curChildren );
                         if ( class(g) == "BooleanGate" ){
                             return( NULL );
