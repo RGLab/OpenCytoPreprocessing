@@ -10,6 +10,7 @@
         <dependency path='OpenCytoPreprocessing/SuperBoxSelect/SuperBoxSelect.js'/>
         <dependency path='OpenCytoPreprocessing/GridPanelHeaderResize.js'/>
         <dependency path='OpenCytoPreprocessing/ColumnModelChromePatch.js'/>
+        <dependency path='OpenCytoPreprocessing/FitToParent.js'/>
         <dependency path='OpenCytoPreprocessing.js'/>
     </dependencies>
 </view>

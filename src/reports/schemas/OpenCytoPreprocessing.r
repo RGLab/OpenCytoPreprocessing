@@ -4,7 +4,7 @@ suppressMessages( library(Rlabkey) );
 path <- labkey.url.params$path;
 name <- labkey.url.params$name;
 
-if ( path != '' & name!= '' ) {
+if ( path != '' & name != '' ) {
 
     folderPath <- unlist( strsplit( path, split = '/' ) );
     len <- length( folderPath ) - 1;
@@ -18,6 +18,7 @@ if ( path != '' & name!= '' ) {
         print('Before parsing (unarchiving)');
     
         suppressMessages( ws <- openWorkspace( path ) );
+
         G <- parseWorkspace( ws, name = name );
 #        G <- suppressMessages( unarchive( paste( folderPath, '/GatingSet.tar', sep = '' ) ) );
 
@@ -74,7 +75,7 @@ if ( path != '' & name!= '' ) {
 
 }
 
-txt <- 'all good';
+txt <- 'all good!'; 
 
 write(txt, file='${txtout:textOutput}');
 

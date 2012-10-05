@@ -264,11 +264,12 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     },
                     minChars: 0,
                     mode: 'local',
+                    plugins: 'fittoparent',
                     store: strSampleGroups,
                     tpl: '<tpl for="."><div class="x-combo-list-item">{SampleGroup:htmlEncode}</div></tpl>',
                     triggerAction: 'all',
                     typeAhead: true,
-                    valueField: 'SampleGroup',
+                    valueField: 'SampleGroup'
                 });
 
                 var cbXml = new Ext.ux.ResizableCombo({
@@ -289,11 +290,12 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     },
                     minChars: 0,
                     mode: 'local',
+                    plugins: 'fittoparent',
                     store: strXML,
                     tpl: '<tpl for="."><div class="x-combo-list-item">{FileName:htmlEncode}</div></tpl>',
                     triggerAction: 'all',
                     typeAhead: true,
-                    valueField: 'FilePath',
+                    valueField: 'FilePath'
                 });
 
                 strSampleGroups.on({
@@ -334,7 +336,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
                         var path = cbXml.getValue();
                         wpParseConfig.path = path.replace(/%20/g, ' ').replace(/file:/, '');
-                        wpParseConfig.name = cbSampleGroups.getValue();
+                        wpParseConfig.name = cbSampleGroups.getValue().replace(/\n/g, '');
 
                         wpParse.render();
                     },
@@ -434,29 +436,37 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     items: [
                         btnNcdf,
                         cmpNcdf,
-                        new Ext.Component({
-                            cls: 'bold-centered-text',
-                            html: 'Please, select the XML FlowJo workspace to process:'
-                        }),
                         new Ext.Container({
-                            items: [ cbXml ],
-                            layout: 'fit'
+                            height: 60,
+                            items: [
+                            new Ext.Container({
+                                cls: 'bold-centered-text',
+                                flex: 1,
+                                html: 'Please, select the sample group to process:',
+                                items: [ cbSampleGroups ],
+                                layout: 'vbox'
+                            }),
+                            new Ext.Container({
+                                cls: 'bold-centered-text',
+                                flex: 1,
+                                html: 'Please, select the XML FlowJo workspace to process:',
+                                items: [ cbXml ],
+                                layout: 'vbox'
+                            })
+                            ],
+                            layout: {
+                                align: 'middle',
+                                pack: 'center',
+                                type: 'hbox'
+                            }
                         }),
-                        new Ext.Component({
-                            cls: 'bold-centered-text',
-                            html: 'Please, select the sample group to process:'
-                        }),
-                        new Ext.Container({
-                            items: [ cbSampleGroups ],
-                            layout: 'fit'
-                        }),
-                 	cmpSampleGroups, 
+                        cmpSampleGroups,
                         btnParse,
                         new Ext.Component({
                             contentEl: 'divParse' + config.webPartDivId
                         })
                     ],
-                    layout: 'auto',
+                    //layout: 'auto',
                     listeners: {
                         afterrender: function(){
                             maskSampleGroups = new Ext.LoadMask(this.getEl(), {
