@@ -1,3 +1,19 @@
+/*
+ *  Copyright 2012 Fred Hutchinson Cancer Research Center
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 function removeById(elId) {
     $("#"+elId).remove();
 };
@@ -31,12 +47,30 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         '<div id="divNcdf' + config.webPartDivId + '" class="centered-text">' +
                                 '<div style="height: 20px"></div>' +
                         '</div>' +
+
                         '<div id="divParse' + config.webPartDivId + '" class="centered-text">' +
                                 '<div style="height: 20px"></div>' +
                         '</div>' +
-                        '<div id="divSampleGroups' + config.webPartDivId + '" class="centered-text hidden">' +
+
+                        '<div id="divSampleGroupsFetching' + config.webPartDivId + '" class="centered-text hidden">' +
                                 '<div style="height: 20px"></div>' +
-                        '</div>'
+                        '</div>' +
+
+                        '<ul id="ulList' + config.webPartDivId + '" class="bold-centered-text ulList">' +
+        
+                            '<li class="liListDefault">' +
+                                '<div id="divXml' + config.webPartDivId + '"></div>' +
+                            '</li>' +
+        
+                            '<li class="liListDefault">' +
+                                '<div id="divSampleGroup' + config.webPartDivId + '"></div>' +
+                            '</li>' +
+
+                            '<li class="liListDefault">' +
+                                '<div id="divGatingSetName' + config.webPartDivId + '"></div>' +
+                            '</li>' +
+
+                        '</ul>'
                 );
 
                 Ext.Ajax.timeout = 600000;
@@ -50,8 +84,8 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 /////////////////////////////////////
                 //             Strings             //
                 /////////////////////////////////////
-                var strngErrorContact = '. Please, contact ldashevs@fhcrc.org for support.';
-                var strngErrorContactWithLink = '. Please, contact the <a href="mailto:ldashevs@fhcrc.org?Subject=OpenCytoPreprocessing%20Support">developer</a>.'
+                var strngErrorContact = '. Please, contact ldashevs@fhcrc.org, if you have questions.';
+                var strngErrorContactWithLink = '. Please, contact the <a href="mailto:ldashevs@fhcrc.org?Subject=OpenCytoPreprocessing%20Support">developer</a>, if you have questions.'
 
                 var strngSqlStart = 'SELECT DISTINCT FCSFiles.Name AS FileName';
                 var strngSqlEnd =
@@ -75,26 +109,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 //////////////////////////////////////////////////////////////////
                 //             Queries and associated functionality             //
                 //////////////////////////////////////////////////////////////////
-                LABKEY.Query.selectRows({
-                    columns: ['RootPath'],
-                    failure: onFailure,
-                    queryName: 'RootPath',
-                    schemaName: 'flow',
-                    success: onRootPathSuccess
-                });
-
-                function onRootPathSuccess(data){
-                    if ( data.rowCount == 1 ){
-                        rootPath = data.rows[0].RootPath;
-                    } else{
-                        // disable all
-                        pnlFiles.disable();
-                        pnlComp.disable();
-                        pnlStudyVars.disable();
-                        pnlFiles.getEl().mask('Cannot retrieve the path for the data files: it is either non-unique or empty' + strngErrorContactWithLink, 'infoMask')
-                    }
-                };
-
                 // IE 7 compatibility
                 Object.keys = Object.keys || (function () {
                     var hasOwnProperty = Object.prototype.hasOwnProperty,
@@ -136,7 +150,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 //            Stores             //
                 ///////////////////////////////////
                 //    .bindStore(newStore);
-                var strSampleGroups = new Ext.data.ArrayStore({
+                var strSampleGroup = new Ext.data.ArrayStore({
                     autoLoad: false,
                     data: [],
                     fields: [{ name: 'SampleGroup', type: 'string' }]
@@ -198,11 +212,12 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
 
                 /////////////////////////////////////
-                //          ComboBoxes I           //
+                //     ComboBoxes / TextFeilds     //
                 /////////////////////////////////////
                 var cbFileName = new Ext.ux.ResizableLovCombo({
                     addSelectAllItem: false,
                     allowBlank: true,
+                    autoSelect: false,
                     displayField: 'FileName',
                     emptyText: 'Select...',
                     forceSelection: true,
@@ -222,9 +237,11 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
                 var cbStudyVarName = new Ext.ux.form.SuperBoxSelect({
                     allowBlank: true,
+                    autoSelect: false,
                     displayField: 'Name',
                     emptyText: 'Select...',
                     forceSelection: true,
+                    lazyInit: false,
                     listeners: {
                         additem: function(){
                             btnSetStudyVars.setDisabled(false);
@@ -249,7 +266,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     valueField: 'Name'
                 });
 
-                var cbSampleGroups = new Ext.ux.ResizableCombo({
+                var cbSampleGroup = new Ext.ux.ResizableCombo({
                     allowBlank: true,
                     disabled: true,
                     displayField: 'SampleGroup',
@@ -264,12 +281,12 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     },
                     minChars: 0,
                     mode: 'local',
-                    plugins: 'fittoparent',
-                    store: strSampleGroups,
+                    store: strSampleGroup,
                     tpl: '<tpl for="."><div class="x-combo-list-item">{SampleGroup:htmlEncode}</div></tpl>',
                     triggerAction: 'all',
                     typeAhead: true,
-                    valueField: 'SampleGroup'
+                    valueField: 'SampleGroup',
+                    width: 220
                 });
 
                 var cbXml = new Ext.ux.ResizableCombo({
@@ -279,32 +296,39 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     forceSelection: true,
                     listeners: {
                         select: function(){
-                            cbSampleGroups.setDisabled(false);
-                            maskSampleGroups.show();
+                            maskSampleGroupsFetching.show();
 
                             var path = cbXml.getValue();
-                            wpSampleGroupsConfig.path = path.replace(/%20/g, ' ').replace(/file:/, '');
+                            wpSampleGroupsFetchingConfig.path = path.replace(/%20/g, ' ').replace(/file:/, '');
 
-                            wpSampleGroups.render();
+                            wpSampleGroupsFetching.render();
                         }
                     },
                     minChars: 0,
                     mode: 'local',
-                    plugins: 'fittoparent',
                     store: strXML,
                     tpl: '<tpl for="."><div class="x-combo-list-item">{FileName:htmlEncode}</div></tpl>',
                     triggerAction: 'all',
                     typeAhead: true,
-                    valueField: 'FilePath'
+                    valueField: 'FilePath',
+                    width: 220
                 });
 
-                strSampleGroups.on({
+                strSampleGroup.on({
                         'load': function(){
                             cbXml.triggerBlur();
-                            cbSampleGroups.focus();
-                            cbSampleGroups.expand();
+                            cbSampleGroup.focus();
+                            cbSampleGroup.expand();
                         }
                 });
+
+                var tfGatingSetName = new Ext.form.TextField({
+                    allowBlank: true,
+                    emptyText: 'Type...',
+//                    tpl: '<tpl for="."><div class="x-combo-list-item">{FileName:htmlEncode}</div></tpl>',
+                    width: 220
+                });
+
 
                 /////////////////////////////////////
                 //             Buttons             //
@@ -334,13 +358,13 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         this.setDisabled(true);
                         // maskParse.show();
 
-                        var path = cbXml.getValue();
-                        wpParseConfig.path = path.replace(/%20/g, ' ').replace(/file:/, '');
-                        wpParseConfig.name = cbSampleGroups.getValue().replace(/\n/g, '');
+                        wpParseConfig.xmlPath = cbXml.getValue().replace(/%20/g, ' ').replace(/file:/, '');
+                        wpParseConfig.sampleGroupName = cbSampleGroup.getValue().replace(/\n/g, '');
+                        wpParseConfig.gatingSetName = tfGatingSetName.getValue();
 
                         wpParse.render();
                     },
-                    text: 'Parse selected workspace'
+                    text: 'Generate gating set'
                 });
 
                 // var maskParse = new Ext.LoadMask(btnParse.getEl(), {
@@ -351,25 +375,35 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 /////////////////////////////////////
                 //             Web parts           //
                 /////////////////////////////////////
-                var wpSampleGroupsConfig = {
+                var wpSampleGroupsFetchingConfig = {
                     reportId:'module:OpenCytoPreprocessing/SampleGroups.r',
 //                    showSection: 'textOutput', // comment out to show debug output
                     title:'HiddenDiv'
                 };
 
-                var wpSampleGroups = new LABKEY.WebPart({
+                var wpSampleGroupsFetching = new LABKEY.WebPart({
                     frame: 'none',
-                    partConfig: wpSampleGroupsConfig,
+                    partConfig: wpSampleGroupsFetchingConfig,
                     partName: 'Report',
-                    renderTo: 'divSampleGroups' + config.webPartDivId,
+                    renderTo: 'divSampleGroupsFetching' + config.webPartDivId,
                     success: function(){
-                        maskSampleGroups.hide();
-                        var inputArray = $('#divSampleGroups' + config.webPartDivId + ' pre')[0].innerHTML.split( ';' );
-                        var len = inputArray.length;
-                        for ( var i = 0; i < len; i ++ ){
-                            inputArray[i] = [ inputArray[i] ];
+                        maskSampleGroupsFetching.hide();
+                        var inputArray = $('#divSampleGroupsFetching' + config.webPartDivId + ' pre')[0].innerHTML;
+                        if ( inputArray.search('java.lang.RuntimeException: Failed starting process') < 0 ){
+                            if ( inputArray.search('javax.script.ScriptException') < 0 ){
+                                cbSampleGroup.setDisabled(false);
+                                inputArray = inputArray.split(';');
+                                var len = inputArray.length;
+                                for ( var i = 0; i < len; i ++ ){
+                                    inputArray[i] = [ inputArray[i] ];
+                                }
+                                strSampleGroup.loadData(inputArray);
+                            } else {
+                                alert( inputArray.replace(/Execution halted\n/, 'Execution halted') + strngErrorContact );
+                            }
+                        } else {
+                            alert( 'There was an error with starting R, make sure your administrator configured it properly' + strngErrorContact );
                         }
-                        strSampleGroups.loadData( inputArray );
                     }
                 });
 
@@ -412,9 +446,9 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 /////////////////////////////////////
                 //  Panels, Containers, Components //
                 /////////////////////////////////////
-                var cmpSampleGroups = new Ext.Component({
+                var cmpSampleGroupsFetching = new Ext.Component({
                     autoHeight: true,
-                    contentEl: 'divSampleGroups' + config.webPartDivId
+                    contentEl: 'divSampleGroupsFetching' + config.webPartDivId
                 });
 
                 var cmpNcdf = new Ext.Component({
@@ -423,7 +457,34 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 });
 
                 var cmpStudyVars = new Ext.Component({
-                    html: '<div class="bold-centered-text">Please, select the study variables that are of interest:</div>'
+                    html: '<div class="bold-centered-text">Select the study variables that are of interest:</div>'
+                });
+
+                var cntXml = new Ext.Container({
+                    height: 41,
+                    html: 'Select the workspace:',
+                    items: [cbXml],
+                    layout: 'vbox',
+                    renderTo: 'divXml' + config.webPartDivId,
+                    width: 220
+                });
+
+                var cntSampleGroup = new Ext.Container({
+                    height: 41,
+                    html: 'Select the sample group:',
+                    items: [cbSampleGroup],
+                    layout: 'vbox',
+                    renderTo: 'divSampleGroup' + config.webPartDivId,
+                    width: 220
+                });
+
+                var cntGatingSet = new Ext.Container({
+                    height: 41,
+                    html: 'Enter unique gating set name:',
+                    items: [tfGatingSetName],
+                    layout: 'vbox',
+                    renderTo: 'divGatingSetName' + config.webPartDivId,
+                    width: 220
                 });
 
                 var pnlFiles = new Ext.Panel({
@@ -432,49 +493,27 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     defaults: {
                         style: 'padding-bottom: 4px; padding-right: 4px; padding-left: 4px;'
                     },
-//        forceLayout: true,
+                    hideMode: 'offsets',
                     items: [
                         btnNcdf,
                         cmpNcdf,
-                        new Ext.Container({
-                            height: 60,
-                            items: [
-                            new Ext.Container({
-                                cls: 'bold-centered-text',
-                                flex: 1,
-                                html: 'Please, select the sample group to process:',
-                                items: [ cbSampleGroups ],
-                                layout: 'vbox'
-                            }),
-                            new Ext.Container({
-                                cls: 'bold-centered-text',
-                                flex: 1,
-                                html: 'Please, select the XML FlowJo workspace to process:',
-                                items: [ cbXml ],
-                                layout: 'vbox'
-                            })
-                            ],
-                            layout: {
-                                align: 'middle',
-                                pack: 'center',
-                                type: 'hbox'
-                            }
+                        new Ext.Panel({
+                            border: false,
+                            contentEl: 'ulList' + config.webPartDivId
                         }),
-                        cmpSampleGroups,
+                        cmpSampleGroupsFetching,
                         btnParse,
-                        new Ext.Component({
+                        new Ext.Container({
                             contentEl: 'divParse' + config.webPartDivId
                         })
                     ],
-                    //layout: 'auto',
                     listeners: {
                         afterrender: function(){
-                            maskSampleGroups = new Ext.LoadMask(this.getEl(), {
+                            maskSampleGroupsFetching = new Ext.LoadMask(this.getEl(), {
                                 msg: "Obtaining the available sample groups, please, wait..."
                             });
                         }
                     },
-//        monitorResize: true,
                     title: 'Files'
                 });
 
@@ -519,7 +558,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                             border: false,
                             items: [ cbFileName ],
                             layout: 'fit'
-                        }),
+                        })
                     ],
                     title: 'Study Variables'
                 });
@@ -533,7 +572,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 });
 
 
-                var maskSampleGroups;
+                var maskSampleGroupsFetching;
 
                 /////////////////////////////////////
                 //             Functions           //
@@ -569,15 +608,15 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     // Elliminate all of the previous choices
                     $('#ulSortable' + config.webPartDivId).empty();
                     newColumns =
-                            [
-                                {
-                                    dataIndex: 'FileName',
-                                    header: 'File Name',
-//                        id: 'FileName',
-                                    resizable: true,
-                                    sortable: true
-                                }
-                            ];
+                        [
+                            {
+                                dataIndex: 'FileName',
+                                header: 'File Name',
+//                                id: 'FileName',
+                                resizable: true,
+                                sortable: true
+                            }
+                        ];
                     tempSQL = strngSqlStart;
                     currentComboId = undefined;
                     strFilteredTable.setUserFilters([]);

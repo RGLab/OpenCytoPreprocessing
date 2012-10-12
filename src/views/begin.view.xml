@@ -1,16 +1,16 @@
 <view xmlns="http://labkey.org/data/xml/view" title="OpenCyto Preprocessing">
     <dependencies>
         <dependency path='Ext.ux.form.LovCombo.css'/>
-        <dependency path='OpenCytoPreprocessing/jQuery/css/base/jquery-ui.css'/>
-        <dependency path='OpenCytoPreprocessing/SuperBoxSelect/superboxselect-gray-extend.css'/>
-        <dependency path='OpenCytoPreprocessing.css'/>
+        <dependency path='OpenCyto/OpenCyto.css'/>
+        <dependency path='OpenCyto/jQuery/css/base/jquery-ui.css'/>
+        <dependency path='OpenCyto/SuperBoxSelect/superboxselect-gray-extend.css'/>
         <dependency path='Ext.ux.form.LovCombo.js'/>
-        <dependency path='OpenCytoPreprocessing/ResizableCombo.js'/>
-        <dependency path='OpenCytoPreprocessing/ResizableLovCombo.js'/>
-        <dependency path='OpenCytoPreprocessing/SuperBoxSelect/SuperBoxSelect.js'/>
-        <dependency path='OpenCytoPreprocessing/GridPanelHeaderResize.js'/>
-        <dependency path='OpenCytoPreprocessing/ColumnModelChromePatch.js'/>
-        <dependency path='OpenCytoPreprocessing/FitToParent.js'/>
+        <dependency path='OpenCyto/ResizableCombo.js'/>
+        <dependency path='OpenCyto/ResizableLovCombo.js'/>
+        <dependency path='OpenCyto/SuperBoxSelect/SuperBoxSelect.js'/>
+        <dependency path='OpenCyto/GridPanelHeaderResize.js'/>
+        <dependency path='OpenCyto/ColumnModelChromePatch.js'/>
+
         <dependency path='OpenCytoPreprocessing.js'/>
     </dependencies>
 </view>
