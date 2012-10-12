@@ -73,7 +73,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         '</ul>'
                 );
 
-                Ext.Ajax.timeout = 600000;
+                Ext.Ajax.timeout = 3600000;
 
                 /////////////////////////////////////
                 //            Variables            //
