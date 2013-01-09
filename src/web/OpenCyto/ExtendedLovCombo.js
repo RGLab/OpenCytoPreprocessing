@@ -1,9 +1,15 @@
-Ext.ux.ResizableLovCombo = Ext.extend(Ext.ux.form.LovCombo, {
+Ext.ux.ExtendedLovCombo = Ext.extend(Ext.ux.form.LovCombo, {
     initComponent: function(){
-        Ext.ux.ResizableLovCombo.superclass.initComponent.call(this);
+        this.triggerConfig = {
+            tag:'span', cls:'x-form-twin-triggers', cn:[
+                {tag: "img", src: Ext.BLANK_IMAGE_URL, cls: "x-form-trigger"},
+                {tag: "img", src: Ext.BLANK_IMAGE_URL, cls: "x-form-trigger x-form-clear-trigger"}
+            ]};
+
+        Ext.ux.ExtendedLovCombo.superclass.initComponent.call(this);
         this.on('afterrender', this.resizeToFitContent, this);
         this.store.on({
-            'datachanged':   this.resizeToFitContent,
+            'datachanged':  this.resizeToFitContent,
             'add':          this.resizeToFitContent,
             'remove':       this.resizeToFitContent,
             'load':         this.resizeToFitContent,
@@ -38,6 +44,17 @@ Ext.ux.ResizableLovCombo = Ext.extend(Ext.ux.form.LovCombo, {
         if ( this.innerList != undefined ){
             this.innerList.setSize(width);
         }
-    }
+    },
+    onTrigger2Click : function()
+    {
+        this.collapse();
+        this.reset();                       // clear contents of combobox
+        this.fireEvent('cleared');          // send notification that contents have been cleared
+    },
+
+    getTrigger:         Ext.form.TwinTriggerField.prototype.getTrigger,
+    initTrigger:        Ext.form.TwinTriggerField.prototype.initTrigger,
+    onTrigger1Click:    Ext.ux.form.LovCombo.prototype.onTriggerClick,
+    trigger1Class:      Ext.ux.form.LovCombo.prototype.triggerClass
 });
-Ext.reg('resizable-lov-combo', Ext.ux.ResizableLovCombo);
+Ext.reg('extended-lov-combo', Ext.ux.ExtendedLovCombo);

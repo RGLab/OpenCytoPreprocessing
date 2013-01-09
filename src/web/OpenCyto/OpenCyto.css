@@ -6,49 +6,80 @@ pre {
 }
 
 /* Class specs */
+
 .right-text {
     text-align: right;
 }
 
-.centered-text {
-    text-align: center;
+.left-text {
+    text-align: left;
 }
 
-.bold-centered-text {
+/* Centered text */
+.centered-text, .bold-centered-text, .sortable-list li, .x-grid3-hd-row, {
+    text-align: center !important;
+}
+
+/* Bold text */
+.bold-text, .bold-centered-text, .sortable-list li, .infoMask div, .x-mask-loading-custom div, .ux-lovcombo-list-item-all {
     font-weight: bold;
-    text-align: center;
 }
 
-.bold-text {
-    font-weight: bold;
-}
-
+/* Auto margin */
 .centered-table {
     margin: auto;
 }
 
+.x-btn {
+    margin-right: 0px !important;
+}
+
+/* Zero margin */
+.x-tab-strip, .sortable-list, .ulList {
+    margin: 0;
+}
+
+/* Zero padding */
+.x-tab-panel-header, .sortable-list, .ulList {
+    padding: 0;
+}
+
+/* Hidden class */
 .hidden {
     display: none;
     visibility: hidden;
 }
 
 .checkBoxWithLeftMargin {
-    margin-left: 25px !important;
+    margin-left: 4px !important;
 }
 
-.x-mask-loading {
-    /*left: 0 !important;*/
-    width: 100% !important;
+.x-mask-loading-custom {
+    border-left: 0px;
+    left: 0 !important;
+    margin-left: 0px;
+    padding-left: 0px;
+    width: 100%;
+    z-index: 10000;
+}
+
+.x-mask-loading-custom div {
+    background: no-repeat 5px 5px;
+    background-color: white !important;
+    background-image: url(../ext-3.4.0/resources/images/default/grid/loading.gif) !important;
+    /*line-height:16px;*/
+    padding: 5px 10px 5px 25px;
+    text-align: center;
 }
 
 .infoMask {
     width: 100% !important;
+    z-index: 10000;
 }
 
 .infoMask div {
     background-color: white;
     cursor: default;
-    font-weight: bold;
     text-align: center;
 }
 
@@ -57,12 +88,7 @@ ul.x-tab-strip-top {
 }
 
 .x-box-inner {
-    margin-top: 2px;
-}
-
-/* Buttons */
-.x-btn {
-    margin: auto;
+    /*margin-top: 2px;*/
 }
 
 /* Ext4 */
@@ -71,11 +97,8 @@ ul.x-tab-strip-top {
     padding-right: 4px;
 }
 
-/* jQuery Drag and drop tweaks */
-.ux-lovcombo-list-item-all {
-    font-weight: bold;
-}
 
+/* Tweaks for jQuery drag-and-drop in particular and list in general */
 .draggableHandle {
     cursor: move;
 }
@@ -85,19 +108,24 @@ ul.x-tab-strip-top {
     line-height: 1.2em;
 }
 
-.ui-sortable-helper {
+.ui-sortable-helper, .sortable-list, .ulList {
     list-style-type: none;
 }
-/********************************/
+
+.sortable-list li, .ulList li {
+    margin: 3px 5px 3px 5px; /* 0.2em 0.3em 0.2em 0.3em */
+    padding: 1px;
+    float: left;
+}
+
+.sortable-list li {
+    font-size: 1em;
+}
+/**********************************/
 
 /* Ext TabPanel fixes */
 .x-tab-strip {
-    margin: 0;
     padding-left: 5px;
-}
-
-.x-tab-panel-header {
-    padding: 0;
 }
 
 .x-tab-right {
@@ -118,44 +146,53 @@ ul.x-tab-strip-top {
     padding-right: 0px;
 }
 
-.x-grid3-hd-row {
-    text-align: center;
-}
-
 .x-grid3-header-offset {
     width: auto !important;
 }
+
+/* ? */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .x-grid3-cell {
+        box-sizing: border-box;
+    }
+}
 /*************************************/
 
-/* jQuery Drag and drop tweaks */
-.sortable-list {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+/* Fix so that the buttons on toolbars look normal (not text) */
+.x-toolbar .x-btn-tl,.x-toolbar .x-btn-tr,.x-toolbar .x-btn-tc,.x-toolbar .x-btn-ml,.x-toolbar .x-btn-mr,.x-toolbar .x-btn-mc,.x-toolbar .x-btn-bl,.x-toolbar .x-btn-br,.x-toolbar .x-btn-bc {
+    background-image:url(../gtheme/img/lkbtn.gif);
 }
 
-.sortable-list li {
-    margin: 3px 5px 3px 5px; /* 0.2em 0.3em 0.2em 0.3em */
-    padding: 1px;
-    color: black;
-    float: left;
-    font-size: 1em;
-    font-weight: bold;
-    text-align: center;
+.x-toolbar .x-btn-tl{
+    background-position: 0 0;
+}
+.x-toolbar .x-btn-tr{
+    background-position: -3px 0;
+}
+.x-toolbar .x-btn-tc{
+    background-position: 0 -6px;
+}
+
+.x-toolbar .x-btn-ml{
+    background-position: 0px -24px;
+}
+.x-toolbar .x-btn-mr{
+    background-position: -3px -24px;
+}
+
+.x-toolbar .x-btn-mc{
+    background-position: 0 -1096px;
+}
+.x-toolbar .x-btn-bl{
+    background-position: 0 -3px;
+}
+.x-toolbar .x-btn-br{
+    background-position: -3px -3px;
+}
+.x-toolbar .x-btn-bc{
+    background-position: 0 -15px;
 }
 /**********************************/
-
-.ulList {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-.ulList li {
-    margin: 3px 5px 3px 5px; /* 0.2em 0.3em 0.2em 0.3em */
-    padding: 1px;
-    float: left;
-}
 
 /*****************************/
 /* Individual elements specs */

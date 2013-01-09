@@ -3,35 +3,55 @@ suppressMessages( library(ncdfFlow) );
 suppressMessages( library(Rlabkey) );
 suppressMessages( library(digest) );
 
-path            <- labkey.url.params$xmlPath;
-sampleGroupName <- labkey.url.params$sampleGroupName;
-gatingSetName   <- labkey.url.params$gatingSetName;
+xmlPath             <- labkey.url.params$xmlPath;
+filesPath           <- labkey.url.params$rootPath;
+sampleGroupName     <- labkey.url.params$sampleGroupName;
+analysisName        <- labkey.url.params$analysisName;
+analysisDescription <- labkey.url.params$analysisDescription;
+studyVarsString     <- labkey.url.params$studyVars;
 
-if ( path != '' & sampleGroupName != '' ){
+if ( xmlPath != '' & sampleGroupName != '' ){
 
-    folderPath <- dirname( path );
+    folderPath <- dirname( xmlPath );
+    if ( filesPath == '' ){
+        filesPath <- folderPath;
+    }
 
-    currentHashValue <- digest( paste( path, sampleGroupName, sep = '' ) );
+    currentHashValue <- digest( paste( xmlPath, sampleGroupName, studyVarsString, sep = '' ) );
 
     gatingSetPath <- paste( folderPath, '/', currentHashValue, '.tar', sep = '' );
 
     if ( ! file.exists( gatingSetPath ) ) {
     
-        print('Before parsing');
-    
-        suppressMessages( ws <- openWorkspace( path ) );
+        suppressMessages( ws <- openWorkspace( xmlPath ) );
 
-        G <- suppressMessages( parseWorkspace( ws, name = sampleGroupName, isNcdf = T ) );
+        print('Before parsing');
+
+        G <- suppressMessages( parseWorkspace( ws, name = sampleGroupName, isNcdf = T, path = filesPath ) );
 
         # need a flag specifying whether meta data is there or not!
-        meta <- labkey.selectRows( baseUrl = labkey.url.base, folderPath = labkey.url.path, schemaName = 'Samples', queryName = 'Samples' );
-        meta[,2] <- NULL; meta[,2] <- NULL; meta[,2] <- NULL;
-        colnames(meta)[1] <- 'name';
-        pData(G) <- meta;
+        print('Before fetching metadata');
+
+        if ( studyVarsString != '' ){
+
+            meta <- labkey.selectRows(
+                baseUrl     = labkey.url.base,
+                folderPath  = labkey.url.path,
+                schemaName  = 'flow',
+                queryName   = 'Files',
+                colSelect   = c('Name', studyVarsString), # needs to be a vector of comma separated strings
+                colNameOpt  = 'fieldname'
+            );
+            colnames(meta)[1] <- 'name';
+
+            pData(G) <- meta;
+
+        }
 
         archive( G, gatingSetPath );
         if ( ! file.exists( gatingSetPath ) ) {
             txt <- 'BAD ERROR: PROBABLY R COULD NOT CREATE THE TAR FILE BECAUSE THERE WAS NOT ENOUGH MEMORY AVAILABLE';
+            stop('BAD ERROR: PROBABLY R COULD NOT CREATE THE TAR FILE BECAUSE THERE WAS NOT ENOUGH MEMORY AVAILABLE');
             return;
         } else {
 
@@ -84,13 +104,29 @@ if ( path != '' & sampleGroupName != '' ){
                 max_gsid <- max_gsid + 1;
             }
 
-            toInsert <- data.frame( gsid = max_gsid, gsname = gatingSetName, objlink = gatingSetPath );
+            toInsert <- data.frame( gsid            = max_gsid,
+                                    gsname          = analysisName,
+                                    objlink         = gatingSetPath,
+                                    gsdescription   = analysisDescription,
+                                    xmlpath         = xmlPath,
+                                    samplegroup     = sampleGroupName,
+                                    studyvars       = studyVarsString
+                                   );
 
             print('Before writing gating set');
+            test <- labkey.selectRows( queryName = 'gstbl', baseUrl = labkey.url.base, folderPath = labkey.url.path, schemaName = 'opencyto_preprocessing' );
+
             insertedRow <- labkey.insertRows( queryName = "gstbl", toInsert = toInsert, baseUrl = labkey.url.base, folderPath = labkey.url.path, schemaName = 'opencyto_preprocessing' );
 
             print('Before writing projections');
+
             writeProjections( G, max_gsid, baseUrl = labkey.url.base, folderPath = labkey.url.path, schemaName = 'opencyto_preprocessing' );
+
+            toInsert <- data.frame( svname  = unlist( strsplit( studyVarsString, split=',' ) ),
+                                    gsid    = max_gsid
+                                   );
+
+            labkey.insertRows( queryName = "study_vars", toInsert = toInsert, baseUrl = labkey.url.base, folderPath = labkey.url.path, schemaName = 'opencyto_preprocessing' );
 
             txt <- 'hopefully generated the *.tar file and wrote to the db!';
         }

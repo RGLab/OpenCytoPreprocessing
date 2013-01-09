@@ -11,16 +11,36 @@
     </ns:table>
     <ns:table tableName="gstbl" tableDbType="TABLE">
         <ns:columns>
-            <ns:column columnName="gsid">
-                <ns:columnTitle>gsid</ns:columnTitle>
-            </ns:column>
+            <ns:column columnName="gsid"/>
             <ns:column columnName="container"/>
-            <ns:column columnName="gsname">
-                <ns:columnTitle>gsname</ns:columnTitle>
-            </ns:column>
+            <ns:column columnName="gsname"/>
             <ns:column columnName="objlink">
                 <ns:columnTitle>objLink</ns:columnTitle>
             </ns:column>
+            <ns:column columnName="gsdescription">
+                <ns:columnTitle>gsDescription</ns:columnTitle>
+            </ns:column>
+            <ns:column columnName="xmlpath">
+                <ns:columnTitle>xmlPath</ns:columnTitle>
+            </ns:column>
+            <ns:column columnName="samplegroup">
+                <ns:columnTitle>sampleGroup</ns:columnTitle>
+            </ns:column>
+            <ns:column columnName="studyvars">
+                <ns:columnTitle>studyVars</ns:columnTitle>
+            </ns:column>
+        </ns:columns>
+    </ns:table>
+    <ns:table tableName="study_vars" tableDbType="TABLE">
+        <ns:columns>
+            <ns:column columnName="svid">
+                <ns:columnTitle>Study Variable Id</ns:columnTitle>
+            </ns:column>
+            <ns:column columnName="container"/>
+            <ns:column columnName="svname">
+                <ns:columnTitle>Study Variable Name</ns:columnTitle>
+            </ns:column>
+            <ns:column columnName="gsid"/>
         </ns:columns>
     </ns:table>
 </ns:tables>

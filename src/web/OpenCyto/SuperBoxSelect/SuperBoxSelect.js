@@ -865,7 +865,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
              * @methodOf Ext.ux.form.SuperBoxSelect
              * @name clearValue
              * @param {Boolean}
-                    *            supressRemoveEvent [Optional] When true, the
+             *            supressRemoveEvent [Optional] When true, the
              *            'removeitem' event will not fire for each item that is
              *            removed.
              */
