@@ -133,6 +133,12 @@ ul.x-tab-strip-top {
 }
 /********************************/
 
+/* Ext.Resizable fix */
+.xresizable-wrap {
+    margin: 0 auto;
+}
+/********************************/
+
 /* ExtJS GridPanel */
 /* Override standard grid styles (add color to vertical grid lines) */
 .x-grid3-col {
@@ -193,16 +199,3 @@ ul.x-tab-strip-top {
     background-position: 0 -15px;
 }
 /**********************************/
-
-/*****************************/
-/* Individual elements specs */
-/*****************************/
-
-#resultImage {
-    /*height: 480;*/
-    /*width: 90%;*/
-}
-
-#resultImage-rzwrap {
-    margin: 0 auto;
-}

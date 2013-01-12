@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<query name="FilePaths" schemaName="flow" xmlns="http://labkey.org/data/xml/query"/>
+<query name="FilePaths" schemaName="flow" xmlns="http://labkey.org/data/xml/query">
+    <description>
+        Contains the path and the name of each of the imported FCS files.
+    </description>
+</query>

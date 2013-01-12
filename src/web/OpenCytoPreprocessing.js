@@ -677,7 +677,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             plugins: ['autosizecolumns'], // new Ext.ux.plugins.CheckBoxMemory({ idProperty: 'FileName' })],
             store: strFilteredTable,
             stripeRows: true,
-            title:'Files',
+            title: 'Files',
 //                    view: new Ext.ux.grid.LockingGridView(),
             viewConfig:
             {

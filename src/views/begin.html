@@ -11,7 +11,7 @@
 LABKEY.Query.getSchemas({
     success: function(schemasInfo){
         if ( ! ( $.inArray( 'opencyto_preprocessing', schemasInfo.schemas ) < 0 ) ){
-///////////////////////////////////////////////////////////////////
+// END REMOVE
 
         var OpenCytoPreprocessing = new LABKEY.ext.OpenCytoPreprocessing({
             webPartDivId: webPartDiv
@@ -27,7 +27,7 @@ LABKEY.Query.getSchemas({
         Ext.EventManager.onWindowResize( resizeModule );
         Ext.EventManager.fireWindowResize();
 
-//////////////////////////////////////////////////////////////////////
+// REMOVE once issue #18 in OpenCytoVisualization is taken care of
         } else {
             var temp = new Ext.Panel({
                 border: false,
@@ -44,7 +44,8 @@ LABKEY.Query.getSchemas({
             Ext.EventManager.fireWindowResize();
         }
     }
-}); // REMOVE once issue #18 in OpenCytoVisualization is taken care of
+});
+// END REMOVE
 
     }
 
