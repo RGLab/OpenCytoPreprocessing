@@ -125,7 +125,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
 
         var strStudyVarName = new Ext.data.ArrayStore({
-            autoLoad: true,
             data: [],
             fields: ['Flag', 'Display', 'Value'],
             sortInfo: {
@@ -465,7 +464,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 tfAnalysisDescription.setDisabled(false);
 
                 var inputArray = $('#wpSampleGroupsFetching' + config.webPartDivId + ' pre')[0].innerHTML;
-                if ( inputArray.search('java.lang.RuntimeException: Failed starting process') < 0 ){
+                if ( inputArray.search('java.lang.RuntimeException') < 0 ){
                     if ( inputArray.search('javax.script.ScriptException') < 0 ){
                         cbSampleGroup.setDisabled(false);
                         inputArray = inputArray.replace(/\n/g, '').replace('All Samples;', '').split(';');
@@ -476,12 +475,12 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         strSampleGroup.loadData(inputArray);
                     } else {
                         onFailure({
-                            exception: inputArray.replace(/Execution halted\n/, 'Execution halted') + '.'
+                            exception: inputArray.replace(/Execution halted\n/, 'Execution halted')
                         });
                     }
                 } else {
                     onFailure({
-                        exception: 'there was an error with starting R, make sure your administrator configured it properly.'
+                        exception: inputArray
                     });
                 }
             }
@@ -880,6 +879,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         this.layout = 'fit';
         this.renderTo = config.webPartDivId;
         this.webPartDivId = config.webPartDivId;
+        this.width = document.getElementById(config.webPartDivId).offsetWidth;
 
         LABKEY.ext.OpenCytoPreprocessing.superclass.constructor.apply(this, arguments);
 
