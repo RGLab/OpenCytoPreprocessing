@@ -50,8 +50,12 @@ pre {
     visibility: hidden;
 }
 
-.checkBoxWithLeftMargin {
-    margin-left: 4px !important;
+.simple-panel-header {
+    background-color: white;
+    border-bottom-width: 0px !important;
+    font-family: verdana, arial, helvetica, sans-serif;
+    padding-bottom: 3px;
+    padding-left: 0px;
 }
 
 .x-mask-loading-custom {

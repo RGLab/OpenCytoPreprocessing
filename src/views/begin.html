@@ -34,6 +34,11 @@ LABKEY.Query.getSchemas({
                 frame: false,
                 height: 100,
                 layout: 'fit',
+                listeners: {
+                    afterrender: function(){
+                        this.getEl().mask('Seems like you have not enabled the OpenCytoVisualization module, click <a href="' + LABKEY.ActionURL.buildURL('admin', 'folderManagement', LABKEY.ActionURL.getContainer(), { tabId: 'folderType' } ) + '">here</a> to do so.', 'infoMask');
+                    }
+                },
                 renderTo: webPartDiv,
                 resize: function(){
                     temp.getEl().mask('Seems like you have not enabled the OpenCytoPreprocessing module, click <a href="' + LABKEY.ActionURL.buildURL('admin', 'folderManagement', LABKEY.ActionURL.getContainer(), { tabId: 'folderType' } ) + '">here</a> to do so.', 'infoMask');

@@ -33,19 +33,19 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             '<ul id="ulList' + config.webPartDivId + '" class="bold-text ulList">' +
 
                 '<li class="liListDefault">' +
-                    '<div class="left-text" id="cntXml' + config.webPartDivId + '"></div>' +
+                    '<div class="left-text" id="pnlXml' + config.webPartDivId + '"></div>' +
                 '</li>' +
 
                 '<li class="liListDefault">' +
-                    '<div class="left-text" id="cntSampleGroup' + config.webPartDivId + '"></div>' +
+                    '<div class="left-text" id="pnlSampleGroup' + config.webPartDivId + '"></div>' +
                 '</li>' +
 
                 '<li class="liListDefault">' +
-                    '<div class="left-text" id="cntAnalysisName' + config.webPartDivId + '"></div>' +
+                    '<div class="left-text" id="pnlAnalysisName' + config.webPartDivId + '"></div>' +
                 '</li>' +
 
                 '<li class="liListDefault">' +
-                    '<div class="left-text" id="cntAnalysisDescription' + config.webPartDivId + '"></div>' +
+                    '<div class="left-text" id="pnlAnalysisDescription' + config.webPartDivId + '"></div>' +
                 '</li>' +
 
             '</ul>'
@@ -253,7 +253,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             valueField: 'Value'
         });
 
-        var lastlySelectedXML;
+        var lastlySelectedXML = undefined;
 
         var cbXml = new Ext.form.ClearableComboBox({
             allowBlank: true,
@@ -290,7 +290,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     var value = this.getValue();
 
                     if ( value != lastlySelectedXML ){
-                        lastlySelectedXML = value;
 
                         maskGlobal.msg = 'Obtaining the available sample groups, please, wait...';
                         maskGlobal.show();
@@ -452,6 +451,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         };
 
         var wpSampleGroupsFetching = new LABKEY.WebPart({
+            failure: onFailure,
             frame: 'none',
             partConfig: wpSampleGroupsFetchingConfig,
             partName: 'Report',
@@ -473,6 +473,8 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                             inputArray[i] = [ inputArray[i] ];
                         }
                         strSampleGroup.loadData(inputArray);
+
+                        lastlySelectedXML = cbXml.getValue();
                     } else {
                         onFailure({
                             exception: inputArray.replace(/Execution halted\n/, 'Execution halted')
@@ -543,72 +545,40 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         });
 
 
-        new Ext.Container({
-            defaults: {
-                style: 'padding-bottom: 1px;'
-            },
-            height: 39,
-            items: [
-                {
-                    border: false,
-                    html: 'Select the workspace:'
-                },
-                cbXml
-            ],
-            layout: 'vbox',
-            renderTo: 'cntXml' + config.webPartDivId,
-            width: 200
+        new Ext.Panel({
+            border: false,
+            headerCssClass: 'simple-panel-header',
+            items: [ cbXml ],
+            layout: 'fit',
+            renderTo: 'pnlXml' + config.webPartDivId,
+            title: 'Select the workspace:'
         });
 
-        new Ext.Container({
-            defaults: {
-                style: 'padding-bottom: 1px;'
-            },
-            height: 39,
-            items: [
-                {
-                    border: false,
-                    html: 'Select the sample group:'
-                },
-                cbSampleGroup
-            ],
-            layout: 'vbox',
-            renderTo: 'cntSampleGroup' + config.webPartDivId,
-            width: 200
+        new Ext.Panel({
+            border: false,
+            headerCssClass: 'simple-panel-header',
+            items: [ cbSampleGroup ],
+            layout: 'fit',
+            renderTo: 'pnlSampleGroup' + config.webPartDivId,
+            title: 'Select the sample group:'
         });
 
-        new Ext.Container({
-            defaults: {
-                style: 'padding-bottom: 1px;'
-            },
-            height: 39,
-            items: [
-                {
-                    border: false,
-                    html: 'Enter analysis name:'
-                },
-                tfAnalysisName
-            ],
-            layout: 'vbox',
-            renderTo: 'cntAnalysisName' + config.webPartDivId,
-            width: 200
+        new Ext.Panel({
+            border: false,
+            headerCssClass: 'simple-panel-header',
+            items: [ tfAnalysisName ],
+            layout: 'fit',
+            renderTo: 'pnlAnalysisName' + config.webPartDivId,
+            title: 'Enter analysis name:'
         });
 
-        new Ext.Container({
-            defaults: {
-                style: 'padding-bottom: 1px;'
-            },
-            height: 39,
-            items: [
-                {
-                    border: false,
-                    html: 'Enter analysis description:'
-                },
-                tfAnalysisDescription
-            ],
-            layout: 'vbox',
-            renderTo: 'cntAnalysisDescription' + config.webPartDivId,
-            width: 200
+        new Ext.Panel({
+            border: false,
+            headerCssClass: 'simple-panel-header',
+            items: [ tfAnalysisDescription ],
+            layout: 'fit',
+            renderTo: 'pnlAnalysisDescription' + config.webPartDivId,
+            title: 'Enter analysis description:'
         });
         
 
