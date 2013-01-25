@@ -20,12 +20,12 @@ function onFailure(errorInfo, options, responseObj){
     var strngErrorContact = ' Please, contact ldashevs@fhcrc.org, if you have questions.';
 
     if (errorInfo && errorInfo.exception)
-        alert('Failure: ' + errorInfo.exception + strngErrorContact);
+        Ext.Msg.alert('Error', 'Failure: ' + errorInfo.exception + strngErrorContact);
     else {
         if ( responseObj != undefined ){
-            alert('Failure: ' + responseObj.statusText + strngErrorContact);
+            Ext.Msg.alert('Error', 'Failure: ' + responseObj.statusText + strngErrorContact);
         } else {
-            alert('Failure: ' + strngErrorContact);
+            Ext.Msg.alert('Error', 'Failure: ' + strngErrorContact);
         }
     }
 };

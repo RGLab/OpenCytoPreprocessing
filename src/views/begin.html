@@ -7,28 +7,32 @@
     var initOpenCytoPreprocessing = function(){
         var webPartDiv = <%=webpartContext%>.wrapperDivId;
 
+        var resizeModule;
 // REMOVE once issue #18 in OpenCytoVisualization is taken care of
 LABKEY.Query.getSchemas({
+    failure: onFailure,
     success: function(schemasInfo){
-        if ( ! ( $.inArray( 'opencyto_preprocessing', schemasInfo.schemas ) < 0 ) ){
+        if ( $.inArray( 'opencyto_preprocessing', schemasInfo.schemas ) >= 0 ){
 // END REMOVE
 
         var OpenCytoPreprocessing = new LABKEY.ext.OpenCytoPreprocessing({
             webPartDivId: webPartDiv
         });
 
-        var resizeModule = function(w, h){
+        resizeModule = function(w, h){
 
             LABKEY.Utils.resizeToViewport( OpenCytoPreprocessing, w, -1, null, null, -5 );
 
             OpenCytoPreprocessing.resize();
         };
 
-        Ext.EventManager.onWindowResize( resizeModule );
-        Ext.EventManager.fireWindowResize();
-
 // REMOVE once issue #18 in OpenCytoVisualization is taken care of
         } else {
+            var maskMsg =
+                'Seems like you have not enabled the OpenCytoPreprocessing module, click <a href="' +
+                LABKEY.ActionURL.buildURL('admin', 'folderManagement', LABKEY.ActionURL.getContainer(), { tabId: 'folderType' } ) +
+                '">here</a> to do so.';
+
             var temp = new Ext.Panel({
                 border: false,
                 frame: false,
@@ -36,18 +40,21 @@ LABKEY.Query.getSchemas({
                 layout: 'fit',
                 listeners: {
                     afterrender: function(){
-                        this.getEl().mask('Seems like you have not enabled the OpenCytoVisualization module, click <a href="' + LABKEY.ActionURL.buildURL('admin', 'folderManagement', LABKEY.ActionURL.getContainer(), { tabId: 'folderType' } ) + '">here</a> to do so.', 'infoMask');
+                        this.getEl().mask( maskMsg, 'infoMask' );
                     }
                 },
-                renderTo: webPartDiv,
-                resize: function(){
-                    temp.getEl().mask('Seems like you have not enabled the OpenCytoPreprocessing module, click <a href="' + LABKEY.ActionURL.buildURL('admin', 'folderManagement', LABKEY.ActionURL.getContainer(), { tabId: 'folderType' } ) + '">here</a> to do so.', 'infoMask');
-                }
+                renderTo: webPartDiv
             });
 
-            Ext.EventManager.onWindowResize( temp.resize );
-            Ext.EventManager.fireWindowResize();
+            resizeModule = function(){
+                temp.getEl().mask( maskMsg, 'infoMask' );
+            };
+
         }
+// EXCLUDE FROM REMOVE START
+        Ext.EventManager.onWindowResize( resizeModule );
+        Ext.EventManager.fireWindowResize();
+// EXCLUDE FROM REMOVE END
     }
 });
 // END REMOVE

@@ -684,7 +684,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 pnlStudyVars,
                 pnlWorkspaces,
                 new Ext.Container({
-                    //border: false,
                     items: [ pnlTable ],
                     layout: 'fit'
                 }),
@@ -697,10 +696,8 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 }
             },
             tbar: new Ext.Toolbar({
-//                autoHeight: true,
                 items: [ btnProcess, btnBack, btnNext, cmpStatus ]
-            })/*,
-            width: '100%'*/
+            })
         });
 
         btnBack.on( 'click', navHandler.createDelegate( pnlMain, [-1] ) );
