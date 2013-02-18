@@ -1,3 +1,20 @@
+// vim: sw=4:ts=4:nu:nospell:fdc=4
+/*
+ *  Copyright 2012 Fred Hutchinson Cancer Research Center
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 function removeById(elId) {
     $( '#' + elId ).remove();
 };
@@ -8,11 +25,11 @@ function removeByClass(className) {
 
 function captureEvents(observable) {
     Ext.util.Observable.capture(
-            observable,
-            function(eventName) {
-                console.info(eventName);
-            },
-            this
+        observable,
+        function(eventName) {
+            console.info(eventName);
+        },
+        this
     );
 };
 
@@ -25,12 +42,12 @@ function onFailure(errorInfo, options, responseObj){
         if ( responseObj != undefined ){
             Ext.Msg.alert('Error', 'Failure: ' + responseObj.statusText + strngErrorContact);
         } else {
-            Ext.Msg.alert('Error', 'Failure: ' + strngErrorContact);
+            Ext.Msg.alert('Error', 'Failure: ' + errorInfo.statusText + (errorInfo.timedout==true?', timed out.':'') + strngErrorContact);
         }
     }
 };
 
-Ext.Ajax.timeout = 3600000;
+Ext4.Ajax.timeout = 60 * 60 * 1000; // override the timeout to be 60 mintues; value is in milliseconds
 
 Ext.QuickTips.init();
 
@@ -222,6 +239,30 @@ Ext.TabPanel.override({
 
 });
 
+// Remove elements from an array by values
+Array.prototype.remove = function() {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+        what = a[--L];
+        while ((ax = this.indexOf(what)) !== -1) {
+            this.splice(ax, 1);
+        }
+    }
+    return this;
+};
+
+// IE8 and below
+if(!Array.prototype.indexOf) {
+    Array.prototype.indexOf = function(what, i) {
+        i = i || 0;
+        var L = this.length;
+        while (i < L) {
+            if(this[i] === what) return i;
+            ++i;
+        }
+        return -1;
+    };
+}
 
 
 // ? First column non-moveable

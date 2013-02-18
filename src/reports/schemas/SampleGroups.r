@@ -6,6 +6,7 @@ if ( path != '' ){
 
     suppressMessages( ws <- openWorkspace( path ) );
     txt <- paste( unique( getSampleGroups(ws)[[1]]  ), collapse=';' );
+    # unique(getSampleGroups(ws)[,1:2]); # alternative ?
 }
 
 #sg<-merge(getSamples(ws),getSampleGroups(ws),by="sampleID")

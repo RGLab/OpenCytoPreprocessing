@@ -10,7 +10,6 @@ CREATE TABLE opencyto_preprocessing.gsTbl
     gsDescription TEXT,
     xmlPath       TEXT NOT NULL,
     sampleGroup   TEXT NOT NULL,
-    studyVars     TEXT NOT NULL,
 
     CONSTRAINT PK_gsTbl PRIMARY KEY (gsId, Container)
 );

@@ -18,4 +18,3 @@ Ext.grid.ColumnModel.override({
     return this.totalWidth;
   }
 });
-

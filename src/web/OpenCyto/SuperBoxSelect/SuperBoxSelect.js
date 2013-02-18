@@ -1,3 +1,20 @@
+// vim: sw=4:ts=4:nu:nospell:fdc=4
+/*
+ *  Copyright 2012 Fred Hutchinson Cancer Research Center
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 Ext.namespace('Ext.ux.form');
 /**
  * <p>
@@ -30,9 +47,9 @@ Ext.ux.form.SuperBoxSelect = function(config) {
              * @event beforeadditem
              * @memberOf Ext.ux.form.SuperBoxSelect
              * @param {SuperBoxSelect}
-                    *            this
+             *            this
              * @param {Mixed}
-                    *            value The value of the item to be added
+             *            value The value of the item to be added
              */
             'beforeadditem',
 
@@ -42,11 +59,11 @@ Ext.ux.form.SuperBoxSelect = function(config) {
              * @event additem
              * @memberOf Ext.ux.form.SuperBoxSelect
              * @param {SuperBoxSelect}
-                    *            this
+             *            this
              * @param {Mixed}
-                    *            value The value of the item which was added
+             *            value The value of the item which was added
              * @param {Record}
-                    *            record The store record which was added
+             *            record The store record which was added
              */
             'additem',
 
@@ -57,9 +74,9 @@ Ext.ux.form.SuperBoxSelect = function(config) {
              * @event newitem
              * @memberOf Ext.ux.form.SuperBoxSelect
              * @param {SuperBoxSelect}
-                    *            this
+             *            this
              * @param {Mixed}
-                    *            value The new item's value
+             *            value The new item's value
              */
             'newitem',
 
@@ -70,9 +87,9 @@ Ext.ux.form.SuperBoxSelect = function(config) {
              * @event beforeremoveitem
              * @memberOf Ext.ux.form.SuperBoxSelect
              * @param {SuperBoxSelect}
-                    *            this
+             *            this
              * @param {Mixed}
-                    *            value The value of the item to be removed
+             *            value The value of the item to be removed
              */
             'beforeremoveitem',
 
@@ -82,11 +99,11 @@ Ext.ux.form.SuperBoxSelect = function(config) {
              * @event removeitem
              * @memberOf Ext.ux.form.SuperBoxSelect
              * @param {SuperBoxSelect}
-                    *            this
+             *            this
              * @param {Mixed}
-                    *            value The value of the item which was removed
+             *            value The value of the item which was removed
              * @param {Record}
-                    *            record The store record which was removed
+             *            record The store record which was removed
              */
             'removeitem',
             /**
@@ -95,7 +112,7 @@ Ext.ux.form.SuperBoxSelect = function(config) {
              * @event clear
              * @memberOf Ext.ux.form.SuperBoxSelect
              * @param {SuperBoxSelect}
-                    *            this
+             *            this
              */
             'clear');
 
@@ -1219,7 +1236,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
              * @methodOf Ext.ux.form.SuperBoxSelect
              * @name addItem
              * @param {Array}
-                    *            newItemObjects An Array of object literals containing
+             *            newItemObjects An Array of object literals containing
              *            the property names and values for an item. The
              *            property names must match those specified in
              *            {@link #Ext.ux.form.SuperBoxSelect-displayField},
@@ -1243,7 +1260,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
              * @methodOf Ext.ux.form.SuperBoxSelect
              * @name addItem
              * @param {Object}
-                    *            newItemObject An object literal containing the
+             *            newItemObject An object literal containing the
              *            property names and values for an item. The property
              *            names must match those specified in
              *            {@link #Ext.ux.form.SuperBoxSelect-displayField},
@@ -1475,7 +1492,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
              * @methodOf Ext.ux.form.SuperBoxSelect
              * @name setValue
              * @param {String|Array}
-                    *            value An array of item values, or a String value
+             *            value An array of item values, or a String value
              *            containing a delimited list of item values. (The list
              *            should be delimited with the
              *            {@link #Ext.ux.form.SuperBoxSelect-valueDelimiter)
@@ -1521,7 +1538,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
              * @methodOf Ext.ux.form.SuperBoxSelect
              * @name setValue
              * @param {Array}
-                    *            data An Array of item objects containing the
+             *            data An Array of item objects containing the
              *            {@link #Ext.ux.form.SuperBoxSelect-displayField},
              *            {@link #Ext.ux.form.SuperBoxSelect-valueField} and
              *            {@link #Ext.ux.form.SuperBoxSelect-classField}
@@ -1544,7 +1561,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
              * @methodOf Ext.ux.form.SuperBoxSelect
              * @name hasValue
              * @param {Mixed}
-                    *            val The value to test.
+             *            val The value to test.
              * @return {Boolean} true if the component has the selected value,
              *         false otherwise.
              */
