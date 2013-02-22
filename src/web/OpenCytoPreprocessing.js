@@ -69,22 +69,11 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             , listStudyVars     = []
             ;
 
+
         /////////////////////////////////////
         //             Strings             //
         /////////////////////////////////////
         var strngErrorContactWithLink = ' Please, contact the <a href="mailto:ldashevs@fhcrc.org?Subject=OpenCytoPreprocessing%20Support">developer</a>, if you have questions.'
-
-
-        /////////////////////////////////////
-        //            Close Tool           //
-        /////////////////////////////////////
-        var closeTool = [{
-            id: 'close',
-            handler: function(e, target, pnl){
-                var toRemove = document.getElementById( pnl.getId() ).parentNode.parentNode;
-                toRemove.parentNode.removeChild( toRemove );
-            }
-        }];
 
 
         ///////////////////////////////////
@@ -115,9 +104,9 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
         var strngSqlStartTable = 'SELECT DISTINCT FCSFiles.Name AS FileName';
         var strngSqlEndTable =
-            ' FROM FCSFiles' +
-            ' WHERE FCSFiles.Run.FCSFileCount != 0 AND FCSFiles.Run.ProtocolStep = \'Keywords\'' +
-            ' ORDER BY FileName';
+              ' FROM FCSFiles'
+            + ' WHERE FCSFiles.Run.FCSFileCount != 0 AND FCSFiles.Run.ProtocolStep = \'Keywords\''
+                ;
 
         var strFilteredTable = new LABKEY.ext.Store({
             listeners: {
@@ -135,7 +124,12 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 //                        displayColumn: 'myDisplayColumn',
 //                        nullCaption: '0'
 //                    },
+            remoteSort: false,
             schemaName: 'flow',
+            sortInfo: {
+                field: 'FileName',
+                direction: 'ASC'
+            },
             sql: strngSqlStartTable + strngSqlEndTable
         });
 
@@ -740,7 +734,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             layout: 'card',
             listeners: {
                 afterrender: function(){
-                    maskGlobal = new Ext.LoadMask( this.getEl(), {msgCls: 'x-mask-loading-custom'} );
+                    maskGlobal = new Ext.LoadMask( this.getEl(), { msgCls: 'x-mask-loading-custom' } );
                 }
             },
             tbar: new Ext.Toolbar({

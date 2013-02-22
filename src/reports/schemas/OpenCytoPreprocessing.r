@@ -40,10 +40,10 @@ if ( xmlPath != '' & sampleGroupName != '' ){
         suppressMessages(
             G <- parseWorkspace(
                   ws
-                , name   = sampleGroupName
-                , isNcdf = T
-                , path   = filesPath
-                , subset = filesArray
+                , name      = sampleGroupName
+                , isNcdf    = T
+                , path      = filesPath
+                , subset    = filesArray
             )
         );
 
