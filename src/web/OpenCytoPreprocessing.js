@@ -102,8 +102,8 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             sort: 'FileName'
         });
 
-        var strngSqlStartTable = 'SELECT DISTINCT FCSFiles.Name AS FileName';
-        var strngSqlEndTable =
+        var strngSqlStartTable = 'SELECT DISTINCT FCSFiles.Name AS FileName',
+            strngSqlEndTable =
               ' FROM FCSFiles'
             + ' WHERE FCSFiles.Run.FCSFileCount != 0 AND FCSFiles.Run.ProtocolStep = \'Keywords\''
                 ;

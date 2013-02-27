@@ -64,11 +64,12 @@ if ( xmlPath != '' & sampleGroupName != '' ){
                 , colSelect     = c('Name', allStudyVarsString) # needs to be a vector of comma separated strings
                 , colNameOpt    = 'fieldname'
                 , colFilter     = makeFilter( c("Name", "IN", filesString) )
+                , showHidden    = T
             );
-            colnames(meta)[1] <- 'name';
+            colnames(meta)[1]   <- 'name';
+            colnames(meta)[length(colnames(meta))] <- 'id';
 
             pData(G) <- meta;
-
         }
 
         suppressMessages( archive( G, gatingSetPath ) );
@@ -130,7 +131,7 @@ if ( xmlPath != '' & sampleGroupName != '' ){
             )[1,];
 
             if ( is.na(max_gsid) ){
-                max_gsid <- 0;
+                max_gsid <- 1;
             } else {
                 max_gsid <- max_gsid + 1;
             }
@@ -177,18 +178,20 @@ if ( xmlPath != '' & sampleGroupName != '' ){
                 , schemaName    = 'opencyto_preprocessing'
             );
 
-            toInsert <- data.frame(
-                  svname  = unlist( strsplit( studyVarsString, split=',' ) )
-                , gsid    = max_gsid
-            );
+            if ( studyVarsString != '' ){
+                toInsert <- data.frame(
+                      svname  = unlist( strsplit( studyVarsString, split=',' ) )
+                    , gsid    = max_gsid
+                );
 
-            labkey.insertRows(
-                  queryName     = 'study_vars'
-                , toInsert      = toInsert
-                , baseUrl       = labkey.url.base
-                , folderPath    = labkey.url.path
-                , schemaName    = 'opencyto_preprocessing'
-            );
+                labkey.insertRows(
+                      queryName     = 'study_vars'
+                    , toInsert      = toInsert
+                    , baseUrl       = labkey.url.base
+                    , folderPath    = labkey.url.path
+                    , schemaName    = 'opencyto_preprocessing'
+                );
+            }
 
             print( proc.time() - ptm );
 
