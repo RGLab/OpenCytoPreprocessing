@@ -1,0 +1,72 @@
+<!-- vim: ts=2:sw=2:nu:fdc=2:spell -->
+
+
+<!--<script type='text/javascript'>	LABKEY.requiresExt4ClientAPI(); </script>-->
+<script src='//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
+<script src='//ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js'></script>
+
+
+
+<script type='text/javascript'>
+
+    var initOpenCytoPreprocessing = function(){
+        var webPartDiv = <%=webpartContext%>.wrapperDivId;
+
+        var resizeModule;
+// REMOVE once issue #18 in OpenCytoVisualization is taken care of
+LABKEY.Query.getSchemas({
+    failure: onFailure,
+    success: function(schemasInfo){
+        if ( $.inArray( 'opencyto_preprocessing', schemasInfo.schemas ) >= 0 ){
+// END REMOVE
+
+        var OpenCytoPreprocessing = Ext4.create('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
+            webPartDivId: webPartDiv
+        });
+            
+        resizeModule = function(w, h){
+
+            LABKEY.Utils.resizeToViewport( OpenCytoPreprocessing, w, -1, null, null, -5 );
+
+            OpenCytoPreprocessing.resize();
+        };
+
+// REMOVE once issue #18 in OpenCytoVisualization is taken care of
+        } else {
+            var maskMsg =
+                'Seems like you have not enabled the OpenCytoPreprocessing module, click <a href="' +
+                LABKEY.ActionURL.buildURL('admin', 'folderManagement', LABKEY.ActionURL.getContainer(), { tabId: 'folderType' } ) +
+                '">here</a> to do so.';
+
+            var temp = new Ext.Panel({
+                border: false,
+                frame: false,
+                //height: 100,
+                height: 120,
+                layout: 'fit',
+                listeners: {
+                    afterrender: function(){
+                        this.getEl().mask( maskMsg, 'infoMask' );
+                    }
+                },
+                renderTo: webPartDiv
+            });
+
+            resizeModule = function(){
+                temp.getEl().mask( maskMsg, 'infoMask' );
+            };
+
+        }
+// EXCLUDE FROM REMOVE START
+        Ext4.EventManager.onWindowResize( resizeModule );
+        //Ext4.EventManager.fireWindowResize();
+// EXCLUDE FROM REMOVE END
+    }
+});
+// END REMOVE
+
+    }
+
+    Ext4.onReady( initOpenCytoPreprocessing );
+
+</script>

@@ -1,0 +1,4 @@
+<webpart title="Flow Layout Test" xmlns="http://labkey.org/data/xml/webpart">
+	<view name="flowLayoutTest"/>
+</webpart>
+
