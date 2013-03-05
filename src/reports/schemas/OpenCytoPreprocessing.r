@@ -47,14 +47,12 @@ if ( xmlPath != '' & sampleGroupName != '' ){
             )
         );
 
-        # need a flag specifying whether meta data is there or not!
-
         print( proc.time() - ptm );
 
         print('FETCHING METADATA ETC.');
         ptm <- proc.time();
 
-        if ( allStudyVarsString != '' ){
+        #if ( allStudyVarsString != '' ){
 
             meta <- labkey.selectRows(
                   baseUrl       = labkey.url.base
@@ -66,19 +64,24 @@ if ( xmlPath != '' & sampleGroupName != '' ){
                 , colFilter     = makeFilter( c("Name", "IN", filesString) )
                 , showHidden    = T
             );
-            colnames(meta)[1]   <- 'name';
-            colnames(meta)[length(colnames(meta))] <- 'id';
+            colnames(meta)[ which( colnames(meta) == 'Name' ) ]     <- 'name';
+            colnames(meta)[ which( colnames(meta) == 'RowId' ) ]    <- 'id';
 
             pData(G) <- meta;
-        }
+       #}
 
         suppressMessages( archive( G, gatingSetPath ) );
+        txt <- 'hopefully generated the *.tar file';
+    } else {
+        txt <- 'file already exists';
+	suppressMessages( G <- unarchive( gatingSetPath ) );
+    }
+
         if ( ! file.exists( gatingSetPath ) ) {
             txt <- 'BAD ERROR: PROBABLY R COULD NOT CREATE THE TAR FILE BECAUSE THERE WAS NOT ENOUGH MEMORY AVAILABLE';
             stop('BAD ERROR: PROBABLY R COULD NOT CREATE THE TAR FILE BECAUSE THERE WAS NOT ENOUGH MEMORY AVAILABLE');
             return;
         } else {
-
             writeProjections <- function( G, gsId, ... ){
                 gh <- G[[1]];
                 popNames <- getNodes( gh, isPath = T );
@@ -123,7 +126,7 @@ if ( xmlPath != '' & sampleGroupName != '' ){
 
             max_gsid <- labkey.executeSql(
                   sql           = sql
-                , showHidden    = TRUE
+                , showHidden    = T
                 , colNameOpt    = 'caption'
                 , baseUrl       = labkey.url.base
                 , folderPath    = labkey.url.path
@@ -195,11 +198,8 @@ if ( xmlPath != '' & sampleGroupName != '' ){
 
             print( proc.time() - ptm );
 
-            txt <- 'hopefully generated the *.tar file and wrote to the db!';
+            txt <- paste( txt, ' and wrote to the db!' );
         }
-    } else {
-        txt <- 'file already exists';
-    }
 
 } else {
     txt <- 'empty path or sample group';

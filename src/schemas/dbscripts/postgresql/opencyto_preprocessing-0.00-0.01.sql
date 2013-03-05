@@ -24,10 +24,10 @@ CREATE TABLE opencyto_preprocessing.projections
     gsId                 INT NOT NULL,
 
 --     CONSTRAINT UQ_table UNIQUE (Container, <cols-list>), -- cols combination to make unique to the project
-    CONSTRAINT PK_projections PRIMARY KEY (Container, name, x_axis, y_axis, gsId),
-    CONSTRAINT FK_projections_gsTbl FOREIGN KEY (gsId, Container)
-      REFERENCES opencyto_preprocessing.gsTbl (gsId, Container)
-      ON DELETE CASCADE
+      CONSTRAINT PK_projections PRIMARY KEY (Container, name, x_axis, y_axis, gsId)
+    , CONSTRAINT FK_projections_gsTbl FOREIGN KEY (gsId, Container)
+        REFERENCES opencyto_preprocessing.gsTbl (gsId, Container)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE opencyto_preprocessing.study_vars
@@ -37,8 +37,8 @@ CREATE TABLE opencyto_preprocessing.study_vars
     svName        TEXT NOT NULL,
     gsId           INT NOT NULL,
 
-    CONSTRAINT PK_study_vars PRIMARY KEY (svId, Container),
-    CONSTRAINT FK_study_vars_gsTbl FOREIGN KEY (gsId, Container)
-      REFERENCES opencyto_preprocessing.gsTbl (gsId, Container)
-      ON DELETE CASCADE
+      CONSTRAINT PK_study_vars PRIMARY KEY (svId, Container)
+    , CONSTRAINT FK_study_vars_gsTbl FOREIGN KEY (gsId, Container)
+        REFERENCES opencyto_preprocessing.gsTbl (gsId, Container)
+        ON DELETE CASCADE
 );
