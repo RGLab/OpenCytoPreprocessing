@@ -7,21 +7,32 @@
         <dependency path='clientapi/ext4/data/Proxy.js'/>
         <dependency path='clientapi/ext4/data/Store.js'/>
         <dependency path='ux/CheckCombo/CheckCombo.js'/>  
-        <dependency path='ux/CheckCombo/CheckCombo.css'/>        
-        <dependency path='Ext.ux.form.LovCombo.css'/>
-        <dependency path='OpenCyto/OpenCyto.css'/>
-        <dependency path='OpenCyto/jQuery/css/base/jquery-ui.css'/>
-        <dependency path='OpenCyto/SuperBoxSelect/superboxselect-gray-extend.css'/>
-        <dependency path='OpenCyto/ExtJS4ResizableCombo.js'/>
-        <dependency path='OpenCyto/ExtJS4ClearableComboBox.js'/>
-        <dependency path='Ext.ux.form.LovCombo.js'/>
-        <dependency path='OpenCyto/ExtendedLovCombo.js'/>
-        <dependency path='OpenCyto/SuperBoxSelect/ExtJS4SuperBoxSelect.js'/>
-        <dependency path='OpenCyto/GridPanelHeaderResize.js'/>
-        <dependency path='OpenCyto/CheckBoxMemory.js'/>
-        <!--<dependency path='OpenCyto/ColumnModelChromePatch.js'/>-->
-        <dependency path='OpenCyto/ExtJS4OpenCyto.js'/>
+        <dependency path='ux/CheckCombo/CheckCombo.css'/>  
+        <dependency path='/OpenCyto/ux/CheckCombo/CheckCombo.js'/>
+        <dependency path='/OpenCyto/ux/CheckCombo/CheckCombo.css'/>        
+        <dependency path='ux/BoxSelect/BoxSelect.js'/>  
+        <dependency path='ux/BoxSelect/BoxSelect.css'/>
+        <!--dependency path='/OpenCyto/ux/BoxSelect/BoxSelect.css'/>        
+        <dependency path='/OpenCyto/ux/BoxSelect/BoxSelect.js'/-->        
+        <!--dependency path='Ext.ux.form.LovCombo.css'/-->
 
+        <dependency path='OpenCyto/jQuery/css/base/jquery-ui.css'/>
+        <!--dependency path='OpenCyto/SuperBoxSelect/superboxselect-gray-extend.css'/-->
+        <!--dependency path='OpenCyto/ExtJS4ResizableCombo.js'/>
+        <dependency path='OpenCyto/ExtJS4ClearableComboBox.js'/-->
+        <!--dependency path='Ext.ux.form.LovCombo.js'/>
+        <dependency path='OpenCyto/ExtendedLovCombo.js'/>
+        <dependency path='OpenCyto/SuperBoxSelect/ExtJS4SuperBoxSelect.js'/-->
+        <!--dependency path='/OpenCyto/ux/ComboFieldBox/ComboFieldBox.css'/>
+        <dependency path='/OpenCyto/ux/ComboFieldBox/ComboFieldBox.js'/>
+        <dependency path='/OpenCyto/ux/ComboFieldBox/ComboView.js'/-->        
+        <!--dependency path='OpenCyto/GridPanelHeaderResize.js'/-->
+        <!--dependency path='OpenCyto/CheckBoxMemory.js'/-->
+        <!--<dependency path='OpenCyto/ColumnModelChromePatch.js'/>-->
+        <dependency path='OpenCyto/ExtJS4ClearableComboBox.js'/>        
+        <dependency path='/OpenCyto/ux/ColumnAutoWidthPlugin.js'/>         
+        <dependency path='OpenCyto/ExtJS4OpenCyto.js'/>
+        <dependency path='OpenCyto/ExtJS4OpenCyto.css'/>
         <dependency path='ExtJS4OpenCytoPreprocessing.js'/>
     </dependencies>
 </view>

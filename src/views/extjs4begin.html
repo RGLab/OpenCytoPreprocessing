@@ -5,8 +5,6 @@
 <script src='//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
 <script src='//ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js'></script>
 
-
-
 <script type='text/javascript'>
 
     var initOpenCytoPreprocessing = function(){
@@ -21,7 +19,9 @@ LABKEY.Query.getSchemas({
 // END REMOVE
 
         var OpenCytoPreprocessing = Ext4.create('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
-            webPartDivId: webPartDiv
+            webPartDivId: webPartDiv,
+            //id: 'OpenCytoPreprocessing',
+            cls: 'open-cyto'
         });
             
         resizeModule = function(w, h){

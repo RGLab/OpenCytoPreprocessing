@@ -15,6 +15,7 @@
  *  limitations under the License.
  */
 
+/*
 // --- A ComboBox with a secondary trigger button that clears the contents of the ComboBox
 
 Ext4.define('Ext.form.ExtJS4ClearableComboBox', {
@@ -32,6 +33,7 @@ Ext4.define('Ext.form.ExtJS4ClearableComboBox', {
     },
     onTrigger2Click : function()
     {
+        console.log("clearing ClearableComboBox");
         this.collapse();
         this.reset();                       // clear contents of combobox
         this.fireEvent('cleared');          // send notification that contents have been cleared
@@ -43,3 +45,102 @@ Ext4.define('Ext.form.ExtJS4ClearableComboBox', {
     trigger1Class:      Ext.ux.ExtJS4ResizableCombo.prototype.triggerClass
 });
 //Ext4.reg('clearcombo', Ext.form.ExtJS4ClearableComboBox);
+*/
+
+/**
+From: http://stackoverflow.com/questions/13830537/extjs4-add-an-empty-option-in-a-combobox
+*/
+Ext4.define('Ext4.ux.form.field.ClearableComboBox', {
+    extend: 'Ext.form.field.ComboBox',
+    alias: 'widget.clearcombo',
+
+    trigger2Cls: 'x4-form-clear-trigger',
+
+    initComponent: function () {
+        var me = this;
+
+
+        me.addEvents(
+            /**
+            * @event beforeclear
+            *
+            * @param {FilterCombo} FilterCombo The filtercombo that triggered the event
+            */
+            'beforeclear',
+            /**
+            * @event beforeclear
+            *
+            * @param {FilterCombo} FilterCombo The filtercombo that triggered the event
+            */
+            'clear'
+        );
+
+        me.callParent(arguments);
+
+        me.on('specialkey', this.onSpecialKeyDown, me);
+        me.on('select', function (me, rec) {
+            me.onShowClearTrigger(true); 
+        }, me);
+        me.on('afterrender', function () { me.onShowClearTrigger(false); }, me);
+    },
+
+    /**
+    * @private onSpecialKeyDown
+    * eventhandler for special keys
+    */
+    onSpecialKeyDown: function (obj, e, opt) {
+        if ( e.getKey() == e.ESC )
+        {
+            this.clear();
+        }
+    },
+
+    onShowClearTrigger: function (show) {
+        var me = this;
+
+        if (show) {
+            me.triggerEl.each(function (el, c, i) {
+                if (i === 1) {
+                    el.setWidth(el.originWidth, false);
+                    el.setVisible(true);
+                    me.active = true;
+                }
+            });
+        } else {
+            me.triggerEl.each(function (el, c, i) {
+                if (i === 1) {
+                    el.originWidth = el.getWidth();
+                    el.setWidth(0, false);
+                    el.setVisible(false);
+                    me.active = false;
+                }
+            });
+        }
+        // ToDo -> Version specific methods
+        if (Ext4.lastRegisteredVersion.shortVersion > 407) {
+            me.updateLayout();
+        } else {
+            me.updateEditState();
+        }
+    },
+
+    /**
+    * @override onTrigger2Click
+    * eventhandler
+    */
+    onTrigger2Click: function (args) {
+        this.clear();
+    },
+
+    /**
+    * @private clear
+    * clears the current search
+    */
+    clear: function () {
+        var me = this;
+        me.fireEvent('beforeclear', me);
+        me.clearValue();
+        me.onShowClearTrigger(false);
+        me.fireEvent('clear', me);
+    }
+});

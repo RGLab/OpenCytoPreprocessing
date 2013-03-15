@@ -1,0 +1,4 @@
+<webpart title="ComboBox Tests" xmlns="http://labkey.org/data/xml/webpart">
+	<view name="comboTest"/>
+</webpart>
+

@@ -24,7 +24,7 @@ function removeByClass(className) {
 };
 
 function captureEvents(observable) {
-    Ext.util.Observable.capture(
+    Ext4.util.Observable.capture(
         observable,
         function(eventName) {
             console.info(eventName);
@@ -37,19 +37,19 @@ function onFailure(errorInfo, options, responseObj){
     var strngErrorContact = ' Please, contact ldashevs@fhcrc.org, if you have questions.';
 
     if (errorInfo && errorInfo.exception)
-        Ext.Msg.alert('Error', 'Failure: ' + errorInfo.exception + strngErrorContact);
+        Ext4.Msg.alert('Error', 'Failure: ' + errorInfo.exception + strngErrorContact);
     else {
         if ( responseObj != undefined ){
-            Ext.Msg.alert('Error', 'Failure: ' + responseObj.statusText + strngErrorContact);
+            Ext4.Msg.alert('Error', 'Failure: ' + responseObj.statusText + strngErrorContact);
         } else {
-            Ext.Msg.alert('Error', 'Failure: ' + errorInfo.statusText + (errorInfo.timedout==true?', timed out.':'') + strngErrorContact);
+            Ext4.Msg.alert('Error', 'Failure: ' + errorInfo.statusText + (errorInfo.timedout==true?', timed out.':'') + strngErrorContact);
         }
     }
 };
 
 Ext4.Ajax.timeout = 60 * 60 * 1000; // override the timeout to be 60 mintues; value is in milliseconds
 
-Ext.QuickTips.init();
+Ext4.QuickTips.init();
 
 // IE 7 compatibility
 Object.keys = Object.keys || (function () {
@@ -67,7 +67,7 @@ Object.keys = Object.keys || (function () {
             DontEnumsLength = DontEnums.length;
 
     return function (o) {
-        if (typeof o != "object" && typeof o != "function" || o === null)
+        if (((typeof o != "object") && (typeof o != "function")) || (o === null))
             throw new TypeError("Object.keys called on a non-object");
 
         var result = [];
@@ -88,10 +88,12 @@ Object.keys = Object.keys || (function () {
 })();
 
 // Search in the middle of words / case insensitive
-Ext.override (Ext.ux.form.SuperBoxSelect, {
+//Ext4.override (Ext.ux.form.SuperBoxSelect, {
+/*
+Ext4.override (Ext4.ux.form.field.BoxSelect203, {        
+//Ext4.override (Ext4.ux.form.field.BoxSelect, {    
     anyMatch: true,
     caseSensitive: false,
-
     //override doQuery function
     doQuery : function(q, forceAll){
 
@@ -115,7 +117,7 @@ Ext.override (Ext.ux.form.SuperBoxSelect, {
         if(forceAll === true || (q.length >= this.minChars)){
             if(this.lastQuery !== q){
                 this.lastQuery = q;
-                if(this.mode == 'local'){
+                if(this.queryMode == 'local'){
                     this.selectedIndex = -1;
                     if(forceAll){
                         this.store.clearFilter();
@@ -141,7 +143,7 @@ Ext.override (Ext.ux.form.SuperBoxSelect, {
         for (var i = 0; i < nodes.length; i++) {
             var n = nodes[i];
             var d = this.view.getRecord(n).data;
-            var re = new RegExp('(.*?)(' + '' + Ext.escapeRe(this.getRawValue()) + ')(.*)', this.caseSensitive ? '' : 'i');
+            var re = new RegExp('(.*?)(' + '' + Ext4.String.escapeRegex(this.getRawValue()) + ')(.*)', this.caseSensitive ? '' : 'i');
             var h = d[this.displayField];
 
             h=h.replace(re, '$1<span class="mark-combo-match">$2</span>$3');
@@ -150,16 +152,20 @@ Ext.override (Ext.ux.form.SuperBoxSelect, {
     }
 });
 
+*/
 
 /*
  * Override to set Tab titles centered (can do any other customizations here)
  */
-Ext.TabPanel.override({
+
+Ext4.override (Ext4.TabPanel, {   
+//Ext4.TabPanel.override({
 
     tabStripInnerStyle : 'text-align: center;',
 
     onRender : function(ct, position){
-        Ext.TabPanel.superclass.onRender.call(this, ct, position);
+        //Ext.TabPanel.superclass.onRender.call(this, ct, position);
+        this.callParent(ct, position);        
 
         if(this.plain){
             var pos = this.tabPosition == 'top' ? 'header' : 'footer';
@@ -183,7 +189,7 @@ Ext.TabPanel.override({
 
 
         if(!this.itemTpl){
-            var tt = new Ext.Template(
+            var tt = new Ext4.Template(
                     '<li class="{cls}" id="{id}"><a class="x-tab-strip-close"></a>',
                     '<a class="x-tab-right" href="#"><em class="x-tab-left">',
                     '<span style="{tabStripInnerStyle}" class="x-tab-strip-inner"><span class="x-tab-strip-text {iconCls}">{text}</span></span>',
@@ -191,7 +197,7 @@ Ext.TabPanel.override({
             );
             tt.disableFormats = true;
             tt.compile();
-            Ext.TabPanel.prototype.itemTpl = tt;
+            Ext.tab.Panel.addMembers({itemTpl:  tt});
         }
 
         this.items.each(this.initTab, this);
@@ -205,7 +211,7 @@ Ext.TabPanel.override({
                         this.itemTpl.insertBefore(before, p) :
                         this.itemTpl.append(this.strip, p),
                 cls = 'x-tab-strip-over',
-                tabEl = Ext.get(el);
+                tabEl = Ext4.get(el);
 
         tabEl.hover(function(){
             if(!item.disabled){
@@ -266,8 +272,31 @@ if(!Array.prototype.indexOf) {
 
 
 // ? First column non-moveable
-Ext.override(Ext.grid.HeaderDragZone, {
+
+Ext4.override(Ext4.grid.header.DragZone, {
     getDragData: function (e) {
+        var header = e.getTarget('.'+this.colHeaderCls),
+            headerCmp,
+            ddel;
+
+        if (header) {
+            headerCmp = Ext4.getCmp(header.id);
+            if (!this.headerCt.dragging && headerCmp.draggable && !(headerCmp.isOnLeftEdge(e) || headerCmp.isOnRightEdge(e))) {
+                ddel = document.createElement('div');
+                ddel.innerHTML = Ext4.getCmp(header.id).text;
+                return {
+                    ddel: ddel,
+                    header: headerCmp
+                };
+            }
+        }
+        return false;
+        
+
+    }
+});
+
+        /*
         var t = Ext.lib.Event.getTarget(e);
         var h = this.view.findHeaderCell(t);
         if (h && (this.grid.colModel.config[this.view.getCellIndex(h)].dragable !== false)) {
@@ -277,9 +306,12 @@ Ext.override(Ext.grid.HeaderDragZone, {
             };
         }
         return false;
-    }
-});
+        */
+       
+       
 // ? //
+/* Haven't found an equivalent for this in Ext JS4...
+
 Ext.CustomColumnModel = Ext.extend(Ext.grid.ColumnModel, {
     moveColumn: function (oldIndex, newIndex) {
         if (oldIndex == 0 || newIndex == 0) {
@@ -294,8 +326,8 @@ Ext.CustomColumnModel = Ext.extend(Ext.grid.ColumnModel, {
         }
     }
 });
-
-// Empty item in a ComboBox should now appear full heigh with this fix
+*/
+// Empty item in a ComboBox should now appear full height with this fix
 /*Ext.override (Ext.form.ComboBox, {
  initList : (function() {
  if (!this.tpl) {

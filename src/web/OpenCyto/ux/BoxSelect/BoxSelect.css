@@ -1,0 +1,82 @@
+/* 
+.x4-boundlist-item img.chkCombo {
+    background: transparent url(../../..ext4.1.0/resources/themes/images/default/menu/unchecked.gif);
+}
+.x4-boundlist-selected img.chkCombo{
+    background: transparent url(../../../ext-4.1.0/resources/themes/images/default/menu/checked.gif);
+}
+ */
+/*  Above two are dude's suggestion at Stack Overflow for showing checkboxes.  Doesn't seem to work:  */
+.x-boxselect.x4-form-text.x4-form-field {
+    height: auto;
+	cursor: text;
+    padding: 0;
+    overflow-y: auto;
+}
+.x-boxselect ul.x-boxselect-list {
+    padding: 1px 3px;
+}
+ul.x-boxselect-list.x-boxselect-singleselect {
+    white-space: nowrap;
+    overflow: hidden;
+}
+.x-boxselect-input, .x-boxselect-item {
+	display: inline-block;
+	position: relative;
+	*display:inline; /* IE7 */
+	zoom:1; /* IE */
+}
+.x-boxselect-input input, .x-boxselect-input div {
+	border: none;
+	background: none;
+	line-height: 18px !important;
+	height: 20px;
+	width: 100%;
+}
+.x-boxselect-emptyinput {
+    display: none;
+}
+.x-boxselect-stacked .x-boxselect-item {
+	display: block;
+}
+.x-boxselect-item {
+	-moz-border-radius: 6px; -webkit-border-radius: 6px; border-radius: 6px; o-border-radius: 6px; khtml-border-radius: 6px; border: 1px solid #CAD8F3;
+	padding: 0px 1px 0px 5px !important;
+	margin: 1px 1px 1px 0 !important;
+	/*background-color: #DEE7F8;*/
+	/*background-color: transparent;*/
+	cursor: default;
+}
+
+.x4-field:not(.x4-item-disabled) .x-boxselect-item:hover {
+	background: #BBCEF1;
+	border: 1px solid #6D95E0;
+}
+.x4-field:not(.x4-item-disabled) .x-boxselect-item.selected {
+	border: 1px solid #316AD3 !important;
+	background: #658FDC !important;
+}
+
+.x-boxselect-item-text {
+	line-height: 16px;
+	padding-right: 20px !important;
+}
+.x-boxselect-item-close {
+	cursor: pointer;
+}
+.x-boxselect-hideselections .x-boundlist-selected {
+    display: none;
+}
+/* Why did I have to bring this in my ext-all.css? */
+.x-tab-close-btn {
+    background: url("../../../ext-4.1.0/resources/themes/images/default/tab/tab-default-close.gif") no-repeat scroll 0 0 transparent;
+    font-size: 0;
+    height: 11px;
+    line-height: 0;
+    opacity: 0.6;
+    position: absolute;
+    right: 2px;
+    text-indent: -999px;
+    top: 2px;
+    width: 11px;
+}

@@ -1,53 +1,23 @@
-<div id="my-target"></div>
-
+<span id="my-target1"></span>
+<HR>
+<span id="my-target2"></span>
+<HR>
+<div id="my-target3"></div>
+<HR>
+<div id="my-target4"></div>
+<HR>
+<div id="my-target5"></div>
+<HR>
+<div id="my-target6"></div>
+<HR>
+<div id="my-target7"></div>
+<HR>
+<div id="my-target8"></div>
+<HR>
+<div id="my-target9"></div>
+<HR>
 <script type='text/javascript'>
-LABKEY.requiresExt4Sandbox(true);
-</script>
 
-<script type='text/javascript'>
-
-function init() {
-
-
-var numbers = Ext4.create('Ext.data.Store', {
-    fields: ['name', 'digit'],
-    data : [
-        {"name": "One", "digit": "1"},
-        {"name": "Two", "digit": "2"},
-        {"name": "Uno", "digit": "1"}
-    ]
-});
-
-
-var myCombo = Ext4.create('Ext.form.ComboBox', {
-    fieldLabel: 'Choose Name',
-    store: numbers,
-    queryMode: 'local',
-    displayField: 'name',
-    valueField: 'digit'
-});
-
-var result = Ext4.create('Ext.form.field.Text', {
-   fieldLabel: 'Number',
-   value: 'Nothing yet'
-});
-
-Ext4.create('Ext.form.Panel', {
-    title: 'Names of Numbers',
-    width: 300,
-    height: 150,
-    bodyPadding: 10,
-    renderTo: 'my-target',
-    items: [myCombo, result]
-});
-
-
-myCombo.on('select', function(combo, records, eOpts){
-   result.setValue(records[0].data.digit);
-});
-
-}
-
-Ext4.onReady(init);
-
+    Ext4.onReady(init);
+    
 </script>

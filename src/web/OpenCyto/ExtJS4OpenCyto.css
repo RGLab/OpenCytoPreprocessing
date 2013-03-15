@@ -35,12 +35,12 @@ pre {
 }
 
 /* Centered text */
-.centered-text, .bold-centered-text, .sortable-list li, .x-grid3-hd-row {
+.centered-text, .bold-centered-text, .sortable-list li, .x-grid4-hd-row {
     text-align: center !important;
 }
 
 /* Bold text */
-.bold-text, .bold-centered-text, .sortable-list li, .infoMask div, .x-mask-loading-custom div, .ux-lovcombo-list-item-all {
+.bold-text, .bold-centered-text, .sortable-list li, .infoMask div, .x4-mask-loading-custom div, .ux-lovcombo-list-item-all {
     font-weight: bold;
 }
 
@@ -49,17 +49,17 @@ pre {
     margin: auto;
 }
 
-.x-btn {
+.x4-btn {
     margin-right: 0px !important;
 }
 
 /* Zero margin */
-.x-tab-strip, .sortable-list, .ulList {
+.x4-tab-strip, .sortable-list, .ulList {
     margin: 0;
 }
 
 /* Zero padding */
-.x-tab-panel-header, .sortable-list, .ulList {
+.x4-tab-panel-header, .sortable-list, .ulList {
     padding: 0;
 }
 
@@ -69,15 +69,160 @@ pre {
     visibility: hidden;
 }
 
+
 .simple-panel-header {
-    background-color: white;
+    background-color: white !important;
     border-bottom-width: 0px !important;
     font-family: verdana, arial, helvetica, sans-serif;
     padding-bottom: 3px;
     padding-left: 0px;
 }
 
-.x-mask-loading-custom {
+/* Change colors of Panels and Panel Headers from their dark originals */
+
+div.x4-reset div.open-cyto.x4-panel {
+	background-image: url(white_85_trans.png);	
+}
+
+div.x4-reset div.open-cyto.x4-panel  div.x4-panel-header.x4-panel-header-default {
+		background-image: url(white_85_trans.png);
+}
+
+div.x4-reset div.open-cyto.x4-panel div.x4-panel-header.x4-panel-header-default.x4-panel-header-default-top {
+		box-shadow: none;		
+}
+
+div.x4-reset div.open-cyto.x4-panel div.open-cyto-fcs-table.x4-panel.x4-grid div.x4-panel-header.x4-panel-header-default {
+		background-image: url(white_85_trans.png);
+}
+
+div.x4-reset div.open-cyto.x4-panel div.open-cyto-fcs-table.x4-panel.x4-grid div.x4-panel-header.x4-panel-header-default.x4-panel-header-default-top {
+		box-shadow: none;		
+}
+
+/* Add bottom border to toolbar */
+div.x4-reset div.open-cyto.x4-panel div.x4-docked-top {
+    border-bottom-width: 1px !important;
+}
+
+/* Attempt to clip background image of toolbar to something less thn its default length. */
+div.x4-reset div.open-cyto.x4-panel div.x4-toolbar.x4-docked {
+  background-clip: content-box;  
+  -moz-box-sizing: content-box;
+}
+
+
+div.x4-reset div.open-cyto.x4-panel .x4-panel-header-horizontal {
+    /* padding: 3px 5px 4px; */
+    padding: 3px 0px 0px;    
+}
+
+/*
+div.x4-reset div.open-cyto.x4-panel .shaded-panel>div.x4-panel-header>div.x4-panel-header-body {
+	
+    background-color: WhiteSmoke;
+    background-image: none;
+    border-color: WhiteSmoke;
+    box-shadow: 0px 1px 0px 0px WhiteSmoke inset;
+    	
+    background-image: url(white_85_trans.png);
+     
+}
+
+div.x4-reset div.open-cyto.x4-panel .x4-panel-header, div.x4-reset div.open-cyto.x4-panel .x4-panel-header-body
+{
+    
+    background-color: white;
+    background-image: none;
+    border-color: WhiteSmoke;
+    box-shadow: 0px 1px 0px 0px white inset;
+    
+    background-image: url(white_85_trans.png); 
+    
+    color: black !important;
+    border-bottom-width: 0px !important;
+    font-family: verdana, arial, helvetica, sans-serif;
+    padding-bottom: 3px;
+    padding-left: 0px;
+    z-index: 1;
+}
+*/
+div.x4-reset div.open-cyto.x4-panel div.x4-panel.shaded-panel {
+		background-image: url(white_85_trans.png);
+}
+
+
+
+/* Make the header fonts bigger. Unfortunately when setting a value for the font-size,
+ * the calculated size of the header text is not
+ * increased so that a long title will not be given enough space to render. 
+ * So we increase the font-size indirectly by changing the header's UI style to the built-in
+ * type 'default-larger' during component construction.
+ * */
+
+div.x4-reset div.open-cyto .x4-panel-header-text-default-large {
+	/* font-size: 120%; */
+	font-weight: bold !important;
+}
+
+
+/* Make panel text black */
+div.x4-reset div.open-cyto .x4-panel-header-text-default, div.x4-reset div.open-cyto .x4-panel-header-text-default-large  { 
+    color: black !important;
+}
+
+
+/* Clear Gray border above ComboBoxes. */
+div.x4-reset div.open-cyto.x4-panel .x4-panel-body-default {
+	border-color: white;
+}
+
+/* Maintain Gray border around FCS Grid */
+div.x4-reset div.open-cyto.x4-panel div.open-cyto-fcs-table.x4-panel div.x4-panel-header {
+	border-color: grey;
+	/* Omit LabKey's default box-shadow color */
+	box-shadow: 'inset 0px 1px 0px 0px';
+}
+
+div.x4-reset div.open-cyto.x4-panel div.open-cyto-fcs-table.x4-panel div.x4-panel-header.x4-panel-header-default-top {
+	/* Omit LabKey's default box-shadow color */
+	box-shadow: 'inset 0px 1px 0px 0px';
+}
+
+.x4-reset div.open-cyto.x4-panel .x4-toolbar-default {
+	background-image: url(white_85_trans.png);
+}
+
+.x4-reset open-cyto.x4-panel .x4-panel-header-default-top {
+	/* Omit LabKey's default box-shadow color */
+    box-shadow: 0 1px 0 0 inset !important;
+}
+
+/*
+ * Create a border around FCS Files Grid
+ */
+div.x4-reset div.open-cyto.x4-panel div.open-cyto-fcs-table.x4-panel.x4-grid {
+	border-color: grey;	
+	border-width: 1px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+}
+
+
+div.open-cyto.x4-panel div.open-cyto-fcs-table.x4-panel.x4-grid div.x4-panel-body.x4-grid-body.x4-panel-body-default {
+	border-color: grey;
+}
+
+/*
+ * Increase height of grid column headers to match height of checkbox column.
+ */
+div.open-cyto-fcs-header.x4-column-header>div.x4-column-header-inner  {
+	line-height: 18px !important;
+}
+
+.x4-mask-loading-custom {
     border-left: 0px;
     left: 0 !important;
     margin-left: 0px;
@@ -86,10 +231,10 @@ pre {
     z-index: 9000;
 }
 
-.x-mask-loading-custom div {
+.x4-mask-loading-custom div {
     background: no-repeat 5px 5px;
     background-color: white !important;
-    background-image: url(../ext-3.4.0/resources/images/default/grid/loading.gif) !important;
+    background-image: url(../ext-4.1.0/resources/themes/images/default/grid/loading.gif) !important;
     /*line-height:16px;*/
     padding: 5px 10px 5px 25px;
     text-align: center;
@@ -106,11 +251,11 @@ pre {
     text-align: center;
 }
 
-ul.x-tab-strip-top {
+ul.x4-tab-strip-top {
     padding-top: 0px;
 }
 
-.x-box-inner {
+.x4-box-inner {
     /*margin-top: 2px;*/
 }
 
@@ -147,11 +292,11 @@ ul.x-tab-strip-top {
 /**********************************/
 
 /* Ext TabPanel fixes */
-.x-tab-strip {
+.x4-tab-strip {
     padding-left: 5px;
 }
 
-.x-tab-right {
+.x4-tab-right {
     border-bottom-width: 0px !important;
 }
 /********************************/
@@ -164,61 +309,70 @@ ul.x-tab-strip-top {
 
 /* ExtJS GridPanel */
 /* Override standard grid styles (add color to vertical grid lines) */
-.x-grid3-col {
+.x-grid4-col {
     border-left:  1px solid #EEEEEE;
     border-right: 1px solid #D2D2D2;
 }
 
 /* Also remove padding from table data (to compensate for added grid lines) */
-.x-grid3-row td, .x-grid3-summary-row td {
+.x-grid4-row td, .x-grid4-summary-row td {
     padding-left: 0px;
     padding-right: 0px;
 }
 
-.x-grid3-header-offset {
+.x-grid4-header-offset {
     width: auto !important;
 }
 
 /* ? */
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
-    .x-grid3-cell {
+    .x-grid4-cell {
         box-sizing: border-box;
     }
 }
 /*************************************/
 
 /* Fix so that the buttons on toolbars look normal (not text) */
-.x-toolbar .x-btn-tl,.x-toolbar .x-btn-tr,.x-toolbar .x-btn-tc,.x-toolbar .x-btn-ml,.x-toolbar .x-btn-mr,.x-toolbar .x-btn-mc,.x-toolbar .x-btn-bl,.x-toolbar .x-btn-br,.x-toolbar .x-btn-bc {
-    background-image:url(../gtheme/img/lkbtn.gif);
+.x4-toolbar .x4-btn-tl,.x4-toolbar .x4-btn-tr,.x4-toolbar .x4-btn-tc,.x4-toolbar .x4-btn-ml,.x4-toolbar .x4-btn-mr,.x4-toolbar .x4-btn-mc,.x4-toolbar .x4-btn-bl,.x4-toolbar .x4-btn-br,.x4-toolbar .x4-btn-bc {
+    background-image:url(../gtheme/img/lkbtn.gif) ;
+}
+/* Fix so that the buttons on toolbars look normal (not text) - Really, for Ext JS 4*/
+div.x4-reset div.open-cyto.x4-panel div.x4-toolbar div.x4-btn  {
+	border-width: 1px;
+	border-style: solid;
+	padding: 0px 2px 0px 2px;
+	margin: 0px 2px 0px 2px;					
+	border-color: grey;
 }
 
-.x-toolbar .x-btn-tl{
+.x4-toolbar .x4-btn-tl{
     background-position: 0 0;
 }
-.x-toolbar .x-btn-tr{
+.x4-toolbar .x4-btn-tr{
     background-position: -3px 0;
 }
-.x-toolbar .x-btn-tc{
+.x4-toolbar .x4-btn-tc{
     background-position: 0 -6px;
 }
 
-.x-toolbar .x-btn-ml{
+.x4-toolbar .x4-btn-ml{
     background-position: 0px -24px;
 }
-.x-toolbar .x-btn-mr{
+.x4-toolbar .x4-btn-mr{
     background-position: -3px -24px;
 }
 
-.x-toolbar .x-btn-mc{
+.x4-toolbar .x4-btn-mc{
     background-position: 0 -1096px;
 }
-.x-toolbar .x-btn-bl{
+.x4-toolbar .x4-btn-bl{
     background-position: 0 -3px;
 }
-.x-toolbar .x-btn-br{
+.x4-toolbar .x4-btn-br{
     background-position: -3px -3px;
 }
-.x-toolbar .x-btn-bc{
+.x4-toolbar .x4-btn-bc{
     background-position: 0 -15px;
 }
+
 /**********************************/

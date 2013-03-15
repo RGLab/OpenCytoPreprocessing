@@ -1,4 +1,5 @@
 // vim: sw=4:ts=4:nu:nospell:fdc=4
+/* jslint vars: true */
 /*
  * Copyright 2012 Fred Hutchinson Cancer Research Center
  * 
@@ -37,7 +38,8 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 
 	initComponent : function() {
 		var me = this;
-
+		// Ext4.log({level: 'warn'}, 'A Warning');
+		// Ext4.log( 'A Warning', {level: 'warn'});
 		this.callParent();
 
 		this.addEvents({
@@ -50,9 +52,6 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 
 		$('#' + me.webPartDivId).append('<div id="wpNcdf' + me.webPartDivId
 				+ '" class="centered-text"></div>'
-
-				+ '<div id="wpSampleGroupsFetching' + me.webPartDivId
-				+ '" class="centered-text hidden"></div>'
 
 				+ '<div id="wpParse' + me.webPartDivId
 				+ '" class="centered-text"></div>'
@@ -116,9 +115,7 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 		this.strFilteredTable = Ext4.create('LABKEY.ext4.data.Store', {
 					listeners : {
 						load : function() {
-							console.log('listened to strFilteredTable load event');							
 							if (me.notSorting) {
-								me.pnlTable.getSelectionModel().selectAll();
 								me.notSorting = false;
 							}
 							me.updateTableStatus();
@@ -151,7 +148,7 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 							this.rootPath = data.rows[0].RootPath;
 						} else if (count < 1) {
 							// disable all
-							btnNext.disable();
+							me.btnNext.disable();
 							me.cbStudyVarName.disable();
 							me.pnlMain.getEl().mask(
 									'Seems like you have not imported any FCS files, click <a href="'
@@ -162,7 +159,7 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 									'infoMask');
 						} else {
 							// disable all
-							btnNext.disable();
+							me.btnNext.disable();
 							me.cbStudyVarName.disable();
 							me.pnlMain.getEl().mask(
 									'Cannot retrieve the path for the data files: it is non-unique.'
@@ -172,49 +169,13 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 					}
 				});
 
-		this.smCheckBox = Ext4.create('Ext.selection.CheckboxModel', {
-					// new Ext.grid.CheckboxSelectionModel({
-					checkOnly : true,
-					listeners : {
-						rowdeselect : this.updateTableStatus,
-						rowselect : this.updateTableStatus
-					},
-					sortable : true
-				});
+		this.pnlTable = this.pnlInitPnlTable(this.strFilteredTable, [
 
-		this.rowNumberer = Ext4.create('Ext.grid.RowNumberer', {});
-		// new Ext.grid.RowNumberer();
-
-		this.pnlTable = Ext4.create('Ext.grid.Panel', {
-					// new Ext.grid.GridPanel({
-					autoScroll : true,
-					// colModel: new Ext.ux.grid.LockingColumnModel([
-					// {
-					// dataIndex: 'FileName',
-					// header: 'File Name',
-					// resizable: true,
-					// sortable: true
-					// }
-					// ]),
-					columns : [],
-					selModel : this.smCheckBox,
-					height : 200,
-					loadMask : {
-						msg : 'Loading data...',
-						msgCls : 'x-mask-loading-custom'
-					},
-					// plugins: ['autosizecolumns', new
-					// Ext.ux.plugins.CheckBoxMemory({ idProperty: 'FileName'
-					// })],
-					store : me.strFilteredTable,
-					stripeRows : true,
-					title : 'Files',
-					// view: new Ext.ux.grid.LockingGridView(),
-					viewConfig : {
-						emptyText : 'No rows to display',
-						splitHandleWidth : 10
-					}
-				});
+				/*
+				 * this.rowNumberer, { dataIndex : 'FileName', header : 'File
+				 * Name', autoWidth : true }
+				 */
+				]);
 
 		this.pnlComp = Ext4.create('Ext.Panel', {
 			defaults : {
@@ -222,10 +183,19 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 			},
 			items : [],
 			title : 'Compensation'
+
 		});
 
-		this.add(this.pnlInitMainPanel());
-
+		// ///////////////////////////////////
+		// Session instantiation //
+		// ///////////////////////////////////
+		LABKEY.Report.createSession({
+					failure : onFailure,
+					success : function(data) {
+						me.reportSessionId = data.reportSessionId;
+						me.add(me.pnlInitMainPanel());
+					}
+				});
 	},
 
 	// ///////////////////////////////////
@@ -233,7 +203,8 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 	// ///////////////////////////////////
 	updateInfoStatus : function(text, code) {
 		var me = this;
-		me.cmpStatus.update(text);
+		// me.cmpStatus.update(text);
+		me.cmpStatus.setText(text);
 		if (text != '') {
 			if (code == -1) {
 				me.cmpStatus.getEl().setStyle({
@@ -257,7 +228,7 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 
 	updateTableStatus : function() {
 		var me = this;
-
+		var selectionModel = me.pnlTable.getSelectionModel();
 		var selectedCount = me.pnlTable.getSelectionModel().getCount();
 
 		// Update the table's title
@@ -269,23 +240,24 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 
 		// Manage the 'check all' icon state
 		// innerHd doesn't exist in Ext JS 4.
-/*
-		var t = Ext4.fly(me.pnlTable.getView().innerHd)
-				.child('.x-grid4-hd-checker');
-		var isChecked = t.hasClass('x-grid4-hd-checker-on');
-		var totalCount = me.pnlTable.getStore().getCount();
-
-		if (selectedCount != totalCount & isChecked) {
-			t.removeClass('x-grid4-hd-checker-on');
-		} else if (selectedCount == totalCount & !isChecked) {
-			t.addClass('x-grid4-hd-checker-on');
-		}
-*/
+		/*
+		 * var t = Ext4.fly(me.pnlTable.getView().innerHd)
+		 * .child('.x-grid4-hd-checker'); var isChecked =
+		 * t.hasClass('x-grid4-hd-checker-on'); var totalCount =
+		 * me.pnlTable.getStore().getCount();
+		 * 
+		 * if (selectedCount != totalCount & isChecked) {
+		 * t.removeClass('x-grid4-hd-checker-on'); } else if (selectedCount ==
+		 * totalCount & !isChecked) { t.addClass('x-grid4-hd-checker-on'); }
+		 */
 	},
 
 	setStudyVars : function() {
 		var me = this;
-
+		me.rowNumberer = Ext4.create('Ext.grid.RowNumberer', {
+			autoWidth : true
+				// , minAutoWidth:'30px'
+			});
 		var temp = me.cbStudyVarName.getValue();
 		if (temp != me.selectedStudyVars) {
 			me.selectedStudyVars = temp;
@@ -301,21 +273,23 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 
 						arrayStudyVars.push(value.data);
 					});
-/*
-			newColumns = [me.rowNumberer, me.smCheckBox, {
+			/*
+			 * newColumns = [me.rowNumberer, me.smCheckBox, { dataIndex :
+			 * 'FileName', header : 'File Name' }];
+			 */
+			newColumns = [me.rowNumberer, {
 						dataIndex : 'FileName',
-						header : 'File Name'
+						header : 'File Name',
+						autoWidth : true,
+						cls : 'open-cyto-fcs-header'
 					}];
-*/					
-			newColumns = [{dataIndex : 'FileName', header : 'File Name'}];
-					
+
 			tempSQL = me.strngSqlStartTable;
 
 			len = arrayStudyVars.length;
 
 			for (i = 0; i < len; i++) {
 				c = arrayStudyVars[i];
-				https : // www.google.com/search?q=%22ext+js4%22+%22createDelegate%22+convert&ie=utf-8&oe=utf-8&aq=t&rls=org.mozilla:en-US:official&client=firefox-a#hl=en&client=firefox-a&hs=DIa&rls=org.mozilla:en-US%3Aofficial&sclient=psy-ab&q=%22ext+js%22+%22createDelegate%22+convert&oq=%22ext+js%22+%22createDelegate%22+convert&gs_l=serp.3...3257.3257.0.4478.1.1.0.0.0.0.86.86.1.1.0.les%3Bcappsweb..0.0...1.1.5.psy-ab.LXb31BUKlgw&pbx=1&bav=on.2,or.r_gc.r_pw.r_cp.r_qf.&bvm=bv.43148975,d.cGE&fp=edee8122245b3399&biw=1280&bih=856
 				curLabel = c.Display;
 				curValue = LABKEY.QueryKey.encodePart(c.Value);
 				curFlag = curLabel.slice(-2, -1);
@@ -339,33 +313,38 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 
 				newColumns.push({
 							dataIndex : curValue,
-							header : curLabel
+							// text : curLabel,
+							header : curLabel,
+							autoWidth : true,
+							cls : 'open-cyto-fcs-header'
 						});
 
 			} // end of for ( i = 0; i < len; i ++ ) loop
 
 			tempSQL += me.strngSqlEndTable;
 
-			me.strFilteredTablesql = tempSQL;
+			me.strFilteredTable.sql = tempSQL;
 			me.strFilteredTable.load();
 
 			this.notSorting = true;
+			console
+					.log('Reconfiguring Filtered Table Store with new column selections.');
+			// this.pnlTable.reconfigure(me.strFilteredTable, newColumns);
+			me.tableContainer.remove(me.pnlTable, true);
+			me.pnlTable = me.pnlInitPnlTable(me.strFilteredTable, newColumns);
+			me.tableContainer.add(me.pnlTable);
+			// me.pnlTable.hide();
+			me.pnlTable.show();
+			me.pnlTable.doLayout();
 
-			this.pnlTable.reconfigure(me.strFilteredTable, newColumns);
+			// me.pnlTable.getSelectionModel().selectAll();
 			/*
-			this.pnlTable.getStore(), // new
-					//Ext.grid.ColumnModel(
-						{
-						items : newColumns,
-						defaults : {
-							dragable : false,
-							hideable : false,
-							resizable : true,
-							sortable : true,
-							tooltip : 'double click the separator between two column headers to fit the column width to its contents'
-						}
-					}));
-            */
+			 * this.pnlTable.getStore(), // new //Ext.grid.ColumnModel( { items :
+			 * newColumns, defaults : { dragable : false, hideable : false,
+			 * resizable : true, sortable : true, tooltip : 'double click the
+			 * separator between two column headers to fit the column width to
+			 * its contents' } }));
+			 */
 			if (me.cbSampleGroup.getValue() != '' & me.cbXml.getValue() != '') {
 				me.btnProcess.setDisabled(false);
 			}
@@ -401,7 +380,7 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 					if (me.cbSampleGroup.getValue() != '') {
 						this.setDisabled(true);
 						me.cbXml.setDisabled(true);
-						me.cbSampleGroup.setDisabled(true);
+						// me.cbSampleGroup.setDisabled(true);
 						me.tfAnalysisName.setDisabled(true);
 						me.tfAnalysisDescription.setDisabled(true);
 
@@ -410,26 +389,8 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 
 						var records = me.pnlTable.getSelectionModel()
 								.getSelection();
-						var files = [];
-						Ext4.each(records, function(record) {
-									files.push(record.data.FileName);
-								});
-						me.wpParseConfig.files = files.join(';');
 
-						me.wpParseConfig.xmlPath = me.wpSampleGroupsFetchingConfig.path;
-						me.wpParseConfig.sampleGroupName = me.cbSampleGroup.getValue();
-						me.wpParseConfig.analysisName = me.tfAnalysisName
-								.getValue();
-						me.wpParseConfig.analysisDescription = me.tfAnalysisDescription
-								.getValue();
-						me.wpParseConfig.studyVars = me.cbStudyVarName
-								.getValue();
-						me.wpParseConfig.allStudyVars = me.cbStudyVarName
-								.getAllValuesAsArray().join();
-						me.wpParseConfig.rootPath = Ext4.util.Format
-								.undef(this.rootPath);
-
-						me.wpParse.render();
+						me.preprocessData(records);
 					}
 				}
 
@@ -442,12 +403,16 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 					text : '< Back'
 				});
 
-		var btnNext = Ext4.create('Ext.button.Button', {
+		this.btnNext = Ext4.create('Ext.button.Button', {
 					text : 'Next >'
 				});
 
-		this.cmpStatus = Ext4.create('Ext.Component', {
-					html : 'Set the study variables and click \'Next\'',
+		// this.cmpStatus = Ext4.create('Ext.toolbar.Item', {
+		this.cmpStatus = Ext4.create('Ext.toolbar.TextItem', {
+					// this.cmpStatus = Ext4.create('Ext.Component', {
+					// html : 'Set the study variables and click \'Next\'',
+					// text : 'Set the study variables and click Next',
+					text : 'Set the study variables and click \'Next\'',
 					style : {
 						paddingLeft : '10px'
 					}
@@ -461,20 +426,38 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 		var pnlMain = Ext4.create('Ext.Panel', {
 					activeItem : 0,
 					autoHeight : true,
+					bodyPadding : 0,
+					margin : 0,
 					bodyStyle : {
-						paddingTop : '3px'
+						paddingTop : '3px',
+						'border-top-width' : '1px',
+						'border-right-width' : '1px',
+						'border-bottom-width' : '1px',
+						'border-left-width' : '1px'
 					},
-					border : false,
+					border : 1,
 					defaults : {
 						autoHeight : true,
-						hideMode : 'offsets'
+						hideMode : 'offsets',
+						border : 1,
+						paddingTop : '3px',
+						'border-top-width' : '1px',
+						'border-right-width' : '1px',
+						'border-bottom-width' : '1px',
+						'border-left-width' : '1px'
 					},
 					deferredRender : false,
 					forceLayout : true,
 					items : [me.pnlInitStudyVarsPanel(),
 							me.pnlInitWorkspacesPanel(), this.tableContainer,
 							this.pnlComp],
-					layout : 'card',
+					layout : {
+						type : 'card'
+						/*
+						 * , defaultMargins : { top : 0, right : 40, bottom : 0,
+						 * left : 0 }
+						 */
+					},
 					listeners : {
 						afterrender : function() {
 							me.maskGlobal = new Ext4.LoadMask(this.getEl(), {
@@ -482,8 +465,10 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 									});
 						}
 					},
-					tbar : Ext4.create('Ext.toolbar.Toolbar', {
-								items : [me.btnProcess, btnBack, btnNext,
+					tbar : Ext4.create('Ext.toolbar.Toolbar', {						
+                             style : 'margin-left: 2px; margin-right: 6px;',
+                             //margin: '0 6 0 2',
+								items : [me.btnProcess, btnBack, me.btnNext,
 										me.cmpStatus]
 							})
 
@@ -508,14 +493,16 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 				}
 			}
 
-			// if ( newIndex == 2 ){ btnNext.setDisabled(false); }
+			// if ( newIndex == 2 ){ me.btnNext.setDisabled(false); }
 
 			// Disable Next button if there no cards after it, othwise enable
 			// it.
-			btnNext.setDisabled(!layout.getNext());
+			me.btnNext.setDisabled(!layout.getNext());
 			// Disable Comp Panel
 			if (newIndex == 3) {
-				btnNext.setDisabled(true);
+				me.btnNext.setDisabled(true);
+				console.log("Grid Columns");
+				console.dir(me.pnlTable.headerCt.getGridColumns());
 			}
 
 			me.updateInfoStatus('');
@@ -523,10 +510,10 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 		};
 
 		btnBack.on('click', Ext4.bind(navHandler, pnlMain, ["prev"]));
-		btnNext.on('click', Ext4.bind(navHandler, pnlMain, ["next"]));
+		me.btnNext.on('click', Ext4.bind(navHandler, pnlMain, ["next"]));
 
 		this.pnlMain = pnlMain;
-		// redudnant, yes. Refactor later.
+		// redundant, yes. Refactor later.
 		return pnlMain;
 	},
 
@@ -560,8 +547,7 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 												toAdd + ' (Keyword)',
 												'RowId/Keyword/' + toAdd]);
 									});
-
-							me.strStudyVarName.loadData(listStudyVars);
+							me.strStudyVarName.loadData(listStudyVars, true);
 						},
 						failure : onFailure
 					});
@@ -600,14 +586,29 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 					},
 					failure : fetchKeywords
 				});
-
 		this.cmpStudyVars = Ext4.create('Ext.Component', {
 			cls : 'bold-text',
-			html : 'Select the study variables that are of interest for this project:'
+			headerCssClass : 'simple-panel-header',
+			html : 'Select the study variables that are of interest for this project:',
+			layout : 'fit'
 		});
 
+		Ext4.define('StudyVarNameModel', {
+					extend : 'Ext.data.Model',
+					fields : [{
+								name : 'Flag',
+								type : 'string'
+							}, {
+								name : 'Display',
+								type : 'string'
+							}, {
+								name : 'Value',
+								type : 'string'
+							}]
+				});
 		this.strStudyVarName = Ext4.create('Ext.data.ArrayStore', {
-					data : [],
+					// model: 'StudyVarNameModel',
+					// data : [],
 					fields : ['Flag', 'Display', 'Value'],
 					sortInfo : {
 						field : 'Flag',
@@ -620,21 +621,29 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 		// ///////////////////////////////////
 		this.cbStudyVarName =
 		// Ext4.create('Ext.ux.form.ExtJS4SuperBoxSelect',{
-		Ext4.create('Ext.ux.CheckCombo', {
+		// Ext4.create('Ext4.ux.ComboFieldBox', {
+		// Ext4.create('Ext4.ux.form.field.BoxSelect', {
+		// Ext4.create('Ext4.ux.form.field.BoxSelect203', {
+		// Ext4.create('Ext.form.ComboBox', {
+		// Ext4.create('Ext.ux.CheckCombo', {
+		Ext4.create('Ext4.ux.CheckCombo', {
 			multiSelect : true,
-			// addAllSelector: true,
-			// new Ext.ux.form.SuperBoxSelect({
+			addAllSelector : true,
+			noData : true,
 			allowBlank : true,
-			autoSelect : false,
+			// autoSelect : false,
 			displayField : 'Display',
 			emptyText : 'Select...',
-			forceSelection : true,
+			// forceSelection : true,
+			typeAhead : false,
+			editable : false,
 			getAllValuesAsArray : function() {
 				var c = [];
 
 				Ext4.each(this.store.data.items, function(r) {
 							c.push(r.data.Value);
 						});
+
 				// usedRecords is a variable of the SuperBoxSelect.
 				/*
 				 * Ext4.each(this.usedRecords.items, function(r) {
@@ -642,13 +651,15 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 				 */
 				return c;
 			},
-			lazyInit : false,
+			// lazyInit : false,
 			listeners : {
 				additem : function() {
+					console.log('cbStudyVarName addItem event');
 					me.updateInfoStatus(
 							'Set the study variables and click \'Next\'', 1);
 				},
 				clear : function() {
+					console.log('cbStudyVarName clear event');
 					me
 							.updateInfoStatus('Set the study variables and click \'Next\'');
 				},
@@ -656,28 +667,42 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 				// this.expand();
 				// },
 				removeitem : function() {
+					console.log('cbStudyVarName removeitem event');
 					me.updateInfoStatus(
 							'Set the study variables and click \'Next\'', 1);
 				}
 			},
-			minChars : 0,
+			// minChars : 0,
 			queryMode : 'local',
-			resizable : true,
+			resizable : false,
 			store : me.strStudyVarName,
-			supressClearValueRemoveEvents : true,
-			triggerAction : 'all',
-			typeAhead : true,
-			valueField : 'Value'
+			// supressClearValueRemoveEvents : true,
+			// triggerAction : 'all',
+			// typeAhead : true,
+			valueField : 'Value',
+			layout : {
+				type : 'fit'
+				/*
+				 * , defaultMargins : { top : 0, right : 80, bottom : 0, left :
+				 * 0 }
+				 */
+			}
 		});
 
 		var pnlStudyVars = Ext4.create('Ext.Panel', {
+			cls : 'shaded-panel',
+			header : {
+				xtype : 'header',
+				ui : 'default-large'
+			},
 			defaults : {
 				style : 'padding-bottom: 4px; padding-right: 4px; padding-left: 4px;'
 			},
 			items : [me.cmpStudyVars, Ext4.create('Ext.Panel', {
 								border : false,
 								items : [me.cbStudyVarName],
-								layout : 'fit'
+								style:'padding-right: 4px;',
+								layout: 'fit'
 							})],
 			title : 'Configuration'
 		});
@@ -689,11 +714,10 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 
 		var me = this;
 
-		var lastlySelectedXML = undefined;
+		me.lastlySelectedXML = undefined;
 
-		// var me.cbXml = Ext4.create('Ext.form.field.ComboBox', {
-		me.cbXml = Ext4.create('Ext.form.ExtJS4ClearableComboBox', {
-			// new Ext.form.ClearableComboBox({
+		// me.cbXml = Ext4.create('Ext.form.field.ComboBox', {
+		me.cbXml = Ext4.create('Ext4.ux.form.field.ClearableComboBox', {
 			allowBlank : true,
 			displayField : 'FileName',
 			emptyText : 'Select',
@@ -726,7 +750,7 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 				select : function(c, r, i) {
 					var value = this.getValue();
 
-					if (value != lastlySelectedXML) {
+					if (value != me.lastlySelectedXML) {
 
 						me.maskGlobal.msg = 'Obtaining the available sample groups, please, wait...';
 						me.maskGlobal.show();
@@ -734,114 +758,88 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 						this.setDisabled(true); // to prevent interaction with
 						// that combo while the mask is
 						// on
-						me.tfAnalysisName.setDisabled(true); // to prevent
-						// interaction
-						// with that
-						// combo while
-						// the mask is
-						// on
-						me.tfAnalysisDescription.setDisabled(true); // to
-						// prevent
-						// interaction
-						// with that
-						// combo
-						// while the
-						// mask is
-						// on
+						me.tfAnalysisName.setDisabled(true); 
+						// to prevent interaction with that
+						// combo while the mask is on
+						me.tfAnalysisDescription.setDisabled(true);
+						// to prevent interaction with that combo
+						// while the mask is on
 						// do we need to also disable the navigation buttons ?
 
 						// when we have an example with multiple xml workspaces,
 						// then probably need to clear out the me.cbSampleGroup
 						// ('s store)
 
-						me.wpSampleGroupsFetchingConfig.path = decodeURI(value)
-								.slice(5);
+						var path = decodeURI(value).slice(5);
+						me.fetchSampleGroups(path);
 
-						wpSampleGroupsFetching.render();
 					} else {
 						me.cbSampleGroup.setDisabled(false);
 
 						if (me.cbSampleGroup.getValue() != '') {
 							me.btnProcess.setDisabled(false);
-
 							this.triggerBlur();
-
 							me.tfAnalysisName.focus();
 						} else {
 							this.triggerBlur();
-
 							me.cbSampleGroup.focus();
 						}
 					}
 				}
 			},
 			minChars : 0,
-			mode : 'local',
+			queryMode : 'local',
 			store : me.strXML,
-
 			// tpl: '<tpl for="."><div
 			// class="x-combo-list-item">{FileName:htmlEncode}</div></tpl>',
 			triggerAction : 'all',
 			typeAhead : true,
 			valueField : 'FilePath',
-
 			width : 200
 		});
 
-		me.cbSampleGroup = Ext4.create('Ext.form.ExtJS4ClearableComboBox', {
-					// me.cbSampleGroup = new Ext.form.ClearableComboBox({
-
+		me.cbSampleGroup // = Ext4.create('Ext.form.field.ComboBox', {
+		= Ext4.create('Ext4.ux.form.field.ClearableComboBox', {
+					// Ext4.create('Ext.ux.CheckCombo', {
 					allowBlank : true,
 					disabled : true,
 					displayField : 'SampleGroup',
 					emptyText : 'Select...',
 					forceSelection : true,
 					listeners : {
-						change : function() {
+						change : function(combo, newValue, oldValue, eOpts) {
 							if (this.getValue() != '') {
 								me.btnProcess.setDisabled(false);
-
 								me.tfAnalysisName.focus(); // working?
 							} else {
 								me.btnProcess.setDisabled(true);
-
 								this.focus();
 							}
 						},
 						cleared : function() {
 							me.btnProcess.setDisabled(true);
-
 							this.focus();
 						},
-						select : function() {
+						select : function(combo, records, eOpts) {
 							me.btnProcess.setDisabled(false);
-
-							this.triggerBlur();
-
+							combo.triggerBlur();
 							me.tfAnalysisName.focus();
 						}
 					},
 					minChars : 0,
-					mode : 'local',
+					queryMode : 'local',
 					store : me.strSampleGroup,
 					// tpl: '<tpl for="."><div
 					// class="x-combo-list-item">{SampleGroup:htmlEncode}</div></tpl>',
-					triggerAction : 'all',
+					// triggerAction : 'all',
 					typeAhead : true,
 					valueField : 'SampleGroup',
 					width : 200
 				});
 
 		me.strSampleGroup.on({
-					'load' : function() {
-						me.cbSampleGroup.focus();
-						me.cbSampleGroup.expand();
-						console.log("listened to strSampleGroup load event");
-					}
-				});
-
-		me.strSampleGroup.on({
 			'datachanged' : function() {
+				me.cbSampleGroup.enable();
 				me.cbSampleGroup.focus();
 				me.cbSampleGroup.expand();
 				console
@@ -864,65 +862,6 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 		// ///////////////////////////////////
 		// Web parts //
 		// ///////////////////////////////////
-		this.wpSampleGroupsFetchingConfig = {
-			reportId : 'module:OpenCytoPreprocessing/SampleGroups.r',
-			// showSection: 'textOutput', // comment out to show debug output
-			title : 'HiddenDiv'
-		};
-
-		var wpSampleGroupsFetching = new LABKEY.WebPart({
-					failure : function(errorInfo, options, responseObj) {
-						me.maskGlobal.hide();
-
-						me.cbXml.setDisabled(false);
-						me.tfAnalysisName.setDisabled(false);
-						me.tfAnalysisDescription.setDisabled(false);
-
-						onFailure(errorInfo, options, responseObj);
-					},
-					frame : 'none',
-					partConfig : me.wpSampleGroupsFetchingConfig,
-					partName : 'Report',
-					renderTo : 'wpSampleGroupsFetching' + me.webPartDivId,
-					success : function() {
-						me.maskGlobal.hide();
-
-						me.cbXml.setDisabled(false);
-						me.tfAnalysisName.setDisabled(false);
-						me.tfAnalysisDescription.setDisabled(false);
-
-						var inputArray = $('#wpSampleGroupsFetching'
-								+ me.webPartDivId + ' pre')[0].innerHTML;
-						console.log("inputArray for sample group store");
-						console.log(inputArray);
-						if (inputArray.search('java.lang.RuntimeException') < 0) {
-							if (inputArray
-									.search('javax.script.ScriptException') < 0) {
-								me.cbSampleGroup.setDisabled(false);
-								inputArray = inputArray.replace(/\n/g, '')
-										.replace('All Samples;', '').split(';');
-
-								var len = inputArray.length;
-								for (var i = 0; i < len; i++) {
-									inputArray[i] = [inputArray[i]];
-								}
-								me.strSampleGroup.loadData(inputArray);
-
-								lastlySelectedXML = me.cbXml.getValue();
-							} else {
-								onFailure({
-											exception : inputArray.replace(
-													/Execution halted\n/,
-													'Execution halted')
-										});
-							}
-						} else {
-							onFailure({
-										exception : inputArray
-									});
-						}
-					}
-				});
 
 		this.wpParseConfig = {
 			reportId : 'module:OpenCytoPreprocessing/OpenCytoPreprocessing.r',
@@ -971,7 +910,7 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 
 		var pnlWorkspace = Ext4.create('Ext.Panel', {
 					border : false,
-					headerCssClass : 'simple-panel-header',
+					cls : 'simple-panel-header',
 					items : [me.cbXml],
 					layout : 'fit',
 					title : 'Select the workspace:'
@@ -995,6 +934,7 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 
 		var pnlAnalysisDescription = Ext4.create('Ext.Panel', {
 					border : false,
+					cls : 'simple-panel-header',
 					headerCssClass : 'simple-panel-header',
 					items : [me.tfAnalysisDescription],
 					layout : 'fit',
@@ -1007,38 +947,220 @@ Ext4.define('LABKEY.ext.ExtJS4OpenCytoPreprocessing', {
 						type : 'column'
 					},
 					defaults : {
-						bodyStyle : 'padding:15px',
-						width : 200
+						/*
+						 * bodyStyle : 'padding: 2px', width : 200, margin : '0
+						 * 15 0 15',
+						 */
+						bodyStyle : 'padding: 2px',
+						width : 200,
+						margin : '0 15 0 15',
+
+						header : {
+							xtype : 'header',
+							ui : 'default-large'
+						}
 					},
-					id :
-					// contentEl:
-					'ulList' + this.webPartDivId,
+					id : 'ulList' + this.webPartDivId,
 					items : [pnlWorkspace, pnlSampleGroup, pnlAnalysisName,
-							pnlAnalysisDescription
-					]
+							pnlAnalysisDescription]
 				});
 
 		var pnlWorkspaces = Ext4.create('Ext.Panel', {
+			header : {
+				xtype : 'header',
+				ui : 'default-large'
+			},
+			cls : 'shaded-panel',
 			defaults : {
 				hideMode : 'visibility', // ? why not offsets ?
 				style : 'padding-bottom: 4px; padding-right: 4px; padding-left: 4px;'
 			},
 			// disabled: true,
 			// forceLayout: true,
-			items : [
-					pnlList, Ext4.create('Ext.Component', {
-								id :
-								// contentEl:
-								'wpSampleGroupsFetching' + this.webPartDivId
-							}), Ext4.create('Ext.Component', {
-								id :
-								// contentEl:
-								'wpParse' + this.webPartDivId
-							})
-			],
+			items : [pnlList, Ext4.create('Ext.Component', {
+								id : 'wpParse' + this.webPartDivId
+							})],
 			title : 'Workspaces'
 		});
 		return pnlWorkspaces;
+	},
+
+	fetchSampleGroups : function(path) {
+		var me = this;
+
+		me.xmlPath = path;
+
+		var scriptConfig = {
+			success : function(result) {
+				var rConsole = result.console;
+				var errors = result.errors;
+				var outputParams = result.outputParams;
+
+				me.maskGlobal.hide();
+
+				me.cbXml.setDisabled(false);
+				me.tfAnalysisName.setDisabled(false);
+				me.tfAnalysisDescription.setDisabled(false);
+
+				if (errors && errors.length > 0) {
+					Ext4.MessageBox.show({
+								title : "Error in fetchSampleGroups()",
+								msg : "Error in Rserve engine:<P>"
+										+ errors[0].replace(/\n/g, '<P>'),
+								buttons : Ext4.MessageBox.OK,
+								resizable : true
+							});
+				} else {
+					/*
+					 * console.log("fetchSampleGroups() success.");
+					 * console.log('resultObj:') console.dir(result);
+					 * console.log('outputParams:') console.dir(outputParams);
+					 */
+					var inputArray = outputParams[0].value;
+
+					me.cbSampleGroup.setDisabled(false);
+					inputArray = inputArray.replace(/\n/g, '').replace(
+							'All Samples;', '').split(';');
+
+					var len = inputArray.length;
+					for (var i = 0; i < len; i++) {
+						inputArray[i] = [inputArray[i]];
+					}
+					me.strSampleGroup.loadData(inputArray);
+					me.lastlySelectedXML = me.cbXml.getValue();
+				}
+			},
+			failure : function(errorInfo, options, responseObj) {
+				console.log("fetchSampleGroups() failure.");
+				me.maskGlobal.hide();
+
+				me.cbXml.setDisabled(false);
+				me.tfAnalysisName.setDisabled(false);
+				me.tfAnalysisDescription.setDisabled(false);
+
+				onFailure(errorInfo, options, responseObj);
+			},
+
+			inputParams : {
+				// showSection: 'textOutput', // comment out to show debug
+				// output
+				path : path
+			},
+			reportId : 'module:OpenCytoPreprocessing/SampleGroups.r',
+			reportSessionId : me.reportSessionId,
+			scope : me
+		};
+
+		LABKEY.Report.execute(scriptConfig);
+	},
+
+	preprocessData : function(records) {
+		var me = this;
+		var files = [];
+		Ext4.each(records, function(record) {
+					files.push(record.data.FileName);
+				});
+		me.wpParseConfig.files = files.join(';');
+
+		me.wpParseConfig.xmlPath = me.xmlPath;
+		me.wpParseConfig.sampleGroupName = me.cbSampleGroup.getValue();
+		me.wpParseConfig.analysisName = me.tfAnalysisName.getValue();
+		me.wpParseConfig.analysisDescription = me.tfAnalysisDescription
+				.getValue();
+		me.wpParseConfig.studyVars = me.cbStudyVarName.getValue();
+		me.wpParseConfig.allStudyVars = me.cbStudyVarName.getAllValuesAsArray()
+				.join();
+		console.log('Selected StudyVars: ' + me.wpParseConfig.allStudyVars);
+		me.wpParseConfig.rootPath = Ext4.util.Format.undef(this.rootPath);
+		me.wpParseConfig.reportSessionId = me.reportSessionId;
+		me.wpParse.render();
+	},
+
+	smInitSmCheckBox : function() {
+		var me = this;
+		var smCheckBox = Ext4.create('Ext.selection.CheckboxModel', {
+					checkOnly : false,
+					injectCheckbox : 1, // Place the checkbox in the 2nd column
+					// of the grid.
+					listeners : {
+						deselect : {
+							fn : this.updateTableStatus,
+							scope : me
+						},
+						select : {
+							fn : this.updateTableStatus,
+							scope : me
+						},
+						selectionChange : function(obj, selected, eOpts) {
+							// console.log('selected');
+							// console.dir(selected);
+							//console.log('selected records count ='
+							//		+ selected.length);
+						}
+					},
+					sortable : true
+				});
+		return smCheckBox;
+	},
+
+	pnlInitPnlTable : function(store, columns) {
+		var me = this;
+		me.smCheckBox = me.smInitSmCheckBox();
+
+		var pnlTable = Ext4.create('Ext.grid.Panel', {
+					autoScroll : true,
+					// frame: true,
+					columnLines : true,
+					columns : columns,
+					selModel : me.smCheckBox,
+					height : 200,
+					border : 1,
+					margin : 1,
+					cls : 'open-cyto-fcs-table',
+					loadMask : {
+						msg : 'Loading data...',
+						msgCls : 'x-mask-loading-custom'
+					},
+					plugins : [Ext4.create('Ext.ux.ColumnAutoWidthPlugin', {})
+					// , Ext4.create('Ext.ux.grid.FilterBar',{})
+					],
+					store : store,
+					stripeRows : true,
+					title : 'Files',
+					header : {
+						xtype : 'header'
+					},
+					viewConfig : {
+						emptyText : 'No rows to display',
+						splitHandleWidth : 10,
+						border : 1,
+						margin : 1
+					},
+					listeners : {
+						afterrender : {
+							fn : function() {
+								console
+										.log('pnlTable afterrender event detected');
+							},
+							scope : me
+						},
+						viewready : {
+							fn : function() {
+								console
+										.log('pnlTable viewready event detected');
+								this.pnlTable.getSelectionModel().selectAll();
+							},
+							scope : me
+						},
+						destroy : {
+							fn : function() {
+								console.log('pnlTable destroy event detected');
+							},
+							scope : me
+						}
+					}
+				});
+		return pnlTable;
 	},
 
 	resize : function() {
