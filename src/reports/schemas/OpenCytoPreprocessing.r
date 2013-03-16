@@ -22,9 +22,9 @@ if ( xmlPath != '' & sampleGroupName != '' ){
         filesPath <- folderPath;
     }
 
-    currentHashValue <- digest( paste( xmlPath, sampleGroupName, filesString, sep = '' ) );
+    currentHashValue <- digest( paste0( xmlPath, sampleGroupName, filesString ) );
 
-    gatingSetPath <- paste( folderPath, '/', currentHashValue, '.tar', sep = '' );
+    gatingSetPath <- paste0( folderPath, '/', currentHashValue, '.tar' );
 
     if ( ! file.exists( gatingSetPath ) ) {
     
@@ -47,34 +47,43 @@ if ( xmlPath != '' & sampleGroupName != '' ){
             )
         );
 
+        if ( ( ! exists("G") ) | is.null( G[[1]] ) ){
+            txt <- 'The selected sample group does not contain any of the selected files';
+            stop('The selected sample group does not contain any of the selected files');
+            return;
+        }
+
         print( proc.time() - ptm );
 
         print('FETCHING METADATA ETC.');
         ptm <- proc.time();
 
-        #if ( allStudyVarsString != '' ){
+        meta <- labkey.selectRows(
+              baseUrl       = labkey.url.base
+            , folderPath    = labkey.url.path
+            , schemaName    = 'flow'
+            , queryName     = 'Files'
+            , colSelect     = c('Name', allStudyVarsString) # needs to be a vector of comma separated strings
+            , colNameOpt    = 'fieldname'
+            , colFilter     = makeFilter( c("Name", "IN", filesString) )
+            , showHidden    = T
+        );
 
-            meta <- labkey.selectRows(
-                  baseUrl       = labkey.url.base
-                , folderPath    = labkey.url.path
-                , schemaName    = 'flow'
-                , queryName     = 'Files'
-                , colSelect     = c('Name', allStudyVarsString) # needs to be a vector of comma separated strings
-                , colNameOpt    = 'fieldname'
-                , colFilter     = makeFilter( c("Name", "IN", filesString) )
-                , showHidden    = T
-            );
-            colnames(meta)[ which( colnames(meta) == 'Name' ) ]     <- 'name';
-            colnames(meta)[ which( colnames(meta) == 'RowId' ) ]    <- 'id';
+        nameInd <-  which( colnames(meta) == 'Name' );
+        idInd   <-  which( colnames(meta) == 'RowId' );
 
-            pData(G) <- meta;
-       #}
+        meta <- cbind( meta[ c( nameInd, idInd ) ], sapply( meta[ , -c( nameInd, idInd ) ], as.factor ) );
+
+	colnames(meta)[ which( colnames(meta) == 'Name' ) ]	<- 'name';
+        colnames(meta)[ which( colnames(meta) == 'RowId' ) ]	<- 'fileid';
+
+        pData(G) <- meta;
 
         suppressMessages( archive( G, gatingSetPath ) );
         txt <- 'hopefully generated the *.tar file';
     } else {
         txt <- 'file already exists';
-	suppressMessages( G <- unarchive( gatingSetPath ) );
+	    suppressMessages( G <- unarchive( gatingSetPath ) );
     }
 
         if ( ! file.exists( gatingSetPath ) ) {
@@ -95,13 +104,13 @@ if ( xmlPath != '' & sampleGroupName != '' ){
                     if ( length( curChildrens ) > 0 ){
                         prjlist <- lapply( curChildrens, function(curChildren){
                             g <- getGate( gh, curChildren );
-                            if ( class(g) == "BooleanGate" ){
+                            if ( class( g ) == 'BooleanGate' ){
                                 return( NULL );
                             } else {
                                 param <- parameters( g );
 
                                 if ( length( param ) == 1 ){
-                                    param<-c(param,"SSC-A");
+                                    param <- c( param, "SSC-A" );
                                 }
                                 return( param );
                             }
@@ -113,12 +122,29 @@ if ( xmlPath != '' & sampleGroupName != '' ){
                         colnames(prj) <- c('x_axis', 'y_axis');
 
                         cbind( name = curpNode, path = curPop, prj, gsid = gsId );
-                    } else {
-                        # print( 'not yet implemented' );
                     }
                 });
 
                 toInsert <- do.call( rbind, res );
+
+                map <- subset( pData( parameters( getData( gh ) ) )[ , 1:2 ], ! is.na(desc) );
+
+                colnames(map)[1] <- 'x_axis';
+                toInsert <- merge( toInsert, map, all.x = T );
+                emptyInds <- is.na( toInsert$desc );
+                toInsert$desc[ emptyInds ] <- '';
+                toInsert$desc[ ! emptyInds ] <- paste( toInsert$desc[ ! emptyInds ], '' );
+                toInsert$x_axis <- paste0( toInsert$desc, toInsert$x_axis );
+                toInsert$desc <- NULL;
+
+                colnames(map)[1] <- 'y_axis';
+                toInsert <- merge( toInsert, map, all.x = T );
+                emptyInds <- is.na( toInsert$desc );
+                toInsert$desc[ emptyInds ] <- '';
+                toInsert$desc[ ! emptyInds ] <- paste( toInsert$desc[ ! emptyInds ], '' );
+                toInsert$y_axis <- paste0( toInsert$desc, toInsert$y_axis );
+                toInsert$desc <- NULL;
+
                 insertedRow <- labkey.insertRows( queryName = 'projections', toInsert = toInsert, ... );
             };
 
@@ -198,7 +224,7 @@ if ( xmlPath != '' & sampleGroupName != '' ){
 
             print( proc.time() - ptm );
 
-            txt <- paste( txt, ' and wrote to the db!' );
+            txt <- paste( txt, 'and wrote to the db!' );
         }
 
 } else {

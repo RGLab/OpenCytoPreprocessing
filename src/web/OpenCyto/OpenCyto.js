@@ -15,6 +15,11 @@
  *  limitations under the License.
  */
 
+
+//================================//
+// Generic utility functionality: //
+//================================//
+
 function removeById(elId) {
     $( '#' + elId ).remove();
 };
@@ -23,35 +28,32 @@ function removeByClass(className) {
     $( '.' + className ).remove();
 };
 
-function captureEvents(observable) {
-    Ext.util.Observable.capture(
-        observable,
-        function(eventName) {
-            console.info(eventName);
-        },
-        this
-    );
-};
-
-function onFailure(errorInfo, options, responseObj){
-    var strngErrorContact = ' Please, contact ldashevs@fhcrc.org, if you have questions.';
-
-    if (errorInfo && errorInfo.exception)
-        Ext.Msg.alert('Error', 'Failure: ' + errorInfo.exception + strngErrorContact);
-    else {
-        if ( responseObj != undefined ){
-            Ext.Msg.alert('Error', 'Failure: ' + responseObj.statusText + strngErrorContact);
-        } else {
-            Ext.Msg.alert('Error', 'Failure: ' + errorInfo.statusText + (errorInfo.timedout==true?', timed out.':'') + strngErrorContact);
+// Remove elements from an array by values
+Array.prototype.remove = function() {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+        what = a[--L];
+        while ((ax = this.indexOf(what)) !== -1) {
+            this.splice(ax, 1);
         }
     }
+    return this;
 };
 
-Ext4.Ajax.timeout = 60 * 60 * 1000; // override the timeout to be 60 mintues; value is in milliseconds
+// IE8 and below
+if(!Array.prototype.indexOf) {
+    Array.prototype.indexOf = function(what, i) {
+        i = i || 0;
+        var L = this.length;
+        while (i < L) {
+            if(this[i] === what) return i;
+            ++i;
+        }
+        return -1;
+    };
+}
 
-Ext.QuickTips.init();
-
-// IE 7 compatibility
+// IE7 compatibility
 Object.keys = Object.keys || (function () {
     var hasOwnProperty = Object.prototype.hasOwnProperty,
             hasDontEnumBug = !{toString:null}.propertyIsEnumerable("toString"),
@@ -86,6 +88,46 @@ Object.keys = Object.keys || (function () {
         return result;
     };
 })();
+
+function captureEvents(observable) {
+    Ext.util.Observable.capture(
+            observable,
+            function(eventName) {
+                console.info(eventName);
+            },
+            this
+    );
+};
+
+function onFailure(errorInfo, options, responseObj){
+    var strngErrorContact = ' Please, contact ldashevs@fhcrc.org, if you have questions.';
+
+    if (errorInfo && errorInfo.exception)
+        Ext.Msg.alert('Error', 'Failure: ' + errorInfo.exception + strngErrorContact);
+    else {
+        if ( responseObj != undefined ){
+            Ext.Msg.alert('Error', 'Failure: ' + responseObj.statusText + strngErrorContact);
+        } else {
+            Ext.Msg.alert('Error', 'Failure: ' + errorInfo.statusText + (errorInfo.timedout==true?', timed out.':'') + strngErrorContact);
+        }
+    }
+};
+
+
+//============================//
+// Ext specific functionality //
+//============================//
+Ext4.Ajax.timeout = 60 * 60 * 1000; // override the timeout to be 60 mintues; value is in milliseconds
+
+Ext.QuickTips.init();
+
+function loadStoreWithArray( store, array ) {
+    var len = array.length;
+    for ( var i = 0; i < len; i ++ ) {
+        array[i] = [ array[i] ];
+    }
+    store.loadData( array );
+}
 
 // Search in the middle of words / case insensitive
 Ext.override (Ext.ux.form.SuperBoxSelect, {
@@ -149,7 +191,6 @@ Ext.override (Ext.ux.form.SuperBoxSelect, {
         }
     }
 });
-
 
 /*
  * Override to set Tab titles centered (can do any other customizations here)
@@ -238,31 +279,6 @@ Ext.TabPanel.override({
     }
 
 });
-
-// Remove elements from an array by values
-Array.prototype.remove = function() {
-    var what, a = arguments, L = a.length, ax;
-    while (L && this.length) {
-        what = a[--L];
-        while ((ax = this.indexOf(what)) !== -1) {
-            this.splice(ax, 1);
-        }
-    }
-    return this;
-};
-
-// IE8 and below
-if(!Array.prototype.indexOf) {
-    Array.prototype.indexOf = function(what, i) {
-        i = i || 0;
-        var L = this.length;
-        while (i < L) {
-            if(this[i] === what) return i;
-            ++i;
-        }
-        return -1;
-    };
-}
 
 
 // ? First column non-moveable

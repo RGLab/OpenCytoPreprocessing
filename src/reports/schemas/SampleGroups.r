@@ -1,16 +1,28 @@
-suppressMessages( library(flowWorkspace) );
+suppressMessages( library( flowWorkspace ) );
+suppressMessages( library( RJSONIO ) );
 
-path <- labkey.url.params$path;
+wsPath <- labkey.url.params$wsPath;
 
-if ( path != '' ){
+if ( wsPath != '' ){
 
-    suppressMessages( ws <- openWorkspace( path ) );
-    txt <- paste( unique( getSampleGroups(ws)[[1]]  ), collapse=';' );
-    # unique(getSampleGroups(ws)[,1:2]); # alternative ?
+    suppressMessages( ws <- openWorkspace( wsPath ) );
+
+    sampleGroups <- getSampleGroups(ws)[ , c(1,3) ];
+
+    list <- unique( sampleGroups[[1]] );
+
+    sampleGroups <-
+        cbind(
+            sampleGroups,
+            filename = sapply(
+                sampleGroups$sampleID,
+                function(x) flowWorkspace:::.getKeywordsBySampleID( ws, x, "$FIL" )
+            )
+        );
+    sampleGroups <- sampleGroups[ , c(1,3) ];
+
+    sampleGroups <- split( sampleGroups$filename, sampleGroups$groupName );
+
+    write( toJSON( list ), '${jsonout:outArray}' );
+    write( toJSON( sampleGroups ), '${jsonout:outArray}' );
 }
-
-#sg<-merge(getSamples(ws),getSampleGroups(ws),by="sampleID")
-#sg <- cbind(sg, filename = sapply(sg$sampleID, function(x) flowWorkspace:::.getKeywordsBySampleID(ws, x,"$FIL")))
-#subset(sg,groupName=="cell tubes",select="filename")
-
-write(txt, file='${txtout:textOutput}');
