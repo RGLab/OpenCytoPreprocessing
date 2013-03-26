@@ -21,7 +21,7 @@ wsPath <- labkey.url.params$wsPath;
 
 if ( wsPath != '' ){
 
-    suppressMessages( ws <- openWorkspace( wsPath ) );
+    suppressMessages( ws <- openWorkspace( wsPath, options = 1 ) );
 
     sampleGroups <- getSampleGroups(ws)[ , c(1,3) ];
 

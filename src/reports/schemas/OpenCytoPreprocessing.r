@@ -45,7 +45,7 @@ if ( xmlPath != '' & sampleGroupName != '' ){
     if ( ! file.exists( gatingSetPath ) ) {
 
         if ( ! exists('ws') ) {
-            suppressMessages( ws <- openWorkspace( xmlPath ) );
+            suppressMessages( ws <- openWorkspace( xmlPath, options = 1 ) );
         }
 
         print( proc.time() - ptm );
