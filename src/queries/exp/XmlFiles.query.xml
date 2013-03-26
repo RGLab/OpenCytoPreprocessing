@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<query name="XmlFiles" schemaName="exp" xmlns="http://labkey.org/data/xml/query">
+<?xml version='1.0' encoding='UTF-8'?>
+<query name='XmlFiles' schemaName='exp' xmlns='http://labkey.org/data/xml/query'>
     <description>
         Contains the name and the path for each of the imported FlowJo XML workspaces.
     </description>

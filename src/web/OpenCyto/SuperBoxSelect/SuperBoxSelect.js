@@ -2,14 +2,14 @@
 /*
  *  Copyright 2012 Fred Hutchinson Cancer Research Center
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  Licensed under the Apache License, Version 2.0 (the 'License');
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  distributed under the License is distributed on an 'AS IS' BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
@@ -27,7 +27,7 @@ Ext.namespace('Ext.ux.form');
  * here: http://efattal.fr/en/extjs/extuxboxselect/
  * </p>
  *
- * @author <a href="mailto:dan.humphrey@technomedia.co.uk">Dan Humphrey</a>
+ * @author <a href=\'mailto:dan.humphrey@technomedia.co.uk\'>Dan Humphrey</a>
  * @class Ext.ux.form.SuperBoxSelect
  * @extends Ext.form.ComboBox
  * @constructor
@@ -366,7 +366,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
                 // accomodating for bug in Ext 3.0.0 where
                 // options.params are empty
                 var q = options.params[this.queryParam]
-                        || store.baseParams[this.queryParam] || "", isValuesQuery = options.params[this.queryValuesInidicator]
+                        || store.baseParams[this.queryParam] || '', isValuesQuery = options.params[this.queryValuesInidicator]
                         || store.baseParams[this.queryValuesInidicator];
 
                 if (this.removeValuesFromStore) {
@@ -397,7 +397,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
                 // queried display (autocomplete) & addItem
                 if (q !== '' && this.allowAddNewData) {
                     Ext.each(this.remoteLookup, function(r) {
-                        if (typeof r == "object" && r[this.displayField] == q) {
+                        if (typeof r == 'object' && r[this.displayField] == q) {
                             this.remoteLookup.remove(r);
                             if (records.length
                                     && records[0].get(this.displayField) === q) {
@@ -935,7 +935,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
                 var val = this.el.dom.value, it, ctrl = e.ctrlKey;
                 if (e.getKey() === e.ENTER) {
                     e.stopEvent();
-                    if (val !== "") {
+                    if (val !== '') {
                         if (ctrl || !this.isExpanded()) { // ctrl+enter
                             // for new
                             // items
@@ -1618,13 +1618,13 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
                 var el = this.el, v = el.dom.value, d = document
                         .createElement('div');
 
-                if (v === "" && this.emptyText && this.items.getCount() < 1) {
+                if (v === '' && this.emptyText && this.items.getCount() < 1) {
                     v = this.emptyText;
                 }
                 d.appendChild(document.createTextNode(v));
                 v = d.innerHTML;
                 d = null;
-                v += "&#160;";
+                v += '&#160;';
                 var w = Math.max(this.metrics.getWidth(v) + 24, 24);
                 if (typeof this._width != 'undefined') {
                     w = Math.min(this._width, w);
@@ -1718,13 +1718,13 @@ Ext.ux.form.SuperBoxSelectItem = Ext.extend(Ext.ux.form.SuperBoxSelectItem,
                 }
             },
             onLnkFocus : function() {
-                this.el.addClass("x-superboxselect-item-focus");
-                this.owner.outerWrapEl.addClass("x-form-focus");
+                this.el.addClass('x-superboxselect-item-focus');
+                this.owner.outerWrapEl.addClass('x-form-focus');
             },
 
             onLnkBlur : function() {
-                this.el.removeClass("x-superboxselect-item-focus");
-                this.owner.outerWrapEl.removeClass("x-form-focus");
+                this.el.removeClass('x-superboxselect-item-focus');
+                this.owner.outerWrapEl.removeClass('x-form-focus');
             },
 
             enableElListeners : function() {

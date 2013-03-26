@@ -2,25 +2,25 @@
     vim: ts=4:sw=4:nu:fdc=4:nospell
 */
 /*
- *  Copyright 2012 Fred Hutchinson Cancer Research Center
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+    Copyright 2012 Fred Hutchinson Cancer Research Center
+
+    Licensed under the Apache License, Version 2.0 (the 'License');
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an 'AS IS' BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
 
 @charset 'utf-8';
 
 /* Error code from R */
-pre {
+pre, .ext-mb-text {
     white-space: pre-wrap;
 }
 
@@ -77,6 +77,13 @@ pre {
     padding-left: 0px;
 }
 
+.simpler-panel-header {
+    background-color: white;
+    font-family: verdana, arial, helvetica, sans-serif;
+    padding-bottom: 3px;
+    padding-left: 5px;
+}
+
 .x-mask-loading-custom {
     border-left: 0px;
     left: 0 !important;
@@ -104,6 +111,11 @@ pre {
     background-color: white;
     cursor: default;
     text-align: center;
+}
+
+/* Safari fix not to cut off the radio button */
+.x-form-radio {
+    margin-left: 2px !important;
 }
 
 ul.x-tab-strip-top {
@@ -162,24 +174,7 @@ ul.x-tab-strip-top {
 }
 /********************************/
 
-/* ExtJS GridPanel */
-/* Override standard grid styles (add color to vertical grid lines) */
-.x-grid3-col {
-    border-left:  1px solid #EEEEEE;
-    border-right: 1px solid #D2D2D2;
-}
-
-/* Also remove padding from table data (to compensate for added grid lines) */
-.x-grid3-row td, .x-grid3-summary-row td {
-    padding-left: 0px;
-    padding-right: 0px;
-}
-
-.x-grid3-header-offset {
-    width: auto !important;
-}
-
-/* ? */
+/* ExtJS GridPanel important fix for proper alignment */
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     .x-grid3-cell {
         box-sizing: border-box;

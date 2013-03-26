@@ -1,10 +1,26 @@
+# vim: sw=4:ts=4:nu:nospell:fdc=4
+#
+#  Copyright 2013 Fred Hutchinson Cancer Research Center
+#
+#  Licensed under the Apache License, Version 2.0 (the 'License');
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an 'AS IS' BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
 print( 'LOADING LIBRARIES ETC.' );
 ptm <- proc.time();
 
-suppressMessages( library(flowWorkspace) );
-suppressMessages( library(ncdfFlow) );
-suppressMessages( library(Rlabkey) );
-suppressMessages( library(digest) );
+suppressMessages( library( flowWorkspace ) );
+suppressMessages( library( ncdfFlow ) );
+suppressMessages( library( Rlabkey ) );
+suppressMessages( library( digest ) );
 
 xmlPath             <- labkey.url.params$xmlPath;
 filesPath           <- labkey.url.params$rootPath;
@@ -13,7 +29,7 @@ analysisName        <- labkey.url.params$analysisName;
 analysisDescription <- labkey.url.params$analysisDescription;
 studyVarsString     <- labkey.url.params$studyVars;
 allStudyVarsString  <- labkey.url.params$allStudyVars;
-filesString         <- labkey.url.params$files;
+filesIdsString      <- labkey.url.params$filesIds;
 
 if ( xmlPath != '' & sampleGroupName != '' ){
 
@@ -22,20 +38,20 @@ if ( xmlPath != '' & sampleGroupName != '' ){
         filesPath <- folderPath;
     }
 
-    currentHashValue <- digest( paste0( xmlPath, sampleGroupName, filesString ) );
+    currentHashValue <- digest( paste0( xmlPath, sampleGroupName, filesIdsString ) );
 
-    gatingSetPath <- paste0( folderPath, '/', currentHashValue, '.tar' );
+    gatingSetPath <- paste0( folderPath, '/', currentHashValue );
 
     if ( ! file.exists( gatingSetPath ) ) {
-    
-        suppressMessages( ws <- openWorkspace( xmlPath ) );
+
+        if ( ! exists('ws') ) {
+            suppressMessages( ws <- openWorkspace( xmlPath ) );
+        }
 
         print( proc.time() - ptm );
 
         print('PARSING WORKSPACE');
         ptm <- proc.time();
-
-        filesArray <- unlist( strsplit( filesString, split=';' ) );
 
         suppressMessages(
             G <- parseWorkspace(
@@ -43,11 +59,11 @@ if ( xmlPath != '' & sampleGroupName != '' ){
                 , name      = sampleGroupName
                 , isNcdf    = T
                 , path      = filesPath
-                , subset    = filesArray
+                , subset    = unlist( strsplit( labkey.url.params$filesNames, split=',' ) )
             )
         );
 
-        if ( ( ! exists("G") ) | is.null( G[[1]] ) ){
+        if ( ( ! exists('G') ) | is.null( G[[1]] ) ){
             txt <- 'The selected sample group does not contain any of the selected files';
             stop('The selected sample group does not contain any of the selected files');
             return;
@@ -59,173 +75,196 @@ if ( xmlPath != '' & sampleGroupName != '' ){
         ptm <- proc.time();
 
         meta <- labkey.selectRows(
-              baseUrl       = labkey.url.base
-            , folderPath    = labkey.url.path
+              queryName     = 'Files'
             , schemaName    = 'flow'
-            , queryName     = 'Files'
+            , folderPath    = labkey.url.path
+            , baseUrl       = labkey.url.base
             , colSelect     = c('Name', allStudyVarsString) # needs to be a vector of comma separated strings
             , colNameOpt    = 'fieldname'
-            , colFilter     = makeFilter( c("Name", "IN", filesString) )
+            , colFilter     = makeFilter( c( 'RowId', 'IN', filesIdsString ) )
             , showHidden    = T
         );
 
         nameInd <-  which( colnames(meta) == 'Name' );
         idInd   <-  which( colnames(meta) == 'RowId' );
 
-        meta <- cbind( meta[ c( nameInd, idInd ) ], sapply( meta[ , -c( nameInd, idInd ) ], as.factor ) );
+		meta[ , -c( nameInd, idInd ) ] <- lapply( meta[ , -c(nameInd, idInd) ], as.factor );
 
-	colnames(meta)[ which( colnames(meta) == 'Name' ) ]	<- 'name';
+        colnames(meta)[ which( colnames(meta) == 'Name' ) ]     <- 'name';
         colnames(meta)[ which( colnames(meta) == 'RowId' ) ]	<- 'fileid';
-
         pData(G) <- meta;
+        print( proc.time() - ptm );
 
-        suppressMessages( archive( G, gatingSetPath ) );
-        txt <- 'hopefully generated the *.tar file';
-    } else {
-        txt <- 'file already exists';
-	    suppressMessages( G <- unarchive( gatingSetPath ) );
-    }
+        print('ARCHIVING');
+        ptm <- proc.time();
 
+        suppressMessages( flowWorkspace:::save_gs( G, gatingSetPath, overwrite = T ) );
         if ( ! file.exists( gatingSetPath ) ) {
-            txt <- 'BAD ERROR: PROBABLY R COULD NOT CREATE THE TAR FILE BECAUSE THERE WAS NOT ENOUGH MEMORY AVAILABLE';
-            stop('BAD ERROR: PROBABLY R COULD NOT CREATE THE TAR FILE BECAUSE THERE WAS NOT ENOUGH MEMORY AVAILABLE');
+            txt <- 'BAD ERROR: R COULD NOT CREATE THE DATA ON DISK PROBABLY BECAUSE THERE WAS NOT ENOUGH MEMORY AVAILABLE';
+            stop( 'BAD ERROR: R COULD NOT CREATE THE DATA ON DISK PROBABLY BECAUSE THERE WAS NOT ENOUGH MEMORY AVAILABLE' );
             return;
         } else {
-            writeProjections <- function( G, gsId, ... ){
-                gh <- G[[1]];
-                popNames <- getNodes( gh, isPath = T );
-                nodeNames <- getNodes( gh );
-                res <- lapply( 1:length(nodeNames), function(i){
-                    curPop <- popNames[i];
-                    curpNode <- nodeNames[i];
-
-                    #store the children gate projections
-                    curChildrens <- getChildren( gh, curpNode );
-                    if ( length( curChildrens ) > 0 ){
-                        prjlist <- lapply( curChildrens, function(curChildren){
-                            g <- getGate( gh, curChildren );
-                            if ( class( g ) == 'BooleanGate' ){
-                                return( NULL );
-                            } else {
-                                param <- parameters( g );
-
-                                if ( length( param ) == 1 ){
-                                    param <- c( param, "SSC-A" );
-                                }
-                                return( param );
-                            }
-                        });
-                        prj <- do.call( rbind, prjlist );
-                        prj <- unique( prj );
-                        prj <- as.data.frame( prj );
-
-                        colnames(prj) <- c('x_axis', 'y_axis');
-
-                        cbind( name = curpNode, path = curPop, prj, gsid = gsId );
-                    }
-                });
-
-                toInsert <- do.call( rbind, res );
-
-                map <- subset( pData( parameters( getData( gh ) ) )[ , 1:2 ], ! is.na(desc) );
-
-                colnames(map)[1] <- 'x_axis';
-                toInsert <- merge( toInsert, map, all.x = T );
-                emptyInds <- is.na( toInsert$desc );
-                toInsert$desc[ emptyInds ] <- '';
-                toInsert$desc[ ! emptyInds ] <- paste( toInsert$desc[ ! emptyInds ], '' );
-                toInsert$x_axis <- paste0( toInsert$desc, toInsert$x_axis );
-                toInsert$desc <- NULL;
-
-                colnames(map)[1] <- 'y_axis';
-                toInsert <- merge( toInsert, map, all.x = T );
-                emptyInds <- is.na( toInsert$desc );
-                toInsert$desc[ emptyInds ] <- '';
-                toInsert$desc[ ! emptyInds ] <- paste( toInsert$desc[ ! emptyInds ], '' );
-                toInsert$y_axis <- paste0( toInsert$desc, toInsert$y_axis );
-                toInsert$desc <- NULL;
-
-                insertedRow <- labkey.insertRows( queryName = 'projections', toInsert = toInsert, ... );
-            };
-
-            sql <- 'SELECT MAX(gsid) AS max_gsid FROM gstbl';
-
-            max_gsid <- labkey.executeSql(
-                  sql           = sql
-                , showHidden    = T
-                , colNameOpt    = 'caption'
-                , baseUrl       = labkey.url.base
-                , folderPath    = labkey.url.path
-                , schemaName    = 'opencyto_preprocessing'
-            )[1,];
-
-            if ( is.na(max_gsid) ){
-                max_gsid <- 1;
-            } else {
-                max_gsid <- max_gsid + 1;
-            }
-
-            toInsert <- data.frame(
-                  gsid            = max_gsid
-                , gsname          = analysisName
-                , objlink         = gatingSetPath
-                , gsdescription   = analysisDescription
-                , xmlpath         = xmlPath
-                , samplegroup     = sampleGroupName
-            );
-
-            print( proc.time() - ptm );
-
-            print('WRITING GATING SET');
-            ptm <- proc.time();
-
-            test <- labkey.selectRows(
-                  queryName     = 'gstbl',
-                , baseUrl       = labkey.url.base,
-                , folderPath    = labkey.url.path,
-                , schemaName    = 'opencyto_preprocessing'
-            );
-
-            insertedRow <- labkey.insertRows(
-                  queryName     = 'gstbl'
-                , toInsert      = toInsert
-                , baseUrl       = labkey.url.base
-                , folderPath    = labkey.url.path
-                , schemaName    = 'opencyto_preprocessing'
-            );
-
-            print( proc.time() - ptm );
-
-            print('WRITING PROJECTIONS AND STUDY VARIABLES');
-            ptm <- proc.time();
-
-            writeProjections(
-                  G
-                , max_gsid
-                , baseUrl       = labkey.url.base
-                , folderPath    = labkey.url.path
-                , schemaName    = 'opencyto_preprocessing'
-            );
-
-            if ( studyVarsString != '' ){
-                toInsert <- data.frame(
-                      svname  = unlist( strsplit( studyVarsString, split=',' ) )
-                    , gsid    = max_gsid
-                );
-
-                labkey.insertRows(
-                      queryName     = 'study_vars'
-                    , toInsert      = toInsert
-                    , baseUrl       = labkey.url.base
-                    , folderPath    = labkey.url.path
-                    , schemaName    = 'opencyto_preprocessing'
-                );
-            }
-
-            print( proc.time() - ptm );
-
-            txt <- paste( txt, 'and wrote to the db!' );
+            txt <- 'Success: wrote data to disk';
         }
+    } else {
+        print( proc.time() - ptm );
+
+        print('UNARCHIVING THE EXISTING DATA');
+        ptm <- proc.time();
+
+        suppressMessages( G <- flowWorkspace:::load_gs( gatingSetPath ) );
+        txt <- 'Success: reusing the already existing data on disk';
+    }
+
+        writeProjections <- function( G, gsId, ... ){
+            gh <- G[[1]];
+            popNames <- getNodes( gh, isPath = T );
+            nodeNames <- getNodes( gh );
+            res <- lapply( 1:length(nodeNames), function(i){
+                curPop <- popNames[i];
+                curpNode <- nodeNames[i];
+
+                #store the children gate projections
+                curChildrens <- getChildren( gh, curpNode );
+                if ( length( curChildrens ) > 0 ){
+                    prjlist <- lapply( curChildrens, function(curChildren){
+                        g <- getGate( gh, curChildren );
+                        if ( class( g ) == 'BooleanGate' ){
+                            return( NULL );
+                        } else {
+                            param <- parameters( g );
+
+                            if ( length( param ) == 1 ){
+                                param <- c( param, 'SSC-A' );
+                            }
+                            return( param );
+                        }
+                    });
+                    prj <- do.call( rbind, prjlist );
+                    prj <- unique( prj );
+                    prj <- as.data.frame( prj );
+
+                    colnames(prj) <- c('x_axis', 'y_axis');
+
+                    cbind( name = curpNode, path = curPop, prj, gsid = gsId );
+                }
+            });
+
+            toInsert <- do.call( rbind, res );
+
+            map <- subset( pData( parameters( getData( gh ) ) )[ , 1:2 ], ! is.na(desc) );
+
+            colnames(map)[1] <- 'x_axis';
+            toInsert <- merge( toInsert, map, all.x = T );
+            emptyInds <- is.na( toInsert$desc );
+            toInsert$desc[ emptyInds ] <- '';
+            toInsert$desc[ ! emptyInds ] <- paste( toInsert$desc[ ! emptyInds ], '' );
+            toInsert$x_axis <- paste0( toInsert$desc, toInsert$x_axis );
+            toInsert$desc <- NULL;
+
+            colnames(map)[1] <- 'y_axis';
+            toInsert <- merge( toInsert, map, all.x = T );
+            emptyInds <- is.na( toInsert$desc );
+            toInsert$desc[ emptyInds ] <- '';
+            toInsert$desc[ ! emptyInds ] <- paste( toInsert$desc[ ! emptyInds ], '' );
+            toInsert$y_axis <- paste0( toInsert$desc, toInsert$y_axis );
+            toInsert$desc <- NULL;
+
+            insertedRow <- labkey.insertRows( queryName = 'projections', toInsert = toInsert, ... );
+        };
+
+        sql <- 'SELECT MAX(gsid) AS max_gsid FROM gstbl';
+
+        max_gsid <- labkey.executeSql(
+              sql           = sql
+            , schemaName    = 'opencyto_preprocessing'
+            , folderPath    = labkey.url.path
+            , baseUrl       = labkey.url.base
+            , showHidden    = T
+            , colNameOpt    = 'caption'
+        )[1,];
+
+        if ( is.na(max_gsid) ){
+            max_gsid <- 1;
+        } else {
+            max_gsid <- max_gsid + 1;
+        }
+
+        toInsert <- data.frame(
+              gsid            = max_gsid
+            , gsname          = analysisName
+            , objlink         = gatingSetPath
+            , gsdescription   = analysisDescription
+            , xmlpath         = xmlPath
+            , samplegroup     = sampleGroupName
+        );
+
+        print( proc.time() - ptm );
+
+        print('WRITING GATING SET');
+        ptm <- proc.time();
+
+        test <- labkey.selectRows(
+              queryName     = 'gstbl',
+            , schemaName    = 'opencyto_preprocessing'
+            , folderPath    = labkey.url.path
+            , baseUrl       = labkey.url.base
+        );
+
+        insertedRow <- labkey.insertRows(
+              toInsert      = toInsert
+            , queryName     = 'gstbl'
+            , schemaName    = 'opencyto_preprocessing'
+            , folderPath    = labkey.url.path
+            , baseUrl       = labkey.url.base
+        );
+
+        print( proc.time() - ptm );
+
+        print('WRITING PROJECTIONS AND STUDY VARIABLES');
+        ptm <- proc.time();
+
+        writeProjections(
+              G
+            , max_gsid
+            , schemaName    = 'opencyto_preprocessing'
+            , folderPath    = labkey.url.path
+            , baseUrl       = labkey.url.base
+        );
+
+        if ( studyVarsString != '' ){
+            toInsert <- data.frame(
+                  svname  = unlist( strsplit( studyVarsString, split=',' ) )
+                , gsid    = max_gsid
+            );
+
+            labkey.insertRows(
+                  toInsert      = toInsert
+                , queryName     = 'study_vars'
+                , schemaName    = 'opencyto_preprocessing'
+                , folderPath    = labkey.url.path
+                , baseUrl       = labkey.url.base
+            );
+        }
+
+        if ( filesIdsString != '' ){
+            toInsert <- data.frame(
+                  fileid    = unlist( strsplit( filesIdsString, split=';' ) )
+                , gsid      = max_gsid
+            );
+
+            labkey.insertRows(
+                  toInsert      = toInsert
+                , queryName     = 'files'
+                , schemaName    = 'opencyto_preprocessing'
+                , folderPath    = labkey.url.path
+                , baseUrl       = labkey.url.base
+            );
+        }
+
+        print( proc.time() - ptm );
+
+        txt <- paste( txt, 'and wrote to the db!' );
 
 } else {
     txt <- 'empty path or sample group';

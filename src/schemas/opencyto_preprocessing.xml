@@ -1,52 +1,69 @@
-<ns:tables xmlns:ns="http://labkey.org/data/xml">
-    <ns:table tableName="gstbl" tableDbType="TABLE">
+<ns:tables xmlns:ns='http://labkey.org/data/xml'>
+    <ns:table tableName='gstbl' tableDbType='TABLE'>
         <ns:description>
             The 'gsTbl' table contains information about generated gating sets.
         </ns:description>
         <ns:columns>
-            <ns:column columnName="gsid"/>
-            <ns:column columnName="container"/>
-            <ns:column columnName="gsname"/>
-            <ns:column columnName="objlink">
+            <ns:column columnName='gsid'/>
+            <ns:column columnName='container'/>
+            <ns:column columnName='gsname'/>
+            <ns:column columnName='objlink'>
                 <ns:columnTitle>objLink</ns:columnTitle>
             </ns:column>
-            <ns:column columnName="gsdescription">
+            <ns:column columnName='gsdescription'>
                 <ns:columnTitle>gsDescription</ns:columnTitle>
             </ns:column>
-            <ns:column columnName="xmlpath">
+            <ns:column columnName='xmlpath'>
                 <ns:columnTitle>xmlPath</ns:columnTitle>
             </ns:column>
-            <ns:column columnName="samplegroup">
+            <ns:column columnName='samplegroup'>
                 <ns:columnTitle>sampleGroup</ns:columnTitle>
             </ns:column>
         </ns:columns>
     </ns:table>
-    <ns:table tableName="projections" tableDbType="TABLE">
+    <ns:table tableName='projections' tableDbType='TABLE'>
         <ns:description>
             The 'projections' table contains the projections information associated with gating sets.
         </ns:description>
         <ns:columns>
-            <ns:column columnName="container"/>
-            <ns:column columnName="name"/>
-            <ns:column columnName="path"/>
-            <ns:column columnName="x_axis"/>
-            <ns:column columnName="y_axis"/>
-            <ns:column columnName="gsid"/>
+            <ns:column columnName='container'/>
+            <ns:column columnName='name'/>
+            <ns:column columnName='path'/>
+            <ns:column columnName='x_axis'/>
+            <ns:column columnName='y_axis'/>
+            <ns:column columnName='gsid'/>
         </ns:columns>
     </ns:table>
-    <ns:table tableName="study_vars" tableDbType="TABLE">
+    <ns:table tableName='study_vars' tableDbType='TABLE'>
         <ns:description>
             The 'study_vars' table contains the sets of study variables associated with each of the generated gating sets.
         </ns:description>
         <ns:columns>
-            <ns:column columnName="svid">
+            <ns:column columnName='svid'>
                 <ns:columnTitle>Study Variable Id</ns:columnTitle>
             </ns:column>
-            <ns:column columnName="container"/>
-            <ns:column columnName="svname">
+            <ns:column columnName='container'/>
+            <ns:column columnName='svname'>
                 <ns:columnTitle>Study Variable Name</ns:columnTitle>
             </ns:column>
-            <ns:column columnName="gsid"/>
+            <ns:column columnName='gsid'/>
+        </ns:columns>
+    </ns:table>
+    <ns:table tableName='files' tableDbType='TABLE'>
+        <ns:description>
+            The 'files' table contains the sets of files chosen for each of the generated gating sets.
+        </ns:description>
+        <ns:columns>
+            <ns:column columnName='fileId'>
+                <ns:columnTitle>File Id</ns:columnTitle>
+                <ns:fk>
+                    <ns:fkDbSchema>flow</ns:fkDbSchema>
+                    <ns:fkTable>FCSFiles</ns:fkTable>
+                    <ns:fkColumnName>RowId</ns:fkColumnName>
+                </ns:fk>
+            </ns:column>
+            <ns:column columnName='container'/>
+            <ns:column columnName='gsid'/>
         </ns:columns>
     </ns:table>
 </ns:tables>

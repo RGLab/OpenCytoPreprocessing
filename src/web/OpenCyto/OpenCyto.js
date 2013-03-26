@@ -1,19 +1,19 @@
 // vim: sw=4:ts=4:nu:nospell:fdc=4
 /*
- *  Copyright 2012 Fred Hutchinson Cancer Research Center
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+ Copyright 2012 Fred Hutchinson Cancer Research Center
+
+ Licensed under the Apache License, Version 2.0 (the 'License');
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an 'AS IS' BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
 
 
 //================================//
@@ -56,7 +56,7 @@ if(!Array.prototype.indexOf) {
 // IE7 compatibility
 Object.keys = Object.keys || (function () {
     var hasOwnProperty = Object.prototype.hasOwnProperty,
-            hasDontEnumBug = !{toString:null}.propertyIsEnumerable("toString"),
+            hasDontEnumBug = !{toString:null}.propertyIsEnumerable('toString'),
             DontEnums = [
                 'toString',
                 'toLocaleString',
@@ -69,8 +69,8 @@ Object.keys = Object.keys || (function () {
             DontEnumsLength = DontEnums.length;
 
     return function (o) {
-        if (typeof o != "object" && typeof o != "function" || o === null)
-            throw new TypeError("Object.keys called on a non-object");
+        if (typeof o != 'object' && typeof o != 'function' || o === null)
+            throw new TypeError('Object.keys called on a non-object');
 
         var result = [];
         for (var name in o) {
@@ -103,10 +103,10 @@ function onFailure(errorInfo, options, responseObj){
     var strngErrorContact = ' Please, contact ldashevs@fhcrc.org, if you have questions.';
 
     if (errorInfo && errorInfo.exception)
-        Ext.Msg.alert('Error', 'Failure: ' + errorInfo.exception + strngErrorContact);
+        Ext.Msg.alert('Error', 'Failure: ' + errorInfo.exception + '.' + strngErrorContact);
     else {
         if ( responseObj != undefined ){
-            Ext.Msg.alert('Error', 'Failure: ' + responseObj.statusText + strngErrorContact);
+            Ext.Msg.alert('Error', 'Failure: ' + responseObj.statusText + '.' + strngErrorContact);
         } else {
             Ext.Msg.alert('Error', 'Failure: ' + errorInfo.statusText + (errorInfo.timedout==true?', timed out.':'') + strngErrorContact);
         }
@@ -186,7 +186,7 @@ Ext.override (Ext.ux.form.SuperBoxSelect, {
             var re = new RegExp('(.*?)(' + '' + Ext.escapeRe(this.getRawValue()) + ')(.*)', this.caseSensitive ? '' : 'i');
             var h = d[this.displayField];
 
-            h=h.replace(re, '$1<span class="mark-combo-match">$2</span>$3');
+            h=h.replace(re, '$1<span class=\'mark-combo-match\'>$2</span>$3');
             n.innerHTML=h;
         }
     }
@@ -225,9 +225,9 @@ Ext.TabPanel.override({
 
         if(!this.itemTpl){
             var tt = new Ext.Template(
-                    '<li class="{cls}" id="{id}"><a class="x-tab-strip-close"></a>',
-                    '<a class="x-tab-right" href="#"><em class="x-tab-left">',
-                    '<span style="{tabStripInnerStyle}" class="x-tab-strip-inner"><span class="x-tab-strip-text {iconCls}">{text}</span></span>',
+                    '<li class=\'{cls}\' id=\'{id}\'><a class=\'x-tab-strip-close\'></a>',
+                    '<a class=\'x-tab-right\' href=\'#\'><em class=\'x-tab-left\'>',
+                    '<span style=\'{tabStripInnerStyle}\' class=\'x-tab-strip-inner\'><span class=\'x-tab-strip-text {iconCls}\'>{text}</span></span>',
                     '</em></a></li>'
             );
             tt.disableFormats = true;
@@ -306,7 +306,7 @@ Ext.CustomColumnModel = Ext.extend(Ext.grid.ColumnModel, {
             this.config.splice(oldIndex, 1);
             this.config.splice(newIndex, 0, c);
             this.dataMap = null;
-            this.fireEvent("columnmoved", this, oldIndex, newIndex);
+            this.fireEvent('columnmoved', this, oldIndex, newIndex);
         }
     }
 });

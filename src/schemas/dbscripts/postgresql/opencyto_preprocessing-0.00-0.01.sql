@@ -42,3 +42,15 @@ CREATE TABLE opencyto_preprocessing.study_vars
         REFERENCES opencyto_preprocessing.gsTbl (gsId, Container)
         ON DELETE CASCADE
 );
+
+CREATE TABLE opencyto_preprocessing.files
+(
+    fileId         INT NOT NULL,
+    Container ENTITYID NOT NULL,
+    gsId           INT NOT NULL,
+
+      CONSTRAINT PK_files PRIMARY KEY (fileId, Container, gsId)
+    , CONSTRAINT FK_files_gsTbl FOREIGN KEY (gsId, Container)
+        REFERENCES opencyto_preprocessing.gsTbl (gsId, Container)
+        ON DELETE CASCADE
+);

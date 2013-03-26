@@ -1,26 +1,26 @@
 // vim: sw=4:ts=4:nu:nospell:fdc=4
 /*
- *  Copyright 2012 Fred Hutchinson Cancer Research Center
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+ Copyright 2012 Fred Hutchinson Cancer Research Center
+
+ Licensed under the Apache License, Version 2.0 (the 'License');
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an 'AS IS' BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
 
 Ext.ux.ExtendedLovCombo = Ext.extend(Ext.ux.form.LovCombo, {
     initComponent: function(){
         this.triggerConfig = {
             tag:'span', cls:'x-form-twin-triggers', cn:[
-                {tag: "img", src: Ext.BLANK_IMAGE_URL, cls: "x-form-trigger"},
-                {tag: "img", src: Ext.BLANK_IMAGE_URL, cls: "x-form-trigger x-form-clear-trigger"}
+                {tag: 'img', src: Ext.BLANK_IMAGE_URL, cls: 'x-form-trigger'},
+                {tag: 'img', src: Ext.BLANK_IMAGE_URL, cls: 'x-form-trigger x-form-clear-trigger'}
             ]};
 
         Ext.ux.ExtendedLovCombo.superclass.initComponent.call(this);
