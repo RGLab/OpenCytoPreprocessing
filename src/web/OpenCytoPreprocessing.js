@@ -390,6 +390,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         }
                     )
 
+                    updateTableStatus();
                 }
             },
             minChars: 0,
@@ -546,9 +547,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     } else if ( count == 1 ) {
                         cbSampleGroup.setValue( strSampleGroup.getAt(0).data.SampleGroup );
                     }
-
-                    // REMOVE ONCE THE NEWEST SERVER VERSION IS AVAILABLE!
-                    LABKEY.Report.deleteSession( reportSessionId );
                 }
             }
         };
@@ -633,6 +631,8 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 cbAnalysis.clearValue();
                 strGatingSet.reload();
 
+                btnDelete.setDisabled(true);
+
                 onFailure( errorInfo, options, responseObj );
             },
             reportId: 'module:OpenCytoPreprocessing/Delete.r',
@@ -657,7 +657,9 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     Ext.Msg.alert('Info', p.value);
 
                     cbAnalysis.clearValue();
-					strGatingSet.reload();
+                    strGatingSet.reload();
+
+                    btnDelete.setDisabled(true);
                 }
             }
         };
