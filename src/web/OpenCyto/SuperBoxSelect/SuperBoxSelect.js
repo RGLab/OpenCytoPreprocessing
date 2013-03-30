@@ -450,7 +450,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
                     }, this);
                 }
                 this.store.add(toAdd);
-                this.store.sort(this.displayField, 'ASC');
+                this.store.sort( this.store.multiSortInfo.sorters, this.store.multiSortInfo.direction );
 
                 if (this.store.getCount() === 0 && this.isExpanded()) {
                     this.collapse();
@@ -1168,10 +1168,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
                 return this;
             },
             sortStore : function() {
-                var ss = this.store.getSortState();
-                if (ss && ss.field) {
-                    this.store.sort(ss.field, ss.direction);
-                }
+                this.store.sort( this.store.multiSortInfo.sorters, this.store.multiSortInfo.direction );
                 return this;
             },
             getCaption : function(dataObject) {

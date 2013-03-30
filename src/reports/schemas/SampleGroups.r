@@ -16,6 +16,7 @@
 
 suppressMessages( library( flowWorkspace ) );
 suppressMessages( library( RJSONIO ) );
+suppressMessages( library( gdata ) );
 
 wsPath <- labkey.url.params$wsPath;
 
@@ -25,7 +26,15 @@ if ( wsPath != '' ){
 
     sampleGroups <- getSampleGroups(ws)[ , c(1,3) ];
 
-    list <- unique( sampleGroups[[1]] );
+    list <- as.character( unique( sampleGroups[[1]] ) );
+
+    if ( length(list) > 1 ){
+        list <- list[ list != 'All Samples' ];
+
+        sampleGroups <- sampleGroups[ sampleGroups$groupName != 'All Samples', ];
+
+        sampleGroups$groupName <- drop.levels( sampleGroups$groupName );
+    }
 
     sampleGroups <-
         cbind(

@@ -19,6 +19,9 @@
             <ns:column columnName='samplegroup'>
                 <ns:columnTitle>sampleGroup</ns:columnTitle>
             </ns:column>
+            <ns:column columnName='timestamp'>
+                <ns:columnTitle>timeStamp</ns:columnTitle>
+            </ns:column>
         </ns:columns>
     </ns:table>
     <ns:table tableName='projections' tableDbType='TABLE'>

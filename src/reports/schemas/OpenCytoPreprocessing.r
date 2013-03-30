@@ -14,14 +14,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-print( 'LOADING LIBRARIES ETC.' );
-ptm <- proc.time();
-
-suppressMessages( library( flowWorkspace ) );
-suppressMessages( library( ncdfFlow ) );
-suppressMessages( library( Rlabkey ) );
-suppressMessages( library( digest ) );
-
 xmlPath             <- labkey.url.params$xmlPath;
 filesPath           <- labkey.url.params$rootPath;
 sampleGroupName     <- labkey.url.params$sampleGroupName;
@@ -30,10 +22,26 @@ analysisDescription <- labkey.url.params$analysisDescription;
 studyVarsString     <- labkey.url.params$studyVars;
 allStudyVarsString  <- labkey.url.params$allStudyVars;
 filesIdsString      <- labkey.url.params$filesIds;
+filesNamesString    <- labkey.url.params$filesNames;
+
+folderPath <- dirname( xmlPath );
+
+tryCatch({
+
+lg <- '';
+
+print( 'LOADING LIBRARIES ETC.' );
+lg <- paste0( lg, '\nLOADING LIBRARIES ETC.' );
+
+ptm <- proc.time();
+
+suppressMessages( library( flowWorkspace ) );
+suppressMessages( library( ncdfFlow ) );
+suppressMessages( library( Rlabkey ) );
+suppressMessages( library( digest ) );
 
 if ( xmlPath != '' & sampleGroupName != '' ){
 
-    folderPath <- dirname( xmlPath );
     if ( filesPath == '' ){
         filesPath <- folderPath;
     }
@@ -48,9 +56,12 @@ if ( xmlPath != '' & sampleGroupName != '' ){
             suppressMessages( ws <- openWorkspace( xmlPath, options = 1 ) );
         }
 
-        print( proc.time() - ptm );
+        tempTime <- proc.time() - ptm;
+        print( tempTime );
+        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse='\n' ) );
 
         print('PARSING WORKSPACE');
+        lg <- paste0( lg, '\nPARSING WORKSPACE' );
         ptm <- proc.time();
 
         suppressMessages(
@@ -59,7 +70,7 @@ if ( xmlPath != '' & sampleGroupName != '' ){
                 , name      = sampleGroupName
                 , isNcdf    = T
                 , path      = filesPath
-                , subset    = unlist( strsplit( labkey.url.params$filesNames, split=',' ) )
+                , subset    = unlist( strsplit( filesNamesString, split=',' ) )
             )
         );
 
@@ -69,9 +80,12 @@ if ( xmlPath != '' & sampleGroupName != '' ){
             return;
         }
 
-        print( proc.time() - ptm );
+        tempTime <- proc.time() - ptm;
+        print( tempTime );
+        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse='\n' ) );
 
         print('FETCHING METADATA ETC.');
+        lg <- paste0( lg, '\nFETCHING METADATA ETC.' );
         ptm <- proc.time();
 
         meta <- labkey.selectRows(
@@ -93,9 +107,13 @@ if ( xmlPath != '' & sampleGroupName != '' ){
         colnames(meta)[ which( colnames(meta) == 'Name' ) ]     <- 'name';
         colnames(meta)[ which( colnames(meta) == 'RowId' ) ]	<- 'fileid';
         pData(G) <- meta;
-        print( proc.time() - ptm );
+
+        tempTime <- proc.time() - ptm;
+        print( tempTime );
+        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse='\n' ) );
 
         print('ARCHIVING');
+        lg <- paste0( lg, '\nARCHIVING' );
         ptm <- proc.time();
 
         suppressMessages( flowWorkspace:::save_gs( G, gatingSetPath, overwrite = T ) );
@@ -107,9 +125,13 @@ if ( xmlPath != '' & sampleGroupName != '' ){
             txt <- 'Success: wrote data to disk';
         }
     } else {
-        print( proc.time() - ptm );
+
+        tempTime <- proc.time() - ptm;
+        print( tempTime );
+        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse='\n' ) );
 
         print('UNARCHIVING THE EXISTING DATA');
+        lg <- paste0( lg, '\nUNARCHIVING THE EXISTING DATA' );
         ptm <- proc.time();
 
         suppressMessages( G <- flowWorkspace:::load_gs( gatingSetPath ) );
@@ -197,11 +219,15 @@ if ( xmlPath != '' & sampleGroupName != '' ){
             , gsdescription   = analysisDescription
             , xmlpath         = xmlPath
             , samplegroup     = sampleGroupName
+            , timestamp       = as.character( Sys.time() )
         );
 
-        print( proc.time() - ptm );
+        tempTime <- proc.time() - ptm;
+        print( tempTime );
+        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse='\n' ) );
 
         print('WRITING GATING SET');
+        lg <- paste0( lg, '\nWRITING GATING SET' );
         ptm <- proc.time();
 
         test <- labkey.selectRows(
@@ -219,9 +245,12 @@ if ( xmlPath != '' & sampleGroupName != '' ){
             , baseUrl       = labkey.url.base
         );
 
-        print( proc.time() - ptm );
+        tempTime <- proc.time() - ptm;
+        print( tempTime );
+        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse='\n' ) );
 
         print('WRITING PROJECTIONS AND STUDY VARIABLES');
+        lg <- paste0( lg, '\nWRITING PROJECTIONS AND STUDY VARIABLES' );
         ptm <- proc.time();
 
         writeProjections(
@@ -238,7 +267,7 @@ if ( xmlPath != '' & sampleGroupName != '' ){
                 , gsid    = max_gsid
             );
 
-            labkey.insertRows(
+            insertedRows <- labkey.insertRows(
                   toInsert      = toInsert
                 , queryName     = 'study_vars'
                 , schemaName    = 'opencyto_preprocessing'
@@ -253,7 +282,7 @@ if ( xmlPath != '' & sampleGroupName != '' ){
                 , gsid      = max_gsid
             );
 
-            labkey.insertRows(
+            insertedRows <- labkey.insertRows(
                   toInsert      = toInsert
                 , queryName     = 'files'
                 , schemaName    = 'opencyto_preprocessing'
@@ -262,7 +291,9 @@ if ( xmlPath != '' & sampleGroupName != '' ){
             );
         }
 
-        print( proc.time() - ptm );
+        tempTime <- proc.time() - ptm;
+        print( tempTime );
+        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse='\n' ) );
 
         txt <- paste( txt, 'and wrote to the db!' );
 
@@ -271,3 +302,12 @@ if ( xmlPath != '' & sampleGroupName != '' ){
 }
 
 write(txt, file='${txtout:textOutput}');
+
+}, error = function(e){
+    fileConn <- file( paste0( folderPath,'/', Sys.time(), '_', basename( xmlPath ), '_', sampleGroupName, '.log' ) );
+    lg <- paste0( lg, '\n', print( e ) );
+    write( lg, file = fileConn );
+    close( fileConn );
+    stop(e);
+});
+
