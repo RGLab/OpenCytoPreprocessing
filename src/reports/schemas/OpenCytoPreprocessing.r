@@ -117,6 +117,11 @@ if ( xmlPath != '' & sampleGroupName != '' ){
         ptm <- proc.time();
 
         suppressMessages( flowWorkspace:::save_gs( G, gatingSetPath, overwrite = T ) );
+
+        tempTime <- proc.time() - ptm;
+        print( tempTime );
+        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse='\n' ) );
+
         if ( ! file.exists( gatingSetPath ) ) {
             txt <- 'BAD ERROR: R COULD NOT CREATE THE DATA ON DISK PROBABLY BECAUSE THERE WAS NOT ENOUGH MEMORY AVAILABLE';
             stop( 'BAD ERROR: R COULD NOT CREATE THE DATA ON DISK PROBABLY BECAUSE THERE WAS NOT ENOUGH MEMORY AVAILABLE' );
@@ -135,8 +140,60 @@ if ( xmlPath != '' & sampleGroupName != '' ){
         ptm <- proc.time();
 
         suppressMessages( G <- flowWorkspace:::load_gs( gatingSetPath ) );
+
+        tempTime <- proc.time() - ptm;
+        print( tempTime );
+        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse='\n' ) );
+
         txt <- 'Success: reusing the already existing data on disk';
     }
+
+        print('WRITING GATING SET');
+        lg <- paste0( lg, '\nWRITING GATING SET' );
+        ptm <- proc.time();
+
+        sql <- 'SELECT MAX(gsid) AS max_gsid FROM gstbl';
+
+        max_gsid <- labkey.executeSql(
+              sql           = sql
+            , schemaName    = 'opencyto_preprocessing'
+            , folderPath    = labkey.url.path
+            , baseUrl       = labkey.url.base
+            , showHidden    = T
+            , colNameOpt    = 'caption'
+        )[1,];
+
+        if ( is.na(max_gsid) ){
+            max_gsid <- 1;
+        } else {
+            max_gsid <- max_gsid + 1;
+        }
+
+        toInsert <- data.frame(
+              gsid            = max_gsid
+            , gsname          = analysisName
+            , objlink         = gatingSetPath
+            , gsdescription   = analysisDescription
+            , xmlpath         = xmlPath
+            , samplegroup     = sampleGroupName
+            , timestamp       = as.character( Sys.time() )
+        );
+
+        insertedRow <- labkey.insertRows(
+              toInsert      = toInsert
+            , queryName     = 'gstbl'
+            , schemaName    = 'opencyto_preprocessing'
+            , folderPath    = labkey.url.path
+            , baseUrl       = labkey.url.base
+        );
+
+        tempTime <- proc.time() - ptm;
+        print( tempTime );
+        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse='\n' ) );
+
+        print('GENERATING PROJECTIONS, WRITING PROJECTIONS, STUDY VARIABLES, AND FILES');
+        lg <- paste0( lg, '\nGENERATING PROJECTIONS, WRITING PROJECTIONS, STUDY VARIABLES AND FILES' );
+        ptm <- proc.time();
 
         writeProjections <- function( G, gsId, ... ){
             gh <- G[[1]];
@@ -194,64 +251,6 @@ if ( xmlPath != '' & sampleGroupName != '' ){
 
             insertedRow <- labkey.insertRows( queryName = 'projections', toInsert = toInsert, ... );
         };
-
-        sql <- 'SELECT MAX(gsid) AS max_gsid FROM gstbl';
-
-        max_gsid <- labkey.executeSql(
-              sql           = sql
-            , schemaName    = 'opencyto_preprocessing'
-            , folderPath    = labkey.url.path
-            , baseUrl       = labkey.url.base
-            , showHidden    = T
-            , colNameOpt    = 'caption'
-        )[1,];
-
-        if ( is.na(max_gsid) ){
-            max_gsid <- 1;
-        } else {
-            max_gsid <- max_gsid + 1;
-        }
-
-        toInsert <- data.frame(
-              gsid            = max_gsid
-            , gsname          = analysisName
-            , objlink         = gatingSetPath
-            , gsdescription   = analysisDescription
-            , xmlpath         = xmlPath
-            , samplegroup     = sampleGroupName
-            , timestamp       = as.character( Sys.time() )
-        );
-
-        tempTime <- proc.time() - ptm;
-        print( tempTime );
-        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse='\n' ) );
-
-        print('WRITING GATING SET');
-        lg <- paste0( lg, '\nWRITING GATING SET' );
-        ptm <- proc.time();
-
-        test <- labkey.selectRows(
-              queryName     = 'gstbl',
-            , schemaName    = 'opencyto_preprocessing'
-            , folderPath    = labkey.url.path
-            , baseUrl       = labkey.url.base
-        );
-
-        insertedRow <- labkey.insertRows(
-              toInsert      = toInsert
-            , queryName     = 'gstbl'
-            , schemaName    = 'opencyto_preprocessing'
-            , folderPath    = labkey.url.path
-            , baseUrl       = labkey.url.base
-        );
-
-        tempTime <- proc.time() - ptm;
-        print( tempTime );
-        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse='\n' ) );
-
-        print('WRITING PROJECTIONS AND STUDY VARIABLES');
-        lg <- paste0( lg, '\nWRITING PROJECTIONS AND STUDY VARIABLES' );
-        ptm <- proc.time();
 
         writeProjections(
               G

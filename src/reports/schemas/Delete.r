@@ -26,9 +26,9 @@ if ( gsPath != '' ){
 
         deletedRows <- labkey.deleteRows(
             toDelete        = data.frame(
-								gsid        = gsId,
-								container   = entityId
-							  )
+                                  gsid        = gsId,
+                                  container   = entityId
+                              )
             , queryName     = 'gstbl'
             , baseUrl       = labkey.url.base
             , folderPath    = labkey.url.path

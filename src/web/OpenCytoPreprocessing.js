@@ -344,6 +344,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             displayField: 'FileName',
             emptyText: 'Select...',
             forceSelection: true,
+            lazyInit: false,
             listeners: {
                 change: function(){
                     if ( this.getValue() == '' ){
@@ -989,7 +990,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 LABKEY.Report.execute( cnfSampleGroupsFetching );
 
             } else {
-                cbXML.triggerBlur();
                 cbSampleGroup.setDisabled(false);
 
                 manageSampleGroup();
