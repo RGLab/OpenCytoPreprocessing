@@ -82,6 +82,15 @@ Ext.ux.ExtendedLovCombo = Ext.extend(Ext.ux.form.LovCombo, {
         this.reset();                       // clear contents of combobox
         this.fireEvent('cleared');          // send notification that contents have been cleared
     },
+    /////////////////////////////
+    autoSelect: false,
+    emptyText: 'Select...',
+    forceSelection: true,
+    minChars: 0,
+    mode: 'local',
+    triggerAction: 'all',
+    typeAhead: true,
+    /////////////////////////////
 
     getTrigger:         Ext.form.TwinTriggerField.prototype.getTrigger,
     initTrigger:        Ext.form.TwinTriggerField.prototype.initTrigger,

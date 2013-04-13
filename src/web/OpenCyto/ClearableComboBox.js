@@ -25,26 +25,37 @@ Ext.form.ClearableComboBox = Ext.extend(Ext.ux.ResizableCombo, {
             ]};
         Ext.form.ClearableComboBox.superclass.initComponent.call(this);
     },
-    onTrigger2Click : function()
-    {
+    onTrigger2Click : function() {
         this.collapse();
         this.reset();                       // clear contents of combobox
         this.fireEvent('cleared');          // send notification that contents have been cleared
     },
-
-    getTrigger:         Ext.form.TwinTriggerField.prototype.getTrigger,
-    initTrigger:        Ext.form.TwinTriggerField.prototype.initTrigger,
-    onTrigger1Click:    Ext.ux.ResizableCombo.prototype.onTriggerClick,
-    trigger1Class:      Ext.ux.ResizableCombo.prototype.triggerClass,
-
     getSelectedField: function( field ) {
         var curVal = this.getRawValue(),
-            rec = this.findRecord( this.displayField, curVal );
+                rec = this.findRecord( this.displayField, curVal );
         if ( rec != undefined ){
             return rec.get( field );
         } else {
             return undefined;
         }
-    }
+    },
+
+    /////////////////////////////
+    // OpenCyto custom configs //
+    /////////////////////////////
+    autoSelect: false,
+    emptyText: 'Select...',
+    forceSelection: true,
+    minChars: 0,
+    mode: 'local',
+    triggerAction: 'all',
+    typeAhead: true,
+    /////////////////////////////
+
+    getTrigger:         Ext.form.TwinTriggerField.prototype.getTrigger,
+    initTrigger:        Ext.form.TwinTriggerField.prototype.initTrigger,
+    onTrigger1Click:    Ext.ux.ResizableCombo.prototype.onTriggerClick,
+    trigger1Class:      Ext.ux.ResizableCombo.prototype.triggerClass
+
 });
 Ext.reg('clearcombo', Ext.form.ClearableComboBox);

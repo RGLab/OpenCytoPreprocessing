@@ -41,7 +41,7 @@ pre, .ext-mb-text {
 
 /* Bold text */
 .bold-text, .bold-centered-text, .sortable-list li, .infoMask div, .x-mask-loading-custom div, .ux-lovcombo-list-item-all {
-    font-weight: bold;
+    font-weight: bold !important;
 }
 
 /* Auto margin */
@@ -96,7 +96,7 @@ pre, .ext-mb-text {
 .x-mask-loading-custom div {
     background: no-repeat 5px 5px;
     background-color: white !important;
-    background-image: url(../ext-3.4.0/resources/images/default/grid/loading.gif) !important;
+    background-image: url(loading.gif) !important;
     /*line-height:16px;*/
     padding: 5px 10px 5px 25px;
     text-align: center;

@@ -123,6 +123,19 @@ Ext.ux.form.SuperBoxSelect = function(config) {
 Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,
         Ext.form.ComboBox, {
             maxCustomHeight : null,
+
+            /////////////////////////////
+            // OpenCyto custom configs //
+            /////////////////////////////
+            autoSelect : false,
+            emptyText : 'Select...',
+            forceSelection: true,
+            minChars: 0,
+            mode: 'local',
+            triggerAction: 'all',
+            typeAhead: true,
+            /////////////////////////////
+
             /**
              * @cfg {Boolean} allowAddNewData When set to true, allows items to
              *      be added (via the setValueEx and addItem methods) that do

@@ -35,6 +35,7 @@ lg <- paste0( lg, '\nLOADING LIBRARIES ETC.' );
 
 ptm <- proc.time();
 
+suppressMessages( library( flowIncubator ) );
 suppressMessages( library( flowWorkspace ) );
 suppressMessages( library( ncdfFlow ) );
 suppressMessages( library( Rlabkey ) );
@@ -116,7 +117,7 @@ if ( xmlPath != '' & sampleGroupName != '' ){
         lg <- paste0( lg, '\nARCHIVING' );
         ptm <- proc.time();
 
-        suppressMessages( flowWorkspace:::save_gs( G, gatingSetPath, overwrite = T ) );
+        suppressMessages( save_gs( G, gatingSetPath, overwrite = T ) );
 
         tempTime <- proc.time() - ptm;
         print( tempTime );
@@ -139,7 +140,7 @@ if ( xmlPath != '' & sampleGroupName != '' ){
         lg <- paste0( lg, '\nUNARCHIVING THE EXISTING DATA' );
         ptm <- proc.time();
 
-        suppressMessages( G <- flowWorkspace:::load_gs( gatingSetPath ) );
+        suppressMessages( G <- load_gs( gatingSetPath ) );
 
         tempTime <- proc.time() - ptm;
         print( tempTime );
@@ -176,7 +177,6 @@ if ( xmlPath != '' & sampleGroupName != '' ){
             , gsdescription   = analysisDescription
             , xmlpath         = xmlPath
             , samplegroup     = sampleGroupName
-            , timestamp       = as.character( Sys.time() )
         );
 
         insertedRow <- labkey.insertRows(
@@ -238,6 +238,7 @@ if ( xmlPath != '' & sampleGroupName != '' ){
             emptyInds <- is.na( toInsert$desc );
             toInsert$desc[ emptyInds ] <- '';
             toInsert$desc[ ! emptyInds ] <- paste( toInsert$desc[ ! emptyInds ], '' );
+            toInsert$x_key <- toInsert$x_axis;
             toInsert$x_axis <- paste0( toInsert$desc, toInsert$x_axis );
             toInsert$desc <- NULL;
 
@@ -246,6 +247,7 @@ if ( xmlPath != '' & sampleGroupName != '' ){
             emptyInds <- is.na( toInsert$desc );
             toInsert$desc[ emptyInds ] <- '';
             toInsert$desc[ ! emptyInds ] <- paste( toInsert$desc[ ! emptyInds ], '' );
+            toInsert$y_key <- toInsert$y_axis;
             toInsert$y_axis <- paste0( toInsert$desc, toInsert$y_axis );
             toInsert$desc <- NULL;
 

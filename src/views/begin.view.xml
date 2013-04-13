@@ -1,17 +1,26 @@
 <view xmlns='http://labkey.org/data/xml/view' title='OpenCyto Preprocessing'>
     <dependencies>
         <dependency path='Ext.ux.form.LovCombo.css'/>
-
         <dependency path='OpenCyto/jQuery/css/base/jquery-ui.css'/>
         <dependency path='OpenCyto/SuperBoxSelect/superboxselect-gray-extend.css'/>
-        <dependency path='OpenCyto/ResizableCombo.js'/>
-        <dependency path='OpenCyto/ClearableComboBox.js'/>
+        <dependency path='OpenCyto/gridfilters/css/RangeMenu.css'/>
+        <dependency path='OpenCyto/gridfilters/css/GridFilters.css'/>
         <dependency path='OpenCyto/OpenCyto.css'/>
 
         <dependency path='Ext.ux.form.LovCombo.js'/>
-
+        <dependency path='OpenCyto/ResizableCombo.js'/>
+        <dependency path='OpenCyto/ClearableComboBox.js'/>
         <dependency path='OpenCyto/ExtendedLovCombo.js'/>
         <dependency path='OpenCyto/SuperBoxSelect/SuperBoxSelect.js'/>
+        <dependency path='OpenCyto/gridfilters/menu/RangeMenu.js'/>
+        <dependency path='OpenCyto/gridfilters/menu/ListMenu.js'/>
+        <dependency path='OpenCyto/gridfilters/GridFilters.js'/>
+        <dependency path='OpenCyto/gridfilters/filter/Filter.js'/>
+        <dependency path='OpenCyto/gridfilters/filter/StringFilter.js'/>
+        <dependency path='OpenCyto/gridfilters/filter/DateFilter.js'/>
+        <dependency path='OpenCyto/gridfilters/filter/ListFilter.js'/>
+        <dependency path='OpenCyto/gridfilters/filter/NumericFilter.js'/>
+        <dependency path='OpenCyto/gridfilters/filter/BooleanFilter.js'/>
         <dependency path='OpenCyto/GridPanelHeaderResize.js'/>
         <dependency path='OpenCyto/CheckBoxMemory.js'/>
         <dependency path='OpenCyto/OpenCyto.js'/>

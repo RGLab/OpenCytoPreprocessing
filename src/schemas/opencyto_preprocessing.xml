@@ -4,8 +4,8 @@
             The 'gsTbl' table contains information about generated gating sets.
         </ns:description>
         <ns:columns>
-            <ns:column columnName='gsid'/>
             <ns:column columnName='container'/>
+            <ns:column columnName='gsid'/>
             <ns:column columnName='gsname'/>
             <ns:column columnName='objlink'>
                 <ns:columnTitle>objLink</ns:columnTitle>
@@ -19,8 +19,9 @@
             <ns:column columnName='samplegroup'>
                 <ns:columnTitle>sampleGroup</ns:columnTitle>
             </ns:column>
-            <ns:column columnName='timestamp'>
-                <ns:columnTitle>timeStamp</ns:columnTitle>
+            <ns:column columnName='created'>
+                <ns:columnTitle>Created</ns:columnTitle>
+                <ns:formatString>yyyy-MM-dd HH:mm:ss</ns:formatString>
             </ns:column>
         </ns:columns>
     </ns:table>
@@ -32,8 +33,18 @@
             <ns:column columnName='container'/>
             <ns:column columnName='name'/>
             <ns:column columnName='path'/>
-            <ns:column columnName='x_axis'/>
-            <ns:column columnName='y_axis'/>
+            <ns:column columnName='x_axis'>
+                <ns:columnTitle>X Marker and Channel Name</ns:columnTitle>
+            </ns:column>
+            <ns:column columnName='y_axis'>
+                <ns:columnTitle>Y Marker and Channel Name</ns:columnTitle>
+            </ns:column>
+            <ns:column columnName='x_key'>
+                <ns:columnTitle>X Channel Name</ns:columnTitle>
+            </ns:column>
+            <ns:column columnName='y_key'>
+                <ns:columnTitle>Y Channel Name</ns:columnTitle>
+            </ns:column>
             <ns:column columnName='gsid'/>
         </ns:columns>
     </ns:table>
@@ -42,10 +53,10 @@
             The 'study_vars' table contains the sets of study variables associated with each of the generated gating sets.
         </ns:description>
         <ns:columns>
+            <ns:column columnName='container'/>
             <ns:column columnName='svid'>
                 <ns:columnTitle>Study Variable Id</ns:columnTitle>
             </ns:column>
-            <ns:column columnName='container'/>
             <ns:column columnName='svname'>
                 <ns:columnTitle>Study Variable Name</ns:columnTitle>
             </ns:column>
@@ -57,6 +68,7 @@
             The 'files' table contains the sets of files chosen for each of the generated gating sets.
         </ns:description>
         <ns:columns>
+            <ns:column columnName='container'/>
             <ns:column columnName='fileId'>
                 <ns:columnTitle>File Id</ns:columnTitle>
                 <ns:fk>
@@ -65,7 +77,6 @@
                     <ns:fkColumnName>RowId</ns:fkColumnName>
                 </ns:fk>
             </ns:column>
-            <ns:column columnName='container'/>
             <ns:column columnName='gsid'/>
         </ns:columns>
     </ns:table>

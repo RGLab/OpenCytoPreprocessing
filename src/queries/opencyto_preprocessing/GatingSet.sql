@@ -2,8 +2,8 @@ SELECT
  gsid               AS Id,
  gsname             AS Name,
  objlink            AS Path,
- gsdescription      AS Tooltip,
+ gsdescription      AS Description,
  container.EntityId AS EntityId,
- timestamp          AS TimeStamp
+ created            AS Created
 FROM
  gstbl
