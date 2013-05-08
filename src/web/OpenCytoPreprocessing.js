@@ -27,7 +27,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         $('#' + config.webPartDivId).append(
             '<div id=\'wpParse' + config.webPartDivId + '\' class=\'centered-text\'></div>'
 
-          + '<ul id=\'ulList' + config.webPartDivId + '\' class=\'bold-text ulList\'>'
+        + '<ul id=\'ulList1' + config.webPartDivId + '\' class=\'bold-text ulList\'>'
 
               + '<li class=\'liListDefault\'>'
                   + '<div class=\'left-text\' id=\'pnlXml' + config.webPartDivId + '\'></div>' +
@@ -35,7 +35,11 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
               + '<li class=\'liListDefault\'>'
                   + '<div class=\'left-text\' id=\'pnlSampleGroup' + config.webPartDivId + '\'></div>' +
-                '</li>'
+                '</li>' +
+
+            '</ul>'
+
+        + '<ul id=\'ulList2' + config.webPartDivId + '\' class=\'bold-text ulList\'>'
 
               + '<li class=\'liListDefault\'>'
                   + '<div class=\'left-text\' id=\'pnlAnalysisName' + config.webPartDivId + '\'></div>' +
@@ -132,7 +136,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     cbStudyVarName.setDisabled(false);
 
                     cbXML.setDisabled(false);
-                    cbSampleGroup.setDisabled(false);
+                    tfSampleGroup.setDisabled(false);
                     tfAnalysisName.setDisabled(false);
                     tfAnalysisDescription.setDisabled(false);
 
@@ -141,7 +145,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
 
                     // Check to see if a different set of study variables was picked or if the sample group changed
-                    var tempXMLSampleGroup = cbXML.getValue() + cbSampleGroup.getValue();
+                    var tempXMLSampleGroup = cbXML.getValue() + tfSampleGroup.getValue();
                     var tempStudyVarName = cbStudyVarName.getValue();
 
                     if ( tempStudyVarName != selectedStudyVars || tempXMLSampleGroup != selectedXmlAndSampleGroup ){
@@ -405,13 +409,15 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
         var lastlySelectedXML = undefined;
 
-        var cbXML = new Ext.ux.form.ExtendedComboBox({
+        var elWidth = 286;
+
+        var cbXML = new Ext.ux.form.ExtendedLovCombo({
             displayField: 'FileName',
             lazyInit: false,
             listeners: {
                 change: function(){
                     if ( this.getValue() == '' ){
-                        cbSampleGroup.setDisabled(true);
+                        tfSampleGroup.setDisabled(true);
                         cbXML.focus();
                     } else {
 //                        manageWorkspace();
@@ -419,57 +425,53 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 },
                 cleared: function(){
                     btnNext.setDisabled(true);
-                    cbSampleGroup.setDisabled(true);
-                    cbSampleGroup.clearValue();
-                },
-                select: manageWorkspace
+                    tfSampleGroup.setDisabled(true);
+                    tfSampleGroup.clearValue();
+                }//,
+//                select: manageWorkspace
             },
             store: strXML,
             valueField: 'FilePath',
-            width: 200
+            width: elWidth 
         });
 
-        var cbSampleGroup = new Ext.ux.form.ExtendedComboBox({
-            disabled: true,
-            displayField: 'SampleGroup',
-            lazyInit: false,
+        var tfSampleGroup = new Ext.form.TextField({
+            emptyText: 'Type...',
+            enableKeyEvents: true,
             listeners: {
-                change: function(){
-                    if ( this.getValue() != '' ){
-                        manageAnalysisTextFields();
-
+/*
+                keypress: function(){
+                    if ( tfSampleGroup.getValue() != '' && tfAnalysisName.getValue() != '' ){
                         btnNext.setDisabled(false);
                     } else {
-                        manageSampleGroup();
+                        btnNext.setDisabled(true);
                     }
-                },
-                cleared: function(){
-                    btnNext.setDisabled(true);
-
-                    this.focus();
-                },
-                select: function(){
-                    cbSampleGroup.triggerBlur();
-                    manageAnalysisTextFields();
-
-                    btnNext.setDisabled(false);
                 }
+*/
             },
-            store: strSampleGroup,
-            valueField: 'SampleGroup',
-            width: 200
+            width: elWidth 
         });
-
-//        strSampleGroup.on( 'load', manageSampleGroup ); // probably not needed, achieved through change event of cbXML
 
         var tfAnalysisName = new Ext.form.TextField({
             emptyText: 'Type...',
-            width: 200
+            enableKeyEvents: true,
+            listeners: {
+/*
+                keypress: function(){
+                    if ( tfSampleGroup.getValue() != '' && tfAnalysisName.getValue() != '' ){
+                        btnNext.setDisabled(false);
+                    } else {
+                        btnNext.setDisabled(true);
+                    }
+                }
+*/
+            },
+            width: elWidth 
         });
 
         var tfAnalysisDescription = new Ext.form.TextField({
             emptyText: 'Type...',
-            width: 200
+            width: elWidth 
         });
 
 
@@ -755,10 +757,10 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             border: false,
             forceLayout: true,
             headerCssClass: 'simple-panel-header',
-            items: [ cbSampleGroup ],
+            items: [ tfSampleGroup ],
             layout: 'fit',
             renderTo: 'pnlSampleGroup' + config.webPartDivId,
-            title: 'Select the sample group:'
+            title: 'Enter a regex for sample group names:'
         });
 
         new Ext.Panel({
@@ -781,13 +783,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             title: 'Enter analysis description:'
         });
 
-
-        var pnlList = {
-            border: false,
-            contentEl: 'ulList' + config.webPartDivId,
-            forceLayout: true
-        };
-
         var pnlWorkspaces = {
            	autoHeight: true,
             border: false,
@@ -798,11 +793,18 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             forceLayout: true,
            	hideMode: 'offsets',
             items: [
-                pnlList,
-                new Ext.Component({
+                {
+                    border: false,
+                    contentEl: 'ulList1' + config.webPartDivId
+                },
+                {
+                    border: false,
+                    contentEl: 'ulList2' + config.webPartDivId
+                },
+                {
                     contentEl: 'wpParse' + config.webPartDivId,
                     forceLayout: true
-                })
+                }
             ],
             listeners: {
                 afterrender: function(){
@@ -1119,7 +1121,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
             cbStudyVarName.setDisabled(true);
             cbXML.setDisabled(true);
-            cbSampleGroup.setDisabled(true);
+            tfSampleGroup.setDisabled(true);
             tfAnalysisName.setDisabled(true);
             tfAnalysisDescription.setDisabled(true);
 
@@ -1146,7 +1148,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
             if ( value != lastlySelectedXML ){
 
-                cbSampleGroup.clearValue();
+                tfSampleGroup.clearValue();
 
                 cnfSampleGroupsFetching.inputParams = {
                     wsPath: decodeURI( value ).slice(5)
@@ -1158,7 +1160,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 LABKEY.Report.execute( cnfSampleGroupsFetching );
 
             } else {
-                cbSampleGroup.setDisabled(false);
+                tfSampleGroup.setDisabled(false);
 
                 manageSampleGroup();
             }
@@ -1167,12 +1169,12 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         function manageSampleGroup(){
             var count = strSampleGroup.getCount();
             if ( count > 1 ){
-                cbSampleGroup.focus();
-                cbSampleGroup.expand();
+                tfSampleGroup.focus();
+                tfSampleGroup.expand();
             } else if ( count == 1 ) {
-                cbSampleGroup.setValue( strSampleGroup.getAt(0).data.SampleGroup );
+                tfSampleGroup.setValue( strSampleGroup.getAt(0).data.SampleGroup );
                 btnNext.setDisabled(false);
-                cbSampleGroup.triggerBlur();
+                tfSampleGroup.triggerBlur();
                 tfAnalysisName.focus();
             }
         };
@@ -1186,7 +1188,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 tfAnalysisName.focus();
                 tfAnalysisName.getEl().frame( 'ff0000', 1, { duration: 3 } );
             } else {
-                if ( cbSampleGroup.getValue() != '' ){
+                if ( tfSampleGroup.getValue() != '' ){
                     var filesNames = [], filesIds = [];
                     Ext.each( smCheckBoxFiles.getSelections(), function( record ){
                         filesNames.push( record.data.FileName );
@@ -1218,7 +1220,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         wpParseConfig.filesIds              = filesIds.join(';'); // semicolor important for Labkey filter creation
 
                         wpParseConfig.xmlPath               = cnfSampleGroupsFetching.inputParams.wsPath;
-                        wpParseConfig.sampleGroupName       = cbSampleGroup.getValue();
+                        wpParseConfig.sampleGroupName       = tfSampleGroup.getValue();
                         wpParseConfig.analysisName          = tfAnalysisName.getValue();
                         wpParseConfig.analysisDescription   = tfAnalysisDescription.getValue();
 
@@ -1264,7 +1266,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
         function mask( msg ){
             cbXML.setDisabled(true);
-            cbSampleGroup.setDisabled(true);
+            tfSampleGroup.setDisabled(true);
             tfAnalysisName.setDisabled(true);
             tfAnalysisDescription.setDisabled(true);
 
@@ -1284,7 +1286,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
         function unmask(){
             cbXML.setDisabled(false);
-            cbSampleGroup.setDisabled(false);
+            tfSampleGroup.setDisabled(false);
             tfAnalysisName.setDisabled(false);
             tfAnalysisDescription.setDisabled(false);
 
@@ -1367,14 +1369,14 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
 
                 // Check to see if the sample group changed
-                temp = cbXML.getValue() + cbSampleGroup.getValue();
+                temp = cbXML.getValue() + tfSampleGroup.getValue();
 
                 if ( temp != selectedXmlAndSampleGroup ){
 
                     fileNameFilter =
                         LABKEY.Filter.create(
                             'FileName',
-                            sampleGroupsMap[ cbSampleGroup.getValue() ].join(';'),
+//                            sampleGroupsMap[ tfSampleGroup.getValue() ].join(';'),
                             LABKEY.Filter.Types.IN
                         );
 
@@ -1386,14 +1388,14 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             } else {
 
                 // Check to see if the sample group changed
-                temp = cbXML.getValue() + cbSampleGroup.getValue();
+                temp = cbXML.getValue() + tfSampleGroup.getValue();
 
                 if ( temp != selectedXmlAndSampleGroup ){
 
                     fileNameFilter =
                         LABKEY.Filter.create(
                             'FileName',
-                            sampleGroupsMap[ cbSampleGroup.getValue() ].join(';'),
+//                            sampleGroupsMap[ tfSampleGroup.getValue() ].join(';'),
                             LABKEY.Filter.Types.IN
                         );
 
@@ -1426,7 +1428,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
             if ( newIndex == 1 ){
                 btnBack.setDisabled(false);
-                btnNext.setDisabled(true);
+//                btnNext.setDisabled(true);
 
                 if ( cbXML.getValue() == '' ){
                     var count = strXML.getCount();
@@ -1439,8 +1441,8 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         manageWorkspace();
                     }
                 } else {
-                    if ( cbSampleGroup.getValue() == '' ){
-                        btnNext.setDisabled(true);
+                    if ( tfSampleGroup.getValue() == '' ){
+//                        btnNext.setDisabled(true);
 
                         manageSampleGroup();
                     } else {
@@ -1467,7 +1469,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
             if ( newIndex == 3 ){
                 btnNext.setText('Process');
-                if ( cbXML.getValue() == '' || cbSampleGroup.getValue() == '' || flagCreate ) {
+                if ( cbXML.getValue() == '' || tfSampleGroup.getValue() == '' || flagCreate ) {
                     btnNext.setDisabled(true);
                 } else {
                     btnNext.setDisabled(false);
