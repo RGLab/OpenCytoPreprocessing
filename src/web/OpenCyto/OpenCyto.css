@@ -19,6 +19,45 @@
 
 @charset 'utf-8';
 
+.iconArrowLeft {
+    background-image: url(images/arrow-left.gif);
+}
+
+.iconArrowRight {
+    background-image: url(images/arrow-right.gif);
+}
+
+.iconReset {
+    background-image: url(images/reset.png);
+}
+
+.iconPlot {
+    background-image: url(images/scatter_plot.gif);
+}
+
+.iconDelete {
+    background-image: url(../_images/delete.png);
+}
+
+.iconNew {
+    background-image: url(../_images/folder_new.png);
+}
+
+.iconConfigure {
+    background-image: url(../_images/configure.png);
+}
+
+.iconReload {
+    background-image: url(../_images/reload.png);
+}
+
+/* Override not to have the blue default background of numberers and rowSelectionCheckBoxes */
+.x-grid3-body .x-grid3-row-selected .x-grid3-td-numberer,
+.x-grid3-body .x-grid3-row-selected .x-grid3-td-checker,
+.x-grid3-body .x-grid3-row-selected .x-grid3-td-expander {
+	background-image: none;
+}
+
 /* Error code from R */
 pre, .ext-mb-text {
     white-space: pre-wrap;
@@ -96,7 +135,7 @@ pre, .ext-mb-text {
 .x-mask-loading-custom div {
     background: no-repeat 5px 5px;
     background-color: white !important;
-    background-image: url(loading.gif) !important;
+    background-image: url(images/loading.gif) !important;
     /*line-height:16px;*/
     padding: 5px 10px 5px 25px;
     text-align: center;
@@ -148,7 +187,7 @@ ul.x-tab-strip-top {
 }
 
 .sortable-list li, .ulList li {
-    margin: 3px 5px 3px 5px; /* 0.2em 0.3em 0.2em 0.3em */
+    margin: 3px 0px 3px 4px; /* 0.2em 0.3em 0.2em 0.3em */
     padding: 1px;
     float: left;
 }

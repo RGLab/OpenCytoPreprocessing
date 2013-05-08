@@ -19,6 +19,7 @@
 // Ext specific functionality //
 //============================//
 
+// Sets the width of the row numberer depending on the maximum number of digits in the number of records in the underlying store
 function factoryRowNumberer( store ){
     return new Ext.grid.RowNumberer({
         filterable: false,
@@ -29,9 +30,10 @@ function factoryRowNumberer( store ){
 function initTableQuickTips( o ){
     Ext.QuickTips.register({
         target: o,
-        text:   '1) click the arrow on the right of this column header to access the sorting and filtering options menu for this column <br/>' +
-                '2) double click the separator between two column headers to fit the column width to its contents',
-        width: 310
+        text:   '1) click the arrow on the right of a selected column header to access the sorting, filtering and hiding/showing options menu for the column <br/>' +
+                '2) drag and drop column headers to rearrange the order of the columns <br/>' +
+                '3) double click the separator between two column headers to fit the column width to its contents',
+        width: 360
     });
 };
 
@@ -43,68 +45,6 @@ function loadStoreWithArray( store, array ) {
     store.loadData( array );
 }
 
-// Search in the middle of words / case insensitive
-Ext.override (Ext.ux.form.SuperBoxSelect, {
-    anyMatch: true,
-    caseSensitive: false,
-
-    //override doQuery function
-    doQuery : function(q, forceAll){
-
-        if(q === undefined || q === null){
-            q = '';
-        }
-
-        var qe = {
-            query: q,
-            forceAll: forceAll,
-            combo: this,
-            cancel:false
-        };
-
-        if(this.fireEvent('beforequery', qe)===false || qe.cancel){
-            return false;
-        }
-
-        q = qe.query;
-        forceAll = qe.forceAll;
-        if(forceAll === true || (q.length >= this.minChars)){
-            if(this.lastQuery !== q){
-                this.lastQuery = q;
-                if(this.mode == 'local'){
-                    this.selectedIndex = -1;
-                    if(forceAll){
-                        this.store.clearFilter();
-                    }else{
-                        this.store.filter(this.displayField, q, this.anyMatch, this.caseSensitive);
-                    }
-                    this.onLoad();
-                }else{
-                    this.store.baseParams[this.queryParam] = q;
-                    this.store.load({
-                        params: this.getParams(q)
-                    });
-                    this.expand();
-                }
-            }else{
-                this.selectedIndex = -1;
-                this.onLoad();
-            }
-        }
-    },
-    onTypeAhead: function() {
-        var nodes = this.view.getNodes();
-        for (var i = 0; i < nodes.length; i++) {
-            var n = nodes[i];
-            var d = this.view.getRecord(n).data;
-            var re = new RegExp('(.*?)(' + '' + Ext.escapeRe(this.getRawValue()) + ')(.*)', this.caseSensitive ? '' : 'i');
-            var h = d[this.displayField];
-
-            h=h.replace(re, '$1<span class=\'mark-combo-match\'>$2</span>$3');
-            n.innerHTML=h;
-        }
-    }
-});
 
 /*
  * Override to set Tab titles centered (can do any other customizations here)
@@ -221,36 +161,7 @@ Ext.override(Ext.grid.CheckboxSelectionModel, {
     }
 });
 
-function captureEvents(observable) {
-    Ext.util.Observable.capture(
-            observable,
-            function(eventName) {
-                console.info(eventName);
-            },
-            this
-    );
-};
-
-function onFailure(errorInfo, options, responseObj){
-    var strngErrorContact = ' Please, contact ldashevs@fhcrc.org, if you have questions.';
-
-    if (errorInfo && errorInfo.exception)
-        Ext.Msg.alert('Error', 'Failure: ' + errorInfo.exception + strngErrorContact);
-    else {
-        if ( responseObj != undefined ){
-            Ext.Msg.alert('Error', 'Failure: ' + responseObj.statusText + strngErrorContact);
-        } else {
-            Ext.Msg.alert('Error', 'Failure: ' + errorInfo.statusText + (errorInfo.timedout==true?', timed out.':'') + strngErrorContact);
-        }
-    }
-};
-
-Ext4.Ajax.timeout = 60 * 60 * 1000; // override the timeout to be 60 mintues; value is in milliseconds
-
-Ext.QuickTips.init();
-
-
-// ? First column non-moveable
+// Adds a configure 'dragable', which can be set to false to prevent a column from being drag and dropped
 Ext.override(Ext.grid.HeaderDragZone, {
     getDragData: function (e) {
         var t = Ext.lib.Event.getTarget(e);
@@ -264,12 +175,44 @@ Ext.override(Ext.grid.HeaderDragZone, {
         return false;
     }
 });
+
+
+function captureEvents(observable) {
+    Ext.util.Observable.capture(
+        observable,
+        function(eventName, o) {
+            console.info( 'a ' + o.constructor.xtype + ' fired: ' + eventName);
+        },
+        this
+    );
+};
+
+function onFailure(errorInfo, options, responseObj){
+    var strngErrorContact = ' Please, contact ldashevs@fhcrc.org, if you have questions.', text = 'Failure: ';
+
+    if (errorInfo && errorInfo.exception){
+        text += errorInfo.exception;
+    }
+    else {
+        if ( responseObj != undefined ){
+            text += responseObj.statusText;
+        } else {
+            text += errorInfo.statusText + (errorInfo.timedout==true?', timed out.':'');
+        }
+    }
+
+    Ext.Msg.alert('Error', text + strngErrorContact);
+    throw 'Error. ' + text;
+};
+
+Ext4.Ajax.timeout = 60 * 60 * 1000; // override the timeout to be 60 mintues; value is in milliseconds
+
+Ext.QuickTips.init();
+
+// Do not allow columns to be moved to the first 3 positions
 Ext.CustomColumnModel = Ext.extend(Ext.grid.ColumnModel, {
     moveColumn: function (oldIndex, newIndex) {
-        if (oldIndex == 0 || newIndex == 0) {
-            // Do nothing.
-        }
-        else {
+        if ( newIndex > 2 ) {
             var c = this.config[oldIndex];
             this.config.splice(oldIndex, 1);
             this.config.splice(newIndex, 0, c);

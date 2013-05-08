@@ -1,30 +1,107 @@
-// vim: sw=4:ts=4:nu:nospell:fdc=4
-/*
- Copyright 2012 Fred Hutchinson Cancer Research Center
+Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
 
- Licensed under the Apache License, Version 2.0 (the 'License');
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+    //True for use selectAll item
+    addSelectAllItem: true,
 
- http://www.apache.org/licenses/LICENSE-2.0
+    //True to add the extra Clear trigger button
+    addClearItem: true,
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an 'AS IS' BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-*/
+    //Value of valueField for selectAll item
+    selectAllValueField: '_all',
 
-Ext.ux.ExtendedLovCombo = Ext.extend(Ext.ux.form.LovCombo, {
-    initComponent: function(){
-        this.triggerConfig = {
-            tag:'span', cls:'x-form-twin-triggers', cn:[
-                {tag: 'img', src: Ext.BLANK_IMAGE_URL, cls: 'x-form-trigger'},
-                {tag: 'img', src: Ext.BLANK_IMAGE_URL, cls: 'x-form-trigger x-form-clear-trigger'}
-            ]};
+    //Value of textField for selectAll item
+    selectAllTextField: 'Select all',
 
-        Ext.ux.ExtendedLovCombo.superclass.initComponent.call(this);
-        this.on('afterrender', this.resizeToFitContent, this);
+    //Toggle selectAll item
+    allSelected: false,
+
+    beforeBlur: Ext.emptyFn,
+
+    //Specificaly css class for selactAll item : ux-lovcombo-list-item-all
+    initComponent:function() {
+
+        // template with checkbox
+        if( ! this.tpl ) {
+            this.tpl =
+                '<tpl for=".">'
+                    + '<tpl if="' + this.valueField + '==\'' + this.selectAllValueField + '\'">'
+                        + '<div class="x-combo-list-item ux-lovcombo-list-item-all">'
+                            + '<img src="' + Ext.BLANK_IMAGE_URL + '" '
+                            + 'class="ux-lovcombo-icon ux-lovcombo-icon-'
+                            + '{[values.' + this.checkField + '?"checked":"unchecked"' + ']}">'
+                            + '<div class="ux-lovcombo-item-text">{' + (this.displayField || 'text' )+ '}</div>'
+                        + '</div>'
+                    + '</tpl>'
+                    + '<tpl if="' + this.valueField + '!=\'' + this.selectAllValueField + '\'">'
+                        + '<div class="x-combo-list-item">'
+                            + '<img src="' + Ext.BLANK_IMAGE_URL + '" '
+                            + 'class="ux-lovcombo-icon ux-lovcombo-icon-'
+                            + '{[values.' + this.checkField + '?"checked":"unchecked"' + ']}">'
+                            + '<div class="ux-lovcombo-item-text">{' + (this.displayField || 'text' )+ ':htmlEncode}</div>'
+                        + '</div>'
+                    + '</tpl>'
+                 +'</tpl>'
+            ;
+        }
+
+        // Add selected value tool tip
+        this.on('afterrender', function(){
+            new Ext.ToolTip({
+                target: this.getEl(),
+                html: this.getValue(),
+                listeners: {
+                    beforeshow: function(tip) {
+                        var msg = this.getRawValue();
+                        tip.update( Ext.util.Format.htmlEncode( msg ) );
+                        return (msg.length > 0);
+                    },
+                    scope: this
+                },
+                renderTo: document.body
+            });
+
+            this.resizeToFitContent();
+        }, this );
+
+        // Show drop down when the text field is clicked, not just the trigger
+        this.on('focus', function(){
+            this.initList();
+            this.doQuery('', true);
+        }, this );
+
+        // install internal event handlers ???
+        this.on({
+            scope:this
+            ,beforequery:this.onBeforeQuery
+            ,beforeblur:this.beforeBlur
+        });
+
+        // remove selection from input field
+        this.onLoad = this.onLoad.createSequence(function() {
+            if(this.el) {
+                var v = this.el.dom.value;
+                this.el.dom.value = '';
+                this.el.dom.value = v;
+            }
+        });
+
+        this.store.on({
+            'load': function(){
+                if(this.store && this.addSelectAllItem){
+                    var RecordType = Ext.data.Record.create([this.valueField, this.displayField]);
+                    var data = {};
+                    data[this.valueField] = this.selectAllValueField;
+                    data[this.displayField] = this.selectAllTextField;
+                    this.store.insert(0, [new RecordType(data)]);
+                }
+                if(this.allSelected){
+                    this.selectAll();
+                }
+            },
+            buffer: 10,
+            scope: this
+        });
+
         this.store.on({
             'datachanged':  this.resizeToFitContent,
             'add':          this.resizeToFitContent,
@@ -34,10 +111,133 @@ Ext.ux.ExtendedLovCombo = Ext.extend(Ext.ux.form.LovCombo, {
             buffer: 10,
             scope: this
         });
+
+        this.addClearItem
+            ? Ext.form.TwinTriggerField.prototype.initComponent.call(this)
+            : Ext.ux.form.ExtendedLovCombo.superclass.initComponent.call(this)
+        ;
     },
+
+    //Select correct action for selected record
+    onViewClick : function(doFocus){
+        var index = this.view.getSelectedIndexes()[0];
+        if (this.addSelectAllItem && index == 0) {
+            this.toggleAll();
+        }else {
+            var r = this.store.getAt(index);
+            if(r){
+                this.onSelect(r, index);
+            }
+            if(doFocus !== false){
+                this.el.focus();
+            }
+        }
+    },
+
+    //Escape selectAll item value if it's here
+    getCheckedArray:function(field) {
+        field = field || this.valueField;
+        var c = [];
+
+        // store may be filtered so get all records
+        var snapshot = this.store.snapshot || this.store.data;
+
+        snapshot.each(function(r, index) {
+            if(((this.addSelectAllItem && index > 0) || !this.addSelectAllItem) && r.get(this.checkField)) {
+                c.push(r.get(field));
+            }
+        }, this);
+
+        return c;
+    },
+
+    //Using allChecked value
+    setValue:function(v) {
+
+        var matchCount = 0;
+        this.store.each(function(r){
+            var checked = !(!v.match('(^|' + this.separator + '\\s?)' + RegExp.escape(r.get(this.valueField))+'(' + this.separator + '|$)')); // ALL 1 Line
+            if(checked) matchCount++;
+        },this);
+        if(v.length > 0 && matchCount < 1)
+        {
+            return;
+        }
+
+
+        if(v) {
+            v = '' + v;
+            if(this.valueField) {
+                this.store.clearFilter();
+                this.allSelected = true;
+                this.store.each(function(r, index) {
+                    v = '' + v;
+                    var checked =
+                        ! (
+                            ! v.match(
+                                '(^|' + this.separator + ')' + RegExp.escape( r.get( this.valueField ) )
+                                + '(' + this.separator + '|$)'
+                            )
+                        );
+
+                    r.set(this.checkField, checked);
+
+                    if (this.addSelectAllItem && index > 0) {
+                        this.allSelected = this.allSelected && checked;
+                    }
+                }, this);
+
+                if (this.addSelectAllItem) {
+                    this.store.getAt(0).set(this.checkField, this.allSelected);
+                }
+
+                this.value = this.getCheckedValue();
+
+                this.setRawValue(this.getCheckedDisplay());
+                if(this.hiddenField) {
+                    this.hiddenField.value = this.value;
+                }
+            }
+            else {
+                this.value = v;
+                this.setRawValue(v);
+                if(this.hiddenField) {
+                    this.hiddenField.value = v;
+                }
+            }
+            if(this.el) {
+                this.el.removeClass(this.emptyClass);
+            }
+        }
+        else {
+            this.clearValue();
+        }
+    },
+
+    // Create a specific record for selectAll item
+    initList : function(){
+        Ext.ux.form.ExtendedLovCombo.superclass.initList.apply(this, arguments);
+
+        if ( this.allSelected ){
+            this.selectAll();
+        }
+    },
+
+    //Toggle action for de/selectAll
+    toggleAll:function(){
+        if(this.allSelected){
+            this.allSelected = false;
+            this.deselectAll();
+        }else{
+            this.allSelected = true;
+            this.selectAll();
+        }
+    },
+
+    //Size the drop-down list to the contents
     resizeToFitContent: function(){
-        if (!this.elMetrics){
-            this.elMetrics = Ext.util.TextMetrics.createInstance(this.getEl());
+        if ( ! this.elMetrics ){
+            this.elMetrics = Ext.util.TextMetrics.createInstance( this.getEl() );
         }
         var m = this.elMetrics, width = 0, el = this.el, s = this.getSize();
         this.store.each(function (r) {
@@ -48,9 +248,6 @@ Ext.ux.ExtendedLovCombo = Ext.extend(Ext.ux.form.LovCombo, {
             width += el.getBorderWidth('lr');
             width += el.getPadding('lr');
         }
-        if (this.trigger) {
-            width += this.trigger.getWidth();
-        }
         s.width = width;
         width += 3*Ext.getScrollBarWidth() + 20;
         this.listWidth = width;
@@ -59,9 +256,28 @@ Ext.ux.ExtendedLovCombo = Ext.extend(Ext.ux.form.LovCombo, {
             this.list.setSize(width);
         }
         if ( this.innerList != undefined ){
-            this.innerList.setSize(width);
+            this.innerList.setWidth( width );
         }
     },
+
+    onTrigger1Click: Ext.form.ComboBox.prototype.onTriggerClick,
+    onTrigger2Click : function()
+    {
+        this.collapse();
+        this.reset();                       // clear contents of combobox
+        this.fireEvent('cleared');          // send notification that contents have been cleared
+    },
+
+    trigger1Class: Ext.form.ComboBox.prototype.triggerClass,
+    trigger2Class: 'x-form-clear-trigger',
+
+    getTrigger: function(){
+        this.addClearItem ? Ext.form.TwinTriggerField.prototype.getTrigger.call(this) : Ext.form.ComboBox.prototype.getTrigger.call(this);
+    },
+    initTrigger: function(){
+        this.addClearItem ? Ext.form.TwinTriggerField.prototype.initTrigger.call(this) : Ext.form.ComboBox.prototype.initTrigger.call(this);
+    },
+
     getCheckedArrayInds:function() {
         var c = [];
 
@@ -69,32 +285,26 @@ Ext.ux.ExtendedLovCombo = Ext.extend(Ext.ux.form.LovCombo, {
         var snapshot = this.store.snapshot || this.store.data;
 
         snapshot.each(function(r) {
-            if(r.get(this.checkField)) {
+            if(((this.addSelectAllItem && index > 0) || !this.addSelectAllItem) && r.get(this.checkField)) {
                 c.push(this.store.indexOf(r));
             }
         }, this);
 
         return c;
     },
-    onTrigger2Click : function()
-    {
-        this.collapse();
-        this.reset();                       // clear contents of combobox
-        this.fireEvent('cleared');          // send notification that contents have been cleared
-    },
+
+    /////////////////////////////
+    // OpenCyto custom configs //
     /////////////////////////////
     autoSelect: false,
     emptyText: 'Select...',
     forceSelection: true,
     minChars: 0,
     mode: 'local',
+    resizable: true,
     triggerAction: 'all',
-    typeAhead: true,
+    typeAhead: true
     /////////////////////////////
 
-    getTrigger:         Ext.form.TwinTriggerField.prototype.getTrigger,
-    initTrigger:        Ext.form.TwinTriggerField.prototype.initTrigger,
-    onTrigger1Click:    Ext.ux.form.LovCombo.prototype.onTriggerClick,
-    trigger1Class:      Ext.ux.form.LovCombo.prototype.triggerClass
 });
-Ext.reg('extended-lov-combo', Ext.ux.ExtendedLovCombo);
+Ext.reg('extended-lov-combo', Ext.ux.form.ExtendedLovCombo);
