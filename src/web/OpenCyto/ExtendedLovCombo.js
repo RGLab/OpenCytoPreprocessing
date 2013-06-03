@@ -123,6 +123,10 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
         var index = this.view.getSelectedIndexes()[0];
         if (this.addSelectAllItem && index == 0) {
             this.toggleAll();
+            if ( this.addSelectAllItem ){
+                var r = this.store.getAt(0);
+                this.fireEvent('select', this, r, 0);
+            }
         }else {
             var r = this.store.getAt(index);
             if(r){
@@ -249,7 +253,7 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
             width += el.getPadding('lr');
         }
         s.width = width;
-        width += 3*Ext.getScrollBarWidth() + 20;
+        width += 3*Ext.getScrollBarWidth() + 60;
         this.listWidth = width;
         this.minListWidth = width;
         if ( this.list != undefined ){
@@ -264,6 +268,7 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
     onTrigger2Click : function()
     {
         this.collapse();
+        this.allSelected = false;
         this.reset();                       // clear contents of combobox
         this.fireEvent('cleared');          // send notification that contents have been cleared
     },

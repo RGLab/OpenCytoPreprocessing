@@ -35,7 +35,7 @@ if ( gsPath != '' ){
             , schemaName    = 'opencyto_preprocessing'
         );
 
-        txt <- 'analysis removed from the db';
+        txt <- 'Analysis removed from the db';
 
     }
 
@@ -62,7 +62,7 @@ if ( gsPath != '' ){
                         , folderPath    = labkey.url.path
                         , baseUrl       = labkey.url.base
                     )
-                    stop( 'removal of the analysis from the file system failed: should have reinserted the removed row(s)' );
+                    stop( 'Removal of the analysis from the file system failed: should have reinserted the removed row(s)' );
                 }
             } else {
                 txt <- paste( txt, '- did not attempt to remove from the file system, since other analyses entries rely on it' );

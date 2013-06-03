@@ -15,7 +15,7 @@
 
 #fancybox-buttons ul {
 	display: block;
-	width: 166px;
+	width: 73px; /* original 166 px for all the buttons */
 	height: 30px;
 	margin: 0 auto;
 	padding: 0;

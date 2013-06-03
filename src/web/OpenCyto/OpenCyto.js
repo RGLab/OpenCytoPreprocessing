@@ -47,7 +47,7 @@ function loadStoreWithArray( store, array ) {
 
 
 /*
- * Override to set Tab titles centered (can do any other customizations here)
+ * Set Tab titles centered (should be able to do any other customizations by setting the tabStripInnerStyle config)
  */
 Ext.TabPanel.override({
 
@@ -176,6 +176,58 @@ Ext.override(Ext.grid.HeaderDragZone, {
     }
 });
 
+// Apply class "x-dd-drop-nodrop" for anything being attempted to be dropped to the first "disallowMoveBefore" positions
+Ext.override(Ext.grid.HeaderDropZone, {
+    positionIndicator : function(h, n, e){
+        if ( this.grid.colModel.disallowMoveBefore != undefined ){
+            if ( this.view.getCellIndex(n) <= this.grid.colModel.disallowMoveBefore ){
+                return false;
+            }
+        }
+
+        var x = Ext.lib.Event.getPageX(e),
+                r = Ext.lib.Dom.getRegion(n.firstChild),
+                px,
+                pt,
+                py = r.top + this.proxyOffsets[1];
+        if((r.right - x) <= (r.right-r.left)/2){
+            px = r.right+this.view.borderWidth;
+            pt = "after";
+        }else{
+            px = r.left;
+            pt = "before";
+        }
+
+        if(this.grid.colModel.isFixed(this.view.getCellIndex(n))){
+            return false;
+        }
+
+        px +=  this.proxyOffsets[0];
+        this.proxyTop.setLeftTop(px, py);
+        this.proxyTop.show();
+        if(!this.bottomOffset){
+            this.bottomOffset = this.view.mainHd.getHeight();
+        }
+        this.proxyBottom.setLeftTop(px, py+this.proxyTop.dom.offsetHeight+this.bottomOffset);
+        this.proxyBottom.show();
+        return pt;
+    }
+});
+
+// Do not allow columns to be moved to the first "disallowMoveBefore" positions
+Ext.CustomColumnModel = Ext.extend(Ext.grid.ColumnModel, {
+    disallowMoveBefore: -1,
+    moveColumn: function (oldIndex, newIndex) {
+        if ( newIndex > this.disallowMoveBefore ) {
+            var c = this.config[oldIndex];
+            this.config.splice(oldIndex, 1);
+            this.config.splice(newIndex, 0, c);
+            this.dataMap = null;
+            this.fireEvent('columnmoved', this, oldIndex, newIndex);
+        }
+    }
+});
+
 
 function captureEvents(observable) {
     Ext.util.Observable.capture(
@@ -197,30 +249,17 @@ function onFailure(errorInfo, options, responseObj){
         if ( responseObj != undefined ){
             text += responseObj.statusText;
         } else {
-            text += errorInfo.statusText + (errorInfo.timedout==true?', timed out.':'');
+            text += errorInfo.statusText + ( errorInfo.timedout == true ? ', timed out.' : '' );
         }
     }
 
     Ext.Msg.alert('Error', text + strngErrorContact);
-    throw 'Error. ' + text;
 };
 
 Ext4.Ajax.timeout = 60 * 60 * 1000; // override the timeout to be 60 mintues; value is in milliseconds
 
 Ext.QuickTips.init();
 
-// Do not allow columns to be moved to the first 3 positions
-Ext.CustomColumnModel = Ext.extend(Ext.grid.ColumnModel, {
-    moveColumn: function (oldIndex, newIndex) {
-        if ( newIndex > 2 ) {
-            var c = this.config[oldIndex];
-            this.config.splice(oldIndex, 1);
-            this.config.splice(newIndex, 0, c);
-            this.dataMap = null;
-            this.fireEvent('columnmoved', this, oldIndex, newIndex);
-        }
-    }
-});
 
 // Empty item in a ComboBox should now appear full heigh with this fix
 /*Ext.override (Ext.form.ComboBox, {

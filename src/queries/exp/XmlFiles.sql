@@ -1,6 +1,6 @@
 SELECT DISTINCT
  DataInputs.Data.Name AS FileName,
- DataInputs.Data.DataFileUrl AS FilePath
+ SUBSTRING( DataInputs.Data.DataFileUrl, 6 ) AS FilePath
 FROM
  DataInputs
 WHERE

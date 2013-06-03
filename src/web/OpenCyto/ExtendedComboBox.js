@@ -68,8 +68,8 @@ Ext.ux.form.ExtendedComboBox = Ext.extend( Ext.form.ComboBox, {
     // Return specified field of the selected record
     getSelectedField: function( field ) {
         field = field || this.valueField;
-        var curVal = this.getRawValue(),
-            rec = this.findRecord( this.displayField, curVal );
+        var curVal = this.getValue(),
+            rec = this.findRecord( this.valueField, curVal );
         if ( rec != undefined ){
             return rec.get( field );
         } else {

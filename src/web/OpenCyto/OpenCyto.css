@@ -51,12 +51,6 @@
     background-image: url(../_images/reload.png);
 }
 
-/* Override not to have the blue default background of numberers and rowSelectionCheckBoxes */
-.x-grid3-body .x-grid3-row-selected .x-grid3-td-numberer,
-.x-grid3-body .x-grid3-row-selected .x-grid3-td-checker,
-.x-grid3-body .x-grid3-row-selected .x-grid3-td-expander {
-	background-image: none;
-}
 
 /* Error code from R */
 pre, .ext-mb-text {
@@ -123,6 +117,12 @@ pre, .ext-mb-text {
     padding-left: 5px;
 }
 
+.x-form-check-wrap {
+    margin-bottom: 5px;
+    margin-left: 5px;
+    margin-top: 1px;
+}
+
 .x-mask-loading-custom {
     border-left: 0px;
     left: 0 !important;
@@ -182,7 +182,7 @@ ul.x-tab-strip-top {
     line-height: 1.2em;
 }
 
-.ui-sortable-helper, .sortable-list, .ulList {
+.ui-sortable-helper, .sortable-list, .ulList, .x-tree-node, .x-tree-node-ct {
     list-style-type: none;
 }
 
@@ -195,6 +195,29 @@ ul.x-tab-strip-top {
 .sortable-list li {
     font-size: 1em;
 }
+
+/**********************************/
+/* Ext Tree Fixes */
+.x-tree-node, .x-tree-node-ct, .x-tree-root-ct {
+    padding-left: 0px;
+    -webkit-padding-start: 0px;
+}
+
+.x-tree-root-ct {
+    margin: 0;
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+    -moz-padding-start: 0px;
+}
+
+.x-tree-selected {
+    background-color: white !important;
+}
+
+.x-tree-node-over {
+    background-color: white !important;
+}
+
 /**********************************/
 
 /* Ext TabPanel fixes */
@@ -205,6 +228,7 @@ ul.x-tab-strip-top {
 .x-tab-right {
     border-bottom-width: 0px !important;
 }
+
 /********************************/
 
 /* Ext.Resizable fix */
@@ -213,12 +237,27 @@ ul.x-tab-strip-top {
 }
 /********************************/
 
-/* ExtJS GridPanel important fix for proper alignment */
+/* Ext GridPanel fixes */
+
+/* Important fix for proper alignment */
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     .x-grid3-cell {
         box-sizing: border-box;
     }
 }
+
+/* Override not to have the blue default background of numberers and rowSelectionCheckBoxes */
+.x-grid3-body .x-grid3-row-selected .x-grid3-td-numberer,
+.x-grid3-body .x-grid3-row-selected .x-grid3-td-checker,
+.x-grid3-body .x-grid3-row-selected .x-grid3-td-expander {
+    background-image: none;
+}
+
+/* Fix for the numberer background not to look ugly for larger column widths */
+.x-grid3-body .x-grid3-td-numberer {
+    background-image: none;
+}
+
 /*************************************/
 
 /* Fix so that the buttons on toolbars look normal (not text) */

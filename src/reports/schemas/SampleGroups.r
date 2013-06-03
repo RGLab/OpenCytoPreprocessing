@@ -18,37 +18,46 @@ suppressMessages( library( flowWorkspace ) );
 suppressMessages( library( RJSONIO ) );
 suppressMessages( library( gdata ) );
 
-wsPath <- labkey.url.params$wsPath;
+wsPathsString <- labkey.url.params$wsPath;
+wsPaths <- unlist( strsplit( wsPathsString, split=',' ) );
 
-if ( wsPath != '' ){
+if ( length( wsPaths ) > 0 ){
 
-    suppressMessages( ws <- openWorkspace( wsPath, options = 1 ) );
+    sampleGroups <- lapply( wsPaths, function( wsPath ){
+        suppressMessages( ws <- openWorkspace( wsPath, options = 1 ) );
 
-    sampleGroups <- getSampleGroups(ws)[ , c(1,3) ];
+        sampleGroupsTemp <- getSampleGroups(ws)[ , c(1,3) ];
 
-    list <- as.character( unique( sampleGroups[[1]] ) );
+        if ( length( as.character( unique( sampleGroupsTemp[[1]] ) ) ) > 1 ) {;
+            sampleGroupsTemp <- sampleGroupsTemp[ sampleGroupsTemp$groupName != 'All Samples', ];
 
-    if ( length(list) > 1 ){
-        list <- list[ list != 'All Samples' ];
+            sampleGroupsTemp$groupName <- drop.levels( sampleGroupsTemp$groupName );
+        }
 
-        sampleGroups <- sampleGroups[ sampleGroups$groupName != 'All Samples', ];
+        sampleGroupsTemp <-
+            cbind(
+                sampleGroupsTemp,
+                filename = sapply(
+                    sampleGroupsTemp$sampleID,
+                    function(x) flowWorkspace:::.getKeywordsBySampleID( ws, x, '$FIL' )
+                )
+            );
+        sampleGroupsTemp <- sampleGroupsTemp[ , c(1,3) ];
 
-        sampleGroups$groupName <- drop.levels( sampleGroups$groupName );
-    }
+        sampleGroupsTemp <- split( sampleGroupsTemp$filename, sampleGroupsTemp$groupName );
 
-    sampleGroups <-
-        cbind(
-            sampleGroups,
-            filename = sapply(
-                sampleGroups$sampleID,
-                function(x) flowWorkspace:::.getKeywordsBySampleID( ws, x, '$FIL' )
-            )
-        );
-    sampleGroups <- sampleGroups[ , c(1,3) ];
+        return( sampleGroupsTemp );
+    } );
 
-    sampleGroups <- split( sampleGroups$filename, sampleGroups$groupName );
+    sampleGroupsList <- lapply( sampleGroups, function( i ){
+        lapply( i, function( j ){
+            length(j)
+        })
+    });
 
-    write( toJSON( list ), '${jsonout:outArray}' );
-    write( toJSON( sampleGroups ), '${jsonout:outArray}' );
+    names( sampleGroups ) <- wsPaths;
 }
+
+write( toJSON( x = sampleGroupsList, asIs = TRUE ), '${jsonout:outArray}' );
+write( toJSON( x = sampleGroups, asIs = TRUE ), '${jsonout:outArray}' );
 
