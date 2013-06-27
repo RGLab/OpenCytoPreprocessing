@@ -568,7 +568,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
                     if ( errors[0].indexOf('The report session is invalid') < 0 ){
                         onFailure({
-                            exception: errors[0] + '.'
+                            exception: errors[0]
                         });
                     } else {
                         LABKEY.Report.createSession({
@@ -603,7 +603,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                                         leaf: true,
                                         cls: 'file',
                                         checked: false,
-                                        qtip: temp[sg][0]
+                                        qtip: temp[sg][0] + ' samples'
                                     });
                                 };
 
@@ -751,7 +751,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         }
 
                         onFailure({
-                            exception: errors[0] + '.'
+                            exception: errors[0]
                         });
                     } else {
                         LABKEY.Report.createSession({
@@ -775,9 +775,9 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     strGatingSet.reload();
 
                     Ext.Msg.alert(
-                            'Info',
-                            result.outputParams[0].value
-                            + '\n' + result.console
+                        'Info',
+                        result.outputParams[0].value
+                        + '\n' + result.console
                     );
                 }
             }
@@ -803,7 +803,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         strGatingSet.reload();
 
                         onFailure({
-                            exception: errors[0] + '.'
+                            exception: errors[0]
                         });
                     } else {
                         LABKEY.Report.createSession({

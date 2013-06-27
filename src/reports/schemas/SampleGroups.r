@@ -17,13 +17,14 @@
 suppressMessages( library( flowWorkspace ) );
 suppressMessages( library( RJSONIO ) );
 suppressMessages( library( gdata ) );
+suppressMessages( library( parallel ) );
 
 wsPathsString <- labkey.url.params$wsPath;
 wsPaths <- unlist( strsplit( wsPathsString, split=',' ) );
 
 if ( length( wsPaths ) > 0 ){
 
-    sampleGroups <- lapply( wsPaths, function( wsPath ){
+    sampleGroups <- mclapply( wsPaths, function( wsPath ){
         suppressMessages( ws <- openWorkspace( wsPath, options = 1 ) );
 
         sampleGroupsTemp <- getSampleGroups(ws)[ , c(1,3) ];
@@ -49,8 +50,8 @@ if ( length( wsPaths ) > 0 ){
         return( sampleGroupsTemp );
     } );
 
-    sampleGroupsList <- lapply( sampleGroups, function( i ){
-        lapply( i, function( j ){
+    sampleGroupsList <- mclapply( sampleGroups, function( i ){
+        mclapply( i, function( j ){
             length(j)
         })
     });

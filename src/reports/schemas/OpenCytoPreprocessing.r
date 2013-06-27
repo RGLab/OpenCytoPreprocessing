@@ -85,12 +85,12 @@ if ( xmlPathsString != '' | sampleGroupNames != '' ){
             ws <- wsList[[i]];
 
             tempCdfFile <- tempfile(
-                               pattern = 'ncfs',
-                               tmpdir = folderPath,
-                               fileext = '.nc'
-                       );
-                    # to make sure the temp ncdf file is created in the same partition,
-                    # where it will be saved later to be able to link
+                pattern = 'ncfs',
+                tmpdir  = folderPath,
+                fileext = '.nc'
+            );
+            # to make sure the temp ncdf file is created in the same partition,
+            # where it will be saved later to be able to link
 
             suppressMessages(
                 G <- parseWorkspace(
@@ -145,13 +145,15 @@ if ( xmlPathsString != '' | sampleGroupNames != '' ){
             , showHidden    = T
         );
 
-        nameInd <-  which( colnames(meta) == 'Name' );
-        idInd   <-  which( colnames(meta) == 'RowId' );
+        inds <- which( colnames(meta) != 'RowId' );
 
-		meta[ , -c( idInd ) ] <- lapply( meta[ , -c(nameInd, idInd) ], as.factor );
+        for ( i in 1:length(inds) ){
+            ind <- inds[i];
+            meta[ , ind ] <- factor( meta[ , ind ] );
+        }
 
         colnames(meta)[ which( colnames(meta) == 'Name' ) ]     <- 'name';
-        colnames(meta)[ which( colnames(meta) == 'RowId' ) ]	<- 'fileid';
+        colnames(meta)[ which( colnames(meta) == 'RowId' ) ]    <- 'fileid';
 
         rownames(meta) <- meta[,'name'];
 

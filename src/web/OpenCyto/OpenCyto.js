@@ -240,7 +240,7 @@ function captureEvents(observable) {
 };
 
 function onFailure(errorInfo, options, responseObj){
-    var strngErrorContact = ' Please, contact ldashevs@fhcrc.org, if you have questions.', text = 'Failure: ';
+    var strngErrorContact = '\nPlease, contact ldashevs@fhcrc.org, if you have questions.', text = 'Failure: ';
 
     if (errorInfo && errorInfo.exception){
         text += errorInfo.exception;
