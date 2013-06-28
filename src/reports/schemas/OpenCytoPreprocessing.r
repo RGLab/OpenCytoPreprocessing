@@ -28,6 +28,8 @@ allStudyVarsString  <- labkey.url.params$allStudyVars;
 filesIdsString      <- labkey.url.params$filesIds;
 filesNamesString    <- labkey.url.params$filesNames;
 
+# sink( file = '~/opencytopreprocess.txt', type = 'output' );
+
 tryCatch({
 
 lg <- '';
@@ -92,6 +94,8 @@ if ( xmlPathsString != '' | sampleGroupNames != '' ){
             # to make sure the temp ncdf file is created in the same partition,
             # where it will be saved later to be able to link
 
+            print( paste( 'working on', basename( xmlPathArray[[i]] ) ) );
+
             suppressMessages(
                 G <- parseWorkspace(
                       ws
@@ -109,10 +113,6 @@ if ( xmlPathsString != '' | sampleGroupNames != '' ){
                 return;
             }
 
-            tempTime <- proc.time() - ptm;
-            print( tempTime );
-            lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse = '\n' ) );
-
             listOfGatingSets[[i]] <- G ;
         };
 
@@ -129,6 +129,10 @@ if ( xmlPathsString != '' | sampleGroupNames != '' ){
         listOfGatingSets <- unlist( listOfGatingSets );
 
         G <- flowIncubator:::.mergeGS( listOfGatingSets );
+
+        tempTime <- proc.time() - ptm;
+        print( tempTime );
+        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse = '\n' ) );
 
         print('FETCHING METADATA ETC.');
         lg <- paste0( lg, '\nFETCHING METADATA ETC.' );
@@ -247,16 +251,16 @@ if ( xmlPathsString != '' | sampleGroupNames != '' ){
 
         writeProjections <- function( G, gsId, ... ){
             gh <- G[[1]];
-            popNames <- getNodes( gh, isPath = T );
-            nodeNames <- getNodes( gh );
+            popNames    <- getNodes( gh, isPath = T );
+            nodeNames   <- getNodes( gh             );
             res <- lapply( 1:length(nodeNames), function(i){
-                curPop <- popNames[i];
-                curpNode <- nodeNames[i];
-                curChildren <- getChildren( gh, curpNode );
+                curPop  <- popNames[i];
+                curNode <- nodeNames[i];
+                curChildren <- getChildren( gh, curNode );
                 if ( length( curChildren ) > 0 ){
                     prjlist <- lapply( curChildren, function(curChild){
                         g <- getGate( gh, curChild );
-                        if ( class( g ) != 'BooleanGate' ){
+                        if ( ! flowWorkspace:::.isBoolGate( gh, curChild ) ){
                             param <- parameters( g );
 
                             if ( length( param ) == 1 ){
@@ -271,15 +275,15 @@ if ( xmlPathsString != '' | sampleGroupNames != '' ){
                     prj <- unique( prj );
                 } else {
 
-                    g <- getGate( gh, curpNode );
-                    if ( class( g ) != 'BooleanGate' ){
+                    g <- getGate( gh, curNode );
+                    if ( ! flowWorkspace:::.isBoolGate( gh, curNode ) ){
                         prj <- as.list( c( ' ', ' ' ) );
                     }
                 }
                 if ( exists('prj') ){
                     prj <- as.data.frame( prj );
                     colnames(prj) <- c('x_axis', 'y_axis');
-                    cbind( name = curpNode, path = curPop, prj, gsid = gsId );
+                    cbind( name = curNode, path = curPop, prj, gsid = gsId );
                 }
             });
 
@@ -365,8 +369,11 @@ write( txt, file='${txtout:textOutput}' );
         }
     }
 
-    unlink( paste0( folderPath, '/ncfs*.nc' ), force = T, recursive = T );
+    if ( ! exists('folderPath') ){
+        folderPath <- '~';
+    }
 
+    unlink( paste0( folderPath, '/ncfs*.nc' ), force = T, recursive = T );
     fileConn <- file( paste0( folderPath,'/', Sys.time(), '_', paste( basename( xmlPathArray ), collapse = ','), '_', sampleGroupNames, '.log' ) );
     lg <- paste0( lg, '\n', print( e ) );
     write( lg, file = fileConn );

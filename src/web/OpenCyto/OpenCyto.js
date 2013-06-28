@@ -233,7 +233,11 @@ function captureEvents(observable) {
     Ext.util.Observable.capture(
         observable,
         function(eventName, o) {
-            console.info( 'a ' + o.constructor.xtype + ' fired: ' + eventName);
+            var ot = 'unknown';
+            if ( o != undefined ){
+                ot = o.constructor.xtype;
+            }
+            console.info( ot + ' fired: ' + eventName);
         },
         this
     );

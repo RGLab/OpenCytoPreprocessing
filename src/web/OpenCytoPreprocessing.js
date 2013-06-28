@@ -430,6 +430,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         btnNext.setDisabled(true);
                         if ( TreeFilter != undefined ){
                             TreeFilter.clear();
+                            sampleGroupsTree.hide();
                         }
                         tfSampleGroup.reset();
 
@@ -444,6 +445,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     btnNext.setDisabled(true);
                     if ( TreeFilter != undefined ){
                         TreeFilter.clear();
+                        sampleGroupsTree.hide();
                     }
                     tfSampleGroup.reset();
 
@@ -1313,6 +1315,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 LABKEY.Report.execute( cnfSampleGroupsFetching );
             } else {
                 tfSampleGroup.setDisabled(false);
+                sampleGroupsTree.show();
             }
         };
 
@@ -1620,14 +1623,14 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         // jQuery-related
 
 
-        this.border = false;
-        this.boxMinWidth = 370;
-        this.frame = false;
-        this.items = pnlTabs;
-        this.layout = 'fit';
-        this.renderTo = config.webPartDivId;
-        this.webPartDivId = config.webPartDivId;
-        this.width = document.getElementById(config.webPartDivId).offsetWidth;
+        this.border         = false;
+        this.boxMinWidth    = 370;
+        this.frame          = false;
+        this.items          = pnlTabs;
+        this.layout         = 'fit';
+        this.renderTo       = config.webPartDivId;
+        this.webPartDivId   = config.webPartDivId;
+        this.width          = document.getElementById(config.webPartDivId).offsetWidth;
 
         LABKEY.ext.OpenCytoPreprocessing.superclass.constructor.apply(this, arguments);
 
