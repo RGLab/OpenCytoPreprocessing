@@ -48,6 +48,11 @@ suppressMessages( library( Rlabkey ) );
 suppressMessages( library( digest ) );
 suppressMessages( library( Rlibstree ) );
 
+tempTime <- proc.time() - ptm;
+print( tempTime );
+lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse = '\n' ) );
+
+
 if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
 
     xmlPathArray <- unlist( strsplit( strngWorkspacePaths, split = ',' ) );
@@ -73,38 +78,21 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
         return;
     } else { # folder does not exist or exists and does not contain a 'lock' file
 
-        tempTime <- proc.time() - ptm;
-        print( tempTime );
-        lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse = '\n' ) );
-
-        print('WRITING GATING SET');
-        lg <- paste0( lg, '\nWRITING GATING SET' );
-        ptm <- proc.time();
-
-        toInsert <- data.frame(
-              gsname            = analysisName
-            , gspath            = gatingSetPath
-            , gsdescription     = analysisDescription
-            , xmlpaths          = strngWorkspacePaths
-            , samplegroups      = strngSampleGroupNames
-        );
-
-        insertedRow <- labkey.insertRows(
-              toInsert      = toInsert
-            , queryName     = 'gstbl'
+        # check the database, if there is already an entry with the same name 'analysisName'
+        # if so, error out and halt before any heavy lifting!
+        gsTbl <- labkey.selectRows(
+              queryName     = 'gstbl',
             , schemaName    = 'opencyto_preprocessing'
-            , folderPath    = labkey.url.path
             , baseUrl       = labkey.url.base
+            , folderPath    = labkey.url.path
+            , colFilter     = makeFilter( c( 'gsname', 'EQUALS', analysisName ) )
         );
 
-        gsid        <- insertedRow$rows[[1]]$gsid;
-        container   <- insertedRow$rows[[1]]$container;
-
+        if ( nrow( gsTbl ) > 0 ){
+            stop( 'There is already an analysis with the same name, delete it first, before proceding.' );
+        }
 
         if ( file.exists( gatingSetPath ) ){ # folder exists and does not contain a 'lock' file
-            tempTime <- proc.time() - ptm;
-            print( tempTime );
-            lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse = '\n' ) );
 
             print('UNARCHIVING THE EXISTING DATA');
             lg <- paste0( lg, '\nUNARCHIVING THE EXISTING DATA' );
@@ -123,10 +111,6 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
 
             filesNamesList <- unlist( strsplit( strngFilesNames, split = ',' ) );
             sampleGroupNameArray <- unlist( strsplit( strngSampleGroupNames, split = ',' ) );
-
-            tempTime <- proc.time() - ptm;
-            print( tempTime );
-            lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse = '\n' ) );
 
             print('PARSING WORKSPACES');
             lg <- paste0( lg, '\nPARSING WORKSPACES' );
@@ -154,6 +138,8 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
 
                 print( paste( 'working on', basename( xmlPathArray[[i]] ) ) );
 
+                sink('/dev/null');
+
                 suppressMessages(
                     G <- parseWorkspace(
                           ws
@@ -164,6 +150,8 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
                         , ncdfFile  = tempCdfFile
                     )
                 );
+
+                sink();
 
                 if ( ( ! exists('G') ) | is.null( G[[1]] ) ){
                     txt <- 'The selected sample group does not contain any of the selected files';
@@ -246,8 +234,8 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
             }
         }
 
-        print('GENERATING PROJECTIONS, WRITING PROJECTIONS, STUDY VARIABLES, AND FILES');
-        lg <- paste0( lg, '\nGENERATING PROJECTIONS, WRITING PROJECTIONS, STUDY VARIABLES AND FILES' );
+        print('GENERATING PROJECTIONS AND WRITING TO DB');
+        lg <- paste0( lg, '\nGENERATING PROJECTIONS AND WRITING TO DB' );
         ptm <- proc.time();
 
         writeProjections <- function( G, gsid, ... ){
@@ -312,6 +300,25 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
 
             labkey.insertRows( queryName = 'projections', toInsert = toInsert, ... );
         };
+
+        toInsert <- data.frame(
+              gsname            = analysisName
+            , gspath            = gatingSetPath
+            , gsdescription     = analysisDescription
+            , xmlpaths          = strngWorkspacePaths
+            , samplegroups      = strngSampleGroupNames
+        );
+
+        insertedRow <- labkey.insertRows(
+              toInsert      = toInsert
+            , queryName     = 'gstbl'
+            , schemaName    = 'opencyto_preprocessing'
+            , folderPath    = labkey.url.path
+            , baseUrl       = labkey.url.base
+        );
+
+        gsid        <- insertedRow$rows[[1]]$gsid;
+        container   <- insertedRow$rows[[1]]$container;
 
         writeProjections(
               G
@@ -396,12 +403,15 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
 
     fileConn <- file( paste0( folderPath,'/', Sys.time(), '_', paste( basename( xmlPathArray ), collapse = ','), '_', strngSampleGroupNames, '.log' ) );
     lg <- paste0( lg, '\n', print( e ) );
-    if ( ! grepl( 'duplicate key value violates unique constraint', print( e ), fixed = T ) ){
+
+    if (    grepl( 'duplicate key value violates unique constraint', print( e ), fixed = T ) ||
+            grepl( 'There is already an analysis with the same name, delete it first, before proceding.', print( e ), fixed = T )
+        ){
+        close( fileConn );
+        stop( 'There is already an analysis with the same name, delete it first, before proceding.' );
+    } else {
         write( lg, file = fileConn );
         close( fileConn );
         stop(e);
-    } else {
-        close( fileConn );
-        stop( 'It appears as if there is already an analysis with the same name.' );
     }
 });

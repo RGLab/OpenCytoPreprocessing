@@ -576,14 +576,14 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         /////////////////////////////////////
         var btnBack = new Ext.Button({
             disabled: true,
-            iconCls: 'iconArrowLeft',
-            text: 'Back'
+//            iconCls: 'iconArrowLeft',
+            text: '< Back'
         });
 
         var btnNext = new Ext.Button({
             iconAlign: 'right',
-            iconCls: 'iconArrowRight',
-            text: 'Next'
+//            iconCls: 'iconArrowRight',
+            text: 'Next >'
         });
 
         var btnDelete = new Ext.Button({
@@ -605,8 +605,8 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 maskDelete.show();
                 LABKEY.Report.execute( cnfDeleteAnalysis );
             },
-            iconCls: 'iconDelete',
-            text: '&nbspDelete',
+//            iconCls: 'iconDelete',
+            text: 'Delete',
             tooltip: 'Delete the analyses'
         });
 
@@ -616,8 +616,8 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 strGatingSet.commitChanges();
                 this.setDisabled( true );
             },
-            iconCls: 'iconUpdate',
-            text: '&nbspUpdate',
+//            iconCls: 'iconUpdate',
+            text: 'Update',
             tooltip: 'Update modified values'
         });
 
@@ -1139,7 +1139,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             },
             deferredRender: false,
             forceLayout: true,
-            iconCls: 'iconNew',
+//            iconCls: 'iconNew',
             items: [
                 pnlStudyVars,
                 pnlWorkspacesWrapper,
@@ -1278,7 +1278,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             items: [
                 pnlCreate,
                 {
-                    iconCls: 'iconDelete',
+//                    iconCls: 'iconDelete',
                     items: pnlDelete,
                     layout: 'fit',
                     title: 'Delete'
