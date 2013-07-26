@@ -27,28 +27,41 @@
     background-image: url(images/arrow-right.gif);
 }
 
+.iconPlot {
+    background-image: url(images/scatter_plot.gif);
+}
+
 .iconReset {
     background-image: url(images/reset.png);
 }
 
-.iconPlot {
-    background-image: url(images/scatter_plot.gif);
+
+.iconConfigure {
+    background-image: url(../_images/configure.png);
 }
 
 .iconDelete {
     background-image: url(../_images/delete.png);
 }
 
+.iconExport {
+    background-image: url(../_images/download.png);
+}
+
+.iconImport {
+    background-image: url(../_images/upload.png);
+}
+
 .iconNew {
     background-image: url(../_images/folder_new.png);
 }
 
-.iconConfigure {
-    background-image: url(../_images/configure.png);
-}
-
 .iconReload {
     background-image: url(../_images/reload.png);
+}
+
+.iconUpdate {
+    background-image: url(../_images/editprops.png);
 }
 
 
@@ -68,12 +81,12 @@ pre, .ext-mb-text {
 }
 
 /* Centered text */
-.centered-text, .bold-centered-text, .sortable-list li, .x-grid3-hd-row, {
+.centered-text, .bold-centered-text, .sortable-list li, .opencyto .x-grid3-hd-row, {
     text-align: center !important;
 }
 
 /* Bold text */
-.bold-text, .bold-centered-text, .sortable-list li, .infoMask div, .x-mask-loading-custom div, .ux-lovcombo-list-item-all {
+.bold-text, .bold-centered-text, .sortable-list li, .infoMask div, .opencyto .mask-loading div, .ux-lovcombo-list-item-all {
     font-weight: bold !important;
 }
 
@@ -82,17 +95,17 @@ pre, .ext-mb-text {
     margin: auto;
 }
 
-.x-btn {
+.opencyto .x-btn {
     margin-right: 0px !important;
 }
 
 /* Zero margin */
-.x-tab-strip, .sortable-list, .ulList {
+.opencyto .x-tab-strip, .sortable-list, .ulList {
     margin: 0;
 }
 
 /* Zero padding */
-.x-tab-panel-header, .sortable-list, .ulList {
+.opencyto .x-tab-panel-header, .sortable-list, .ulList {
     padding: 0;
 }
 
@@ -117,13 +130,13 @@ pre, .ext-mb-text {
     padding-left: 5px;
 }
 
-.x-form-check-wrap {
+.opencyto .x-form-check-wrap {
     margin-bottom: 5px;
     margin-left: 5px;
     margin-top: 1px;
 }
 
-.x-mask-loading-custom {
+.opencyto .mask-loading {
     border-left: 0px;
     left: 0 !important;
     margin-left: 0px;
@@ -132,11 +145,10 @@ pre, .ext-mb-text {
     z-index: 999;
 }
 
-.x-mask-loading-custom div {
+.opencyto .mask-loading div {
     background: no-repeat 5px 5px;
     background-color: white !important;
     background-image: url(images/loading.gif) !important;
-    /*line-height:16px;*/
     padding: 5px 10px 5px 25px;
     text-align: center;
 }
@@ -153,20 +165,17 @@ pre, .ext-mb-text {
 }
 
 /* Safari fix not to cut off the radio button */
-.x-form-radio {
+.opencyto .x-form-radio {
     margin-left: 2px !important;
 }
 
-ul.x-tab-strip-top {
+.opencyto ul.x-tab-strip-top {
     padding-top: 0px;
 }
 
-.x-box-inner {
-    /*margin-top: 2px;*/
-}
 
 /* Ext4 */
-.x4-btn-inner {
+.opencyto .x4-btn-inner {
     padding-left: 4px;
     padding-right: 4px;
 }
@@ -182,7 +191,7 @@ ul.x-tab-strip-top {
     line-height: 1.2em;
 }
 
-.ui-sortable-helper, .sortable-list, .ulList, .x-tree-node, .x-tree-node-ct {
+.ui-sortable-helper, .sortable-list, .ulList, .opencyto .x-tree-node, .opencyto .x-tree-node-ct {
     list-style-type: none;
 }
 
@@ -198,34 +207,36 @@ ul.x-tab-strip-top {
 
 /**********************************/
 /* Ext Tree Fixes */
-.x-tree-node, .x-tree-node-ct, .x-tree-root-ct {
+.opencyto .x-tree-node,
+.opencyto .x-tree-node-ct,
+.opencyto .x-tree-root-ct {
     padding-left: 0px;
     -webkit-padding-start: 0px;
 }
 
-.x-tree-root-ct {
+.opencyto .x-tree-root-ct {
     margin: 0;
     -webkit-margin-before: 0em;
     -webkit-margin-after: 0em;
     -moz-padding-start: 0px;
 }
 
-.x-tree-selected {
+.opencyto .x-tree-selected {
     background-color: white !important;
 }
 
-.x-tree-node-over {
+.opencyto .x-tree-node-over {
     background-color: white !important;
 }
 
 /**********************************/
 
 /* Ext TabPanel fixes */
-.x-tab-strip {
+.opencyto .x-tab-strip {
     padding-left: 5px;
 }
 
-.x-tab-right {
+.opencyto .x-tab-right {
     border-bottom-width: 0px !important;
 }
 
@@ -241,57 +252,84 @@ ul.x-tab-strip-top {
 
 /* Important fix for proper alignment */
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
-    .x-grid3-cell {
+    .opencyto .x-grid3-cell {
         box-sizing: border-box;
     }
 }
 
 /* Override not to have the blue default background of numberers and rowSelectionCheckBoxes */
-.x-grid3-body .x-grid3-row-selected .x-grid3-td-numberer,
-.x-grid3-body .x-grid3-row-selected .x-grid3-td-checker,
-.x-grid3-body .x-grid3-row-selected .x-grid3-td-expander {
+.opencyto .x-grid3-body .x-grid3-row-selected .x-grid3-td-numberer,
+.opencyto .x-grid3-body .x-grid3-row-selected .x-grid3-td-checker,
+.opencyto .x-grid3-body .x-grid3-row-selected .x-grid3-td-expander {
     background-image: none;
 }
 
 /* Fix for the numberer background not to look ugly for larger column widths */
-.x-grid3-body .x-grid3-td-numberer {
+.opencyto .x-grid3-body .x-grid3-td-numberer {
     background-image: none;
+}
+
+/* Make text selectable */
+.opencyto .x-list-body dt EM,
+.opencyto .x-list-header-inner DIV EM,
+.opencyto .x-grid3-row td,
+.opencyto .x-grid3-summary-row td,
+.opencyto .x-grid3-cell-text,
+.opencyto .x-grid3-hd-text,
+.opencyto .x-grid3-hd,
+.opencyto .x-grid3-row
+{
+    -moz-user-select: inherit !important;
+    -khtml-user-select: text !important;
+    -webkit-user-select: text !important;
 }
 
 /*************************************/
 
 /* Fix so that the buttons on toolbars look normal (not text) */
-.x-toolbar .x-btn-tl,.x-toolbar .x-btn-tr,.x-toolbar .x-btn-tc,.x-toolbar .x-btn-ml,.x-toolbar .x-btn-mr,.x-toolbar .x-btn-mc,.x-toolbar .x-btn-bl,.x-toolbar .x-btn-br,.x-toolbar .x-btn-bc {
+.opencyto .x-toolbar .x-btn-tl,
+.opencyto .x-toolbar .x-btn-tr,
+.opencyto .x-toolbar .x-btn-tc,
+.opencyto .x-toolbar .x-btn-ml,
+.opencyto .x-toolbar .x-btn-mr,
+.opencyto .x-toolbar .x-btn-mc,
+.opencyto .x-toolbar .x-btn-bl,
+.opencyto .x-toolbar .x-btn-br,
+.opencyto .x-toolbar .x-btn-bc {
     background-image:url(../gtheme/img/lkbtn.gif);
 }
 
-.x-toolbar .x-btn-tl{
+.opencyto .x-toolbar .x-btn-tl{
     background-position: 0 0;
 }
-.x-toolbar .x-btn-tr{
+.opencyto .x-toolbar .x-btn-tr{
     background-position: -3px 0;
 }
-.x-toolbar .x-btn-tc{
+.opencyto .x-toolbar .x-btn-tc{
     background-position: 0 -6px;
 }
 
-.x-toolbar .x-btn-ml{
+.opencyto .x-toolbar .x-btn-ml{
     background-position: 0px -24px;
 }
-.x-toolbar .x-btn-mr{
+.opencyto .x-toolbar .x-btn-mr{
     background-position: -3px -24px;
 }
 
-.x-toolbar .x-btn-mc{
+.opencyto .x-toolbar .x-btn-mc{
     background-position: 0 -1096px;
 }
-.x-toolbar .x-btn-bl{
+.opencyto .x-toolbar .x-btn-bl{
     background-position: 0 -3px;
 }
-.x-toolbar .x-btn-br{
+.opencyto .x-toolbar .x-btn-br{
     background-position: -3px -3px;
 }
-.x-toolbar .x-btn-bc{
+.opencyto .x-toolbar .x-btn-bc{
     background-position: 0 -15px;
 }
 /**********************************/
+
+#fancybox-buttons ul {
+    width: 73px;
+}

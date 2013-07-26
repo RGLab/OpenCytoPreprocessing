@@ -6,33 +6,33 @@
  *
  * <p>
  * Shows also parents of matching nodes as opposed to default TreeFilter. In other words
- * this filter works "deep way".
+ * this filter works 'deep way'.
  * </p>
  *
  * @author   Ing. Jozef Sakáloš
  * @version  1.0
  * @date     17. December 2008
  * @revision $Id: Ext.ux.tree.TreeFilterX.js 589 2009-02-21 23:30:18Z jozo $
- * @see      <a href="http://extjs.com/forum/showthread.php?p=252709">http://extjs.com/forum/showthread.php?p=252709</a>
+ * @see      <a href='http://extjs.com/forum/showthread.php?p=252709'>http://extjs.com/forum/showthread.php?p=252709</a>
  *
  * @license Ext.ux.tree.CheckTreePanel is licensed under the terms of
  * the Open Source LGPL 3.0 license.  Commercial use is permitted to the extent
  * that the code/component(s) do NOT become part of another Open Source or Commercially
  * licensed development library or toolkit without explicit permission.
  *
- * <p>License details: <a href="http://www.gnu.org/licenses/lgpl.html"
- * target="_blank">http://www.gnu.org/licenses/lgpl.html</a></p>
+ * <p>License details: <a href='http://www.gnu.org/licenses/lgpl.html'
+ * target='_blank'>http://www.gnu.org/licenses/lgpl.html</a></p>
  *
  * @forum     55489
  * @demo      http://remotetree.extjs.eu
  *
  * @donate
- * <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
- * <input type="hidden" name="cmd" value="_s-xclick">
- * <input type="hidden" name="hosted_button_id" value="3430419">
- * <input type="image" src="https://www.paypal.com/en_US/i/btn/x-click-butcc-donate.gif"
- * border="0" name="submit" alt="PayPal - The safer, easier way to pay online.">
- * <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+ * <form action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_blank'>
+ * <input type='hidden' name='cmd' value='_s-xclick'>
+ * <input type='hidden' name='hosted_button_id' value='3430419'>
+ * <input type='image' src='https://www.paypal.com/en_US/i/btn/x-click-butcc-donate.gif'
+ * border='0' name='submit' alt='PayPal - The safer, easier way to pay online.'>
+ * <img alt='' border='0' src='https://www.paypal.com/en_US/i/scr/pixel.gif' width='1' height='1'>
  * </form>
  */
 
@@ -56,7 +56,7 @@ Ext.ux.tree.TreeFilterX = Ext.extend(Ext.tree.TreeFilter, {
 	 *
      * @param {String/RegExp} value Either string that the attribute value
      * should start with or a RegExp to test against the attribute
-     * @param {String} attr (optional) The attribute passed in your node's attributes collection. Defaults to "text".
+     * @param {String} attr (optional) The attribute passed in your node's attributes collection. Defaults to 'text'.
      * @param {TreeNode} startNode (optional) The node to start the filter at.
      */
 	,filter:function(value, attr, startNode) {
@@ -126,7 +126,7 @@ Ext.ux.tree.TreeFilterX = Ext.extend(Ext.tree.TreeFilter, {
 
         if(this.remove){
            for(var id in af) {
-               if(typeof id != "function") {
+               if(typeof id != 'function') {
                    var n = af[id];
                    if(n && n.parentNode) {
                        n.parentNode.removeChild(n);
@@ -138,7 +138,7 @@ Ext.ux.tree.TreeFilterX = Ext.extend(Ext.tree.TreeFilter, {
 	// }}}
 
     /**
-     * Clears the current filter. Note: with the "remove" option
+     * Clears the current filter. Note: with the 'remove' option
      * set a filter cannot be cleared.
      */
     ,clear : function(){

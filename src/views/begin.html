@@ -18,9 +18,10 @@ vim: ts=2:sw=2:nu:fdc=2:spell
 -->
 
 <!--<script type='text/javascript'>	LABKEY.requiresExt4ClientAPI(); </script>-->
-<script src='//code.jquery.com/jquery-latest.min.js'></script>
-<script type='text/javascript' src='../../OpenCyto/FancyBox/lib/jquery.mousewheel-3.0.6.pack.js'></script>
-<script type='text/javascript' src='../../OpenCyto/FancyBox/source/jquery.fancybox.pack.js'></script>
+<script type='text/javascript'>
+    if ( window.jQuery == undefined )
+        document.write( decodeURI("%3Cscript src='//code.jquery.com/jquery-latest.min.js' type='text/javascript'%3E%3C/script%3E") );
+</script>
 
 <script type='text/javascript'>
 

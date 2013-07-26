@@ -1,6 +1,7 @@
 SELECT DISTINCT
- FCSFiles.Run.FilePathRoot  AS RootPath
+ Runs.FilePathRoot AS RootPath
 FROM
- FCSFiles
+ Runs
 WHERE
- FCSFiles.Run.FilePathRoot IS NOT NULL
+ Runs.FilePathRoot IS NOT NULL AND
+ Runs.ProtocolStep = 'Keywords'

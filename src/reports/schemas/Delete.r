@@ -16,18 +16,18 @@
 
 suppressMessages( library( Rlabkey ) );
 
-gsPath      <- labkey.url.params$gsPath;
-gsId        <- as.numeric( labkey.url.params$gsId );
-entityId    <- labkey.url.params$container;
+gspath      <- labkey.url.params$gspath;
+gsid        <- as.numeric( labkey.url.params$gsid );
+container   <- labkey.url.params$container;
 
-if ( gsPath != '' ){
+if ( gspath != '' ){
 
-    if ( gsId != '' ){
+    if ( gsid != '' ){
 
         deletedRows <- labkey.deleteRows(
             toDelete        = data.frame(
-                                  gsid        = gsId,
-                                  container   = entityId
+                                  gsid        = gsid,
+                                  container   = container
                               )
             , queryName     = 'gstbl'
             , baseUrl       = labkey.url.base
@@ -44,13 +44,13 @@ if ( gsPath != '' ){
         , schemaName    = 'opencyto_preprocessing'
         , baseUrl       = labkey.url.base
         , folderPath    = labkey.url.path
-        , colFilter     = makeFilter( c( 'objlink', 'EQUALS', gsPath ) )
+        , colFilter     = makeFilter( c( 'gspath', 'EQUALS', gspath ) )
     );
 
     tryCatch(
         {
             if ( nrow( gsTbl ) == 0 ) {
-                res <- unlink( gsPath, force = T, recursive = T );
+                res <- unlink( gspath, force = T, recursive = T );
 
                 if ( res == 0 ){
                     txt <- paste( txt, 'and from the file system' );

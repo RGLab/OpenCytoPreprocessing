@@ -176,7 +176,7 @@ Ext.override(Ext.grid.HeaderDragZone, {
     }
 });
 
-// Apply class "x-dd-drop-nodrop" for anything being attempted to be dropped to the first "disallowMoveBefore" positions
+// Apply class 'x-dd-drop-nodrop' for anything being attempted to be dropped to the first 'disallowMoveBefore' positions
 Ext.override(Ext.grid.HeaderDropZone, {
     positionIndicator : function(h, n, e){
         if ( this.grid.colModel.disallowMoveBefore != undefined ){
@@ -192,10 +192,10 @@ Ext.override(Ext.grid.HeaderDropZone, {
                 py = r.top + this.proxyOffsets[1];
         if((r.right - x) <= (r.right-r.left)/2){
             px = r.right+this.view.borderWidth;
-            pt = "after";
+            pt = 'after';
         }else{
             px = r.left;
-            pt = "before";
+            pt = 'before';
         }
 
         if(this.grid.colModel.isFixed(this.view.getCellIndex(n))){
@@ -214,7 +214,7 @@ Ext.override(Ext.grid.HeaderDropZone, {
     }
 });
 
-// Do not allow columns to be moved to the first "disallowMoveBefore" positions
+// Do not allow columns to be moved to the first 'disallowMoveBefore' positions
 Ext.CustomColumnModel = Ext.extend(Ext.grid.ColumnModel, {
     disallowMoveBefore: -1,
     moveColumn: function (oldIndex, newIndex) {
@@ -260,7 +260,7 @@ function onFailure(errorInfo, options, responseObj){
     Ext.Msg.alert('Error', text + strngErrorContact);
 };
 
-Ext4.Ajax.timeout = 60 * 60 * 1000; // override the timeout to be 60 mintues; value is in milliseconds
+Ext4.Ajax.timeout = 6 * 60 * 60 * 1000; // override the timeout to be 6 hours; value is in milliseconds
 
 Ext.QuickTips.init();
 
@@ -325,9 +325,9 @@ function lcs(lcstest, lcstarget) {
     for(lcsi=0; lcsi<lcstest.length; lcsi++){
         lscos=0
         for(lcsj=0; lcsj<lcsi+1; lcsj++){
-            re = new RegExp("(?:.{" + lscos + "})(.{" + lsclen + "})", "i");
+            re = new RegExp('(?:.{' + lscos + '})(.{' + lsclen + '})', 'i');
             temp = re.test(lcstest);
-            re = new RegExp("(" + RegExp.$1 + ")", "i");
+            re = new RegExp('(' + RegExp.$1 + ')', 'i');
             if(re.test(lcstarget)){
                 matchfound=1;
                 result = RegExp.$1;
@@ -338,7 +338,7 @@ function lcs(lcstest, lcstarget) {
         if(matchfound==1){return result; break;}
         lsclen = lsclen - 1;
     }
-    result = "";
+    result = '';
     return result;
 };
 
@@ -399,20 +399,20 @@ if (!Array.prototype.map) {
         var T, A, k;
 
         if (this == null) {
-            throw new TypeError(" this is null or not defined");
+            throw new TypeError(' this is null or not defined');
         }
 
         // 1. Let O be the result of calling ToObject passing the |this| value as the argument.
         var O = Object(this);
 
-        // 2. Let lenValue be the result of calling the Get internal method of O with the argument "length".
+        // 2. Let lenValue be the result of calling the Get internal method of O with the argument 'length'.
         // 3. Let len be ToUint32(lenValue).
         var len = O.length >>> 0;
 
         // 4. If IsCallable(callback) is false, throw a TypeError exception.
         // See: http://es5.github.com/#x9.11
-        if (typeof callback !== "function") {
-            throw new TypeError(callback + " is not a function");
+        if (typeof callback !== 'function') {
+            throw new TypeError(callback + ' is not a function');
         }
 
         // 5. If thisArg was supplied, let T be thisArg; else let T be undefined.

@@ -42,6 +42,16 @@ Ext.ux.form.ExtendedComboBox = Ext.extend( Ext.form.ComboBox, {
                 renderTo: document.body
             });
 
+            this.store.on({
+                'datachanged':  this.resizeToFitContent,
+                'add':          this.resizeToFitContent,
+                'remove':       this.resizeToFitContent,
+                'load':         this.resizeToFitContent,
+                'update':       this.resizeToFitContent,
+                buffer: 10,
+                scope: this
+            });
+
             this.resizeToFitContent();
         }, this );
 
@@ -49,16 +59,6 @@ Ext.ux.form.ExtendedComboBox = Ext.extend( Ext.form.ComboBox, {
          this.initList();
          this.doQuery('', true);
          }, this );*/
-
-        this.store.on({
-            'datachanged':  this.resizeToFitContent,
-            'add':          this.resizeToFitContent,
-            'remove':       this.resizeToFitContent,
-            'load':         this.resizeToFitContent,
-            'update':       this.resizeToFitContent,
-            buffer: 10,
-            scope: this
-        });
 
         this.addClearItem
             ? Ext.form.TwinTriggerField.prototype.initComponent.call(this)
@@ -79,27 +79,28 @@ Ext.ux.form.ExtendedComboBox = Ext.extend( Ext.form.ComboBox, {
 
     //Size the drop-down list to the contents
     resizeToFitContent: function(){
-        if ( ! this.elMetrics ){
-            this.elMetrics = Ext.util.TextMetrics.createInstance( this.getEl() );
-        }
-        var m = this.elMetrics, width = 0, el = this.el, s = this.getSize();
-        this.store.each(function (r) {
-            var text = r.get(this.displayField);
-            width = Math.max(width, m.getWidth( Ext.util.Format.htmlEncode(text) ));
-        }, this);
-        if (el) {
+        var el = this.getEl();
+        if ( el != undefined && this.rendered ){
+            if ( ! this.elMetrics ){
+                this.elMetrics = Ext.util.TextMetrics.createInstance( el );
+            }
+            var m = this.elMetrics, width = 0, s = this.getSize();
+            this.store.each(function (r) {
+                var text = r.get(this.displayField);
+                width = Math.max(width, m.getWidth( Ext.util.Format.htmlEncode(text) ));
+            }, this);
             width += el.getBorderWidth('lr');
             width += el.getPadding('lr');
-        }
-        s.width = width;
-        width += 3*Ext.getScrollBarWidth() + 20;
-        this.listWidth = width;
-        this.minListWidth = width;
-        if ( this.list != undefined ){
-            this.list.setSize(width);
-        }
-        if ( this.innerList != undefined ){
-            this.innerList.setSize(width);
+            s.width = width;
+            width += 3*Ext.getScrollBarWidth() + 60;
+            this.listWidth = width;
+            this.minListWidth = width;
+            if ( this.list != undefined ){
+                this.list.setWidth( width );
+            }
+            if ( this.innerList != undefined ){
+                this.innerList.setWidth( width );
+            }
         }
     },
 

@@ -5,19 +5,23 @@
         </ns:description>
         <ns:columns>
             <ns:column columnName='container'/>
-            <ns:column columnName='gsid'/>
-            <ns:column columnName='gsname'/>
-            <ns:column columnName='objlink'>
-                <ns:columnTitle>objLink</ns:columnTitle>
+            <ns:column columnName='gsid'>
+                <ns:columnTitle>gsId</ns:columnTitle>
+            </ns:column>
+            <ns:column columnName='gsname'>
+                <ns:columnTitle>gsName</ns:columnTitle>
+            </ns:column>
+            <ns:column columnName='gspath'>
+                <ns:columnTitle>gsPath</ns:columnTitle>
             </ns:column>
             <ns:column columnName='gsdescription'>
                 <ns:columnTitle>gsDescription</ns:columnTitle>
             </ns:column>
-            <ns:column columnName='xmlpath'>
-                <ns:columnTitle>xmlPath</ns:columnTitle>
+            <ns:column columnName='xmlpaths'>
+                <ns:columnTitle>xmlPaths</ns:columnTitle>
             </ns:column>
-            <ns:column columnName='samplegroup'>
-                <ns:columnTitle>sampleGroup</ns:columnTitle>
+            <ns:column columnName='samplegroups'>
+                <ns:columnTitle>sampleGroups</ns:columnTitle>
             </ns:column>
             <ns:column columnName='created'>
                 <ns:columnTitle>Created</ns:columnTitle>
@@ -31,8 +35,12 @@
         </ns:description>
         <ns:columns>
             <ns:column columnName='container'/>
-            <ns:column columnName='name'/>
-            <ns:column columnName='path'/>
+            <ns:column columnName='name'>
+                <ns:columnTitle>Name</ns:columnTitle>
+            </ns:column>
+            <ns:column columnName='path'>
+                <ns:columnTitle>Path</ns:columnTitle>
+            </ns:column>
             <ns:column columnName='x_axis'>
                 <ns:columnTitle>X Marker and Channel Name</ns:columnTitle>
             </ns:column>
@@ -45,7 +53,9 @@
             <ns:column columnName='y_key'>
                 <ns:columnTitle>Y Channel Name</ns:columnTitle>
             </ns:column>
-            <ns:column columnName='gsid'/>
+            <ns:column columnName='gsid'>
+                <ns:columnTitle>gsId</ns:columnTitle>
+            </ns:column>
         </ns:columns>
     </ns:table>
     <ns:table tableName='study_vars' tableDbType='TABLE'>
@@ -60,7 +70,9 @@
             <ns:column columnName='svname'>
                 <ns:columnTitle>Study Variable Name</ns:columnTitle>
             </ns:column>
-            <ns:column columnName='gsid'/>
+            <ns:column columnName='gsid'>
+                <ns:columnTitle>gsId</ns:columnTitle>
+            </ns:column>
         </ns:columns>
     </ns:table>
     <ns:table tableName='files' tableDbType='TABLE'>
@@ -77,7 +89,9 @@
                     <ns:fkColumnName>RowId</ns:fkColumnName>
                 </ns:fk>
             </ns:column>
-            <ns:column columnName='gsid'/>
+            <ns:column columnName='gsid'>
+                <ns:columnTitle>gsId</ns:columnTitle>
+            </ns:column>
         </ns:columns>
     </ns:table>
 </ns:tables>

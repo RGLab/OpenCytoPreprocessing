@@ -15,7 +15,7 @@
 
 #fancybox-buttons ul {
 	display: block;
-	width: 73px; /* original 166 px for all the buttons */
+	width: 166px;
 	height: 30px;
 	margin: 0 auto;
 	padding: 0;
@@ -46,6 +46,7 @@
 	width: 30px;
 	height: 30px;
 	text-indent: -9999px;
+	background-color: transparent;
 	background-image: url('fancybox_buttons.png');
 	background-repeat: no-repeat;
 	outline: none;

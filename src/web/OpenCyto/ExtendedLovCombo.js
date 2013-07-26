@@ -25,19 +25,19 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
             this.tpl =
                 '<tpl for=".">'
                     + '<tpl if="' + this.valueField + '==\'' + this.selectAllValueField + '\'">'
-                        + '<div class="x-combo-list-item ux-lovcombo-list-item-all">'
-                            + '<img src="' + Ext.BLANK_IMAGE_URL + '" '
-                            + 'class="ux-lovcombo-icon ux-lovcombo-icon-'
-                            + '{[values.' + this.checkField + '?"checked":"unchecked"' + ']}">'
-                            + '<div class="ux-lovcombo-item-text">{' + (this.displayField || 'text' )+ '}</div>'
+                        + '<div class=\'x-combo-list-item ux-lovcombo-list-item-all\'>'
+                            + '<img src=\'' + Ext.BLANK_IMAGE_URL + '\' '
+                            + 'class=\'ux-lovcombo-icon ux-lovcombo-icon-'
+                            + '{[values.' + this.checkField + '?\'checked\':\'unchecked\'' + ']}\'>'
+                            + '<div class=\'ux-lovcombo-item-text\'>{' + (this.displayField || 'text' )+ '}</div>'
                         + '</div>'
                     + '</tpl>'
                     + '<tpl if="' + this.valueField + '!=\'' + this.selectAllValueField + '\'">'
-                        + '<div class="x-combo-list-item">'
-                            + '<img src="' + Ext.BLANK_IMAGE_URL + '" '
-                            + 'class="ux-lovcombo-icon ux-lovcombo-icon-'
-                            + '{[values.' + this.checkField + '?"checked":"unchecked"' + ']}">'
-                            + '<div class="ux-lovcombo-item-text">{' + (this.displayField || 'text' )+ ':htmlEncode}</div>'
+                        + '<div class=\'x-combo-list-item\'>'
+                            + '<img src=\'' + Ext.BLANK_IMAGE_URL + '\' '
+                            + 'class=\'ux-lovcombo-icon ux-lovcombo-icon-'
+                            + '{[values.' + this.checkField + '?\'checked\':\'unchecked\'' + ']}\'>'
+                            + '<div class=\'ux-lovcombo-item-text\'>{' + (this.displayField || 'text' )+ ':htmlEncode}</div>'
                         + '</div>'
                     + '</tpl>'
                  +'</tpl>'
@@ -60,6 +60,16 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
                 renderTo: document.body
             });
 
+            this.store.on({
+                'datachanged':  this.resizeToFitContent,
+                'add':          this.resizeToFitContent,
+                'remove':       this.resizeToFitContent,
+                'load':         this.resizeToFitContent,
+                'update':       this.resizeToFitContent,
+                buffer: 10,
+                scope: this
+            });
+
             this.resizeToFitContent();
         }, this );
 
@@ -72,8 +82,8 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
         // install internal event handlers ???
         this.on({
             scope:this
-            ,beforequery:this.onBeforeQuery
-            ,beforeblur:this.beforeBlur
+            , beforequery:this.onBeforeQuery
+            , beforeblur:this.beforeBlur
         });
 
         // remove selection from input field
@@ -90,7 +100,7 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
                 if(this.store && this.addSelectAllItem){
                     var RecordType = Ext.data.Record.create([this.valueField, this.displayField]);
                     var data = {};
-                    data[this.valueField] = this.selectAllValueField;
+                    data[this.valueField]   = this.selectAllValueField;
                     data[this.displayField] = this.selectAllTextField;
                     this.store.insert(0, [new RecordType(data)]);
                 }
@@ -98,16 +108,6 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
                     this.selectAll();
                 }
             },
-            buffer: 10,
-            scope: this
-        });
-
-        this.store.on({
-            'datachanged':  this.resizeToFitContent,
-            'add':          this.resizeToFitContent,
-            'remove':       this.resizeToFitContent,
-            'load':         this.resizeToFitContent,
-            'update':       this.resizeToFitContent,
             buffer: 10,
             scope: this
         });
@@ -240,27 +240,28 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
 
     //Size the drop-down list to the contents
     resizeToFitContent: function(){
-        if ( ! this.elMetrics ){
-            this.elMetrics = Ext.util.TextMetrics.createInstance( this.getEl() );
-        }
-        var m = this.elMetrics, width = 0, el = this.el, s = this.getSize();
-        this.store.each(function (r) {
-            var text = r.get(this.displayField);
-            width = Math.max(width, m.getWidth( Ext.util.Format.htmlEncode(text) ));
-        }, this);
-        if (el) {
+        var el = this.getEl();
+        if ( el != undefined && this.rendered ){
+            if ( ! this.elMetrics ){
+                this.elMetrics = Ext.util.TextMetrics.createInstance( el );
+            }
+            var m = this.elMetrics, width = 0, s = this.getSize();
+            this.store.each(function (r) {
+                var text = r.get(this.displayField);
+                width = Math.max(width, m.getWidth( Ext.util.Format.htmlEncode(text) ));
+            }, this);
             width += el.getBorderWidth('lr');
             width += el.getPadding('lr');
-        }
-        s.width = width;
-        width += 3*Ext.getScrollBarWidth() + 60;
-        this.listWidth = width;
-        this.minListWidth = width;
-        if ( this.list != undefined ){
-            this.list.setSize(width);
-        }
-        if ( this.innerList != undefined ){
-            this.innerList.setWidth( width );
+            s.width = width;
+            width += 3*Ext.getScrollBarWidth() + 60;
+            this.listWidth = width;
+            this.minListWidth = width;
+            if ( this.list != undefined ){
+                this.list.setWidth( width );
+            }
+            if ( this.innerList != undefined ){
+                this.innerList.setWidth( width );
+            }
         }
     },
 

@@ -59,6 +59,5 @@ if ( length( wsPaths ) > 0 ){
     names( sampleGroups ) <- wsPaths;
 }
 
-write( toJSON( x = sampleGroupsList, asIs = TRUE ), '${jsonout:outArray}' );
-write( toJSON( x = sampleGroups, asIs = TRUE ), '${jsonout:outArray}' );
-
+write( RJSONIO::toJSON( x = sampleGroupsList, asIs = T ), '${jsonout:outArray}' );
+write( RJSONIO::toJSON( x = sampleGroups, asIs = T ), '${jsonout:outArray}' );
