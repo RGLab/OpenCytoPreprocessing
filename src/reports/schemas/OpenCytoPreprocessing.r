@@ -24,6 +24,8 @@ strngAllStudyVars       <- labkey.url.params$allStudyVars;
 strngFilesIds           <- labkey.url.params$filesIds;
 strngFilesNames         <- labkey.url.params$filesNames;
 
+strngDuplicateAnalysisName <- 'There is already an analysis with the same name, delete it first, before proceeding.';
+
 tryCatch({
 
 if ( exists('gsid') ){
@@ -73,9 +75,6 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
 
         txt <- 'Seems that another session is already working on the same analysis, cannot proceed!';
 
-        write( txt, file='${txtout:textOutput}' );
-
-        return;
     } else { # folder does not exist or exists and does not contain a 'lock' file
 
         # check the database, if there is already an entry with the same name 'analysisName'
@@ -89,7 +88,7 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
         );
 
         if ( nrow( gsTbl ) > 0 ){
-            stop( 'There is already an analysis with the same name, delete it first, before proceding.' );
+            stop( strngDuplicateAnalysisName );
         }
 
         if ( file.exists( gatingSetPath ) ){ # folder exists and does not contain a 'lock' file
@@ -130,7 +129,7 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
 
                 tempCdfFile <- tempfile(
                     pattern = 'ncfs',
-                    tmpdir  = folderPath,
+                    tmpdir  = gatingSetPath,
                     fileext = '.nc'
                 );
                 # to make sure the temp ncdf file is created in the same partition,
@@ -229,8 +228,6 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
                 return;
             } else {
                 txt <- 'Success: wrote data to disk';
-
-                unlink( paste0( gatingSetPath, '/FOLDER_LOCKED_TEMP' ) );
             }
         }
 
@@ -363,13 +360,15 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
         lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse = '\n' ) );
 
         txt <- paste( txt, 'and wrote to the db!' );
+
+        unlink( paste0( gatingSetPath, '/FOLDER_LOCKED_TEMP' ), force = T, recursive = T );
     }
 
 } else {
     txt <- 'Empty path or sample group';
 }
 
-    write( txt, file='${txtout:textOutput}' );
+write( txt, file='${txtout:textOutput}' );
 
 }, error = function(e){
 
@@ -392,23 +391,18 @@ if ( strngWorkspacePaths != '' | strngSampleGroupNames != '' ){
         }
     }
 
-    if ( ! exists('folderPath') ){
-        folderPath <- '~';
-    }
-
     if ( length( list.files( gatingSetPath, pattern = 'FOLDER_LOCKED_TEMP' ) ) == 1 ){
         unlink( gatingSetPath, force = T, recursive = T );
     }
-    unlink( paste0( folderPath, '/ncfs*.nc' ), force = T, recursive = T );
 
     fileConn <- file( paste0( folderPath,'/', Sys.time(), '_', paste( basename( xmlPathArray ), collapse = ','), '_', strngSampleGroupNames, '.log' ) );
     lg <- paste0( lg, '\n', print( e ) );
 
-    if (    grepl( 'duplicate key value violates unique constraint', print( e ), fixed = T ) ||
-            grepl( 'There is already an analysis with the same name, delete it first, before proceding.', print( e ), fixed = T )
+    if (    grepl( 'duplicate key value violates unique constraint', print( e ), fixed = T ) |
+            grepl( strngDuplicateAnalysisName, print( e ), fixed = T )
         ){
         close( fileConn );
-        stop( 'There is already an analysis with the same name, delete it first, before proceding.' );
+        stop( strngDuplicateAnalysisName );
     } else {
         write( lg, file = fileConn );
         close( fileConn );

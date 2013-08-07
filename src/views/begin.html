@@ -31,7 +31,7 @@ vim: ts=2:sw=2:nu:fdc=2:spell
         var resizeModule;
 // REMOVE once issue #18 in OpenCytoVisualization is taken care of
 LABKEY.Query.getSchemas({
-    failure: onFailure,
+    failure: LABKEY.ext.OpenCyto.onFailure,
     success: function(schemasInfo){
         if ( $.inArray( 'opencyto_preprocessing', schemasInfo.schemas ) >= 0 ){
 // END REMOVE

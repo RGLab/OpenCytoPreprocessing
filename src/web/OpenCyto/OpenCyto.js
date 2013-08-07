@@ -15,19 +15,21 @@
  limitations under the License.
 */
 
+Ext.namespace('LABKEY.ext.OpenCyto');
+
 //============================//
 // Ext specific functionality //
 //============================//
 
 // Sets the width of the row numberer depending on the maximum number of digits in the number of records in the underlying store
-function factoryRowNumberer( store ){
+LABKEY.ext.OpenCyto.factoryRowNumberer = function ( store ){
     return new Ext.grid.RowNumberer({
         filterable: false,
         width: Math.round( 23 * ( store.getCount().toString().length  ) / 2 )
     })
 };
 
-function initTableQuickTips( o ){
+LABKEY.ext.OpenCyto.initTableQuickTips = function( o ){
     Ext.QuickTips.register({
         target: o,
         text:   '1) click the arrow on the right of a selected column header to access the sorting, filtering and hiding/showing options menu for the column <br/>' +
@@ -37,7 +39,7 @@ function initTableQuickTips( o ){
     });
 };
 
-function loadStoreWithArray( store, array ) {
+LABKEY.ext.OpenCyto.loadStoreWithArray = function( store, array ) {
     var len = array.length;
     for ( var i = 0; i < len; i ++ ) {
         array[i] = [ array[i] ];
@@ -215,7 +217,7 @@ Ext.override(Ext.grid.HeaderDropZone, {
 });
 
 // Do not allow columns to be moved to the first 'disallowMoveBefore' positions
-Ext.CustomColumnModel = Ext.extend(Ext.grid.ColumnModel, {
+Ext.grid.CustomColumnModel = Ext.extend(Ext.grid.ColumnModel, {
     disallowMoveBefore: -1,
     moveColumn: function (oldIndex, newIndex) {
         if ( newIndex > this.disallowMoveBefore ) {
@@ -229,7 +231,7 @@ Ext.CustomColumnModel = Ext.extend(Ext.grid.ColumnModel, {
 });
 
 
-function captureEvents(observable) {
+LABKEY.ext.OpenCyto.captureEvents = function(observable) {
     Ext.util.Observable.capture(
         observable,
         function(eventName, o) {
@@ -243,7 +245,7 @@ function captureEvents(observable) {
     );
 };
 
-function onFailure(errorInfo, options, responseObj){
+LABKEY.ext.OpenCyto.onFailure = function(errorInfo, options, responseObj){
     var strngErrorContact = '\nPlease, contact ldashevs@fhcrc.org, if you have questions.', text = 'Failure: ';
 
     if (errorInfo && errorInfo.exception){
