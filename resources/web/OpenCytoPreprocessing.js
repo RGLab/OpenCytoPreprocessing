@@ -423,7 +423,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     LABKEY.Filter.create( 'Name', 'DISPLAY;BS;MS', LABKEY.Filter.Types.CONTAINS_NONE_OF ),
                     LABKEY.Filter.create(
                         'Name',
-                        [ '$', 'LASER', 'EXPORT', 'CST', 'CYTOMETER', 'FJ_', 'CREATOR', 'TUBE NAME', 'WINDOW EXTENSION', 'SPILL' ],
+                        [ '$', 'LASER', 'EXPORT', 'CST', 'CYTOMETER', 'FJ_', 'CREATOR', 'TUBE NAME', 'WINDOW EXTENSION', 'SPILL', 'BD$' ],
                         LABKEY.Filter.Types.DOES_NOT_START_WITH
                     )
                 ],

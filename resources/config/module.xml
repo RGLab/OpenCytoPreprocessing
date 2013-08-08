@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<beans xmlns='http://www.springframework.org/schema/beans'
+       xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+       xmlns:util='http://www.springframework.org/schema/util'
+       xsi:schemaLocation='http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd'>
+    <bean id='moduleBean' class='org.labkey.api.module.SimpleModule'>
+        <constructor-arg index='0'><value type='java.lang.String'>OpenCytoPreprocessing</value></constructor-arg>
+        <property name='name' value='OpenCytoPreprocessing'/>
+        <property name='version' value='0.01'/>
+        <property name='requiredServerVersion' value='12.10'/>
+        <property name='moduleDependencies' value='Flow'/>
+        <property name='svnRevision' value='27583'/>
+        <property name='svnUrl' value='https://hedgehog.fhcrc.org/tor/stedi/trunk/server'/>
+        <property name='buildUser' value='ldashevs'/>
+        <property name='buildTime' value='August 7 2013, 12:19 PM'/>
+        <property name='buildOS' value='Linux'/>
+        <property name='buildPath' value='../../../build/deploy/modules/OpenCytoPreprocessing'/>
+        <property name='sourcePath' value='/home/ldashevs/Labkey/release/server/customModules/OpenCytoPreprocessing/resources'/>
+    </bean>
+</beans>

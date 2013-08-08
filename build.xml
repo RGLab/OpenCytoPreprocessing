@@ -7,7 +7,7 @@
 
   <property name='module.name' value='OpenCytoPreprocessing'/>
   <property name='module.file' value='OpenCytoPreprocessing.module'/>
-  <property name='module.src.dir' value='${basedir}/src'/>
+  <property name='module.src.dir' value='${basedir}/resources'/>
 
   <target name='init'>
     <ant target='query_svn_number' dir='${project.root}/server' inheritall='false'/>
@@ -28,7 +28,7 @@
         <filter token='BuildOS' value='${os.name}' />
         <filter token='BuildUser' value='${user.name}' />
         <filter token='BuildPath' value='${deploy.modules.dir}/${module.name}' />
-        <filter token='SourcePath' value='${basedir}/src' />
+        <filter token='SourcePath' value='${basedir}/resources' />
         <filter token='URL' value='Not built from a Subversion source tree' />
         <filter token='Revision' value='Not built from a Subversion source tree' />
       </filterset>

@@ -43,7 +43,6 @@ lg <- paste0( lg, '\nLOADING LIBRARIES ETC.' );
 
 ptm <- proc.time();
 
-suppressMessages( library( flowIncubator ) );
 suppressMessages( library( flowWorkspace ) );
 suppressMessages( library( ncdfFlow ) );
 suppressMessages( library( Rlabkey ) );
