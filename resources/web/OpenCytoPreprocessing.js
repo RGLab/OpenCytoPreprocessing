@@ -106,178 +106,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
         var strTableFiles = new LABKEY.ext.Store({
             listeners: {
-                load: function(){
-                    flagLoading = false;
-
-                    cbStudyVarName.setDisabled(false);
-                    cbWorkspace.setDisabled(false);
-                    tfSampleGroup.setDisabled(false);
-                    tfAnalysisName.setDisabled(false);
-                    tfAnalysisDescription.setDisabled(false);
-
-                    maskStudyVars.hide();
-                    maskWorkspaces.hide();
-
-
-                    // Check to see if a different set of study variables was picked or if the sample groups changed
-                    var tempWorkspaceSampleGroup = '';
-                    for (var key in selectedSampleGroups){
-                        tempWorkspaceSampleGroup += key + selectedSampleGroups[key][0];
-                    }
-
-                    var tempStudyVarName = cbStudyVarName.getValue();
-
-                    if ( tempStudyVarName != selectedStudyVars || tempWorkspaceSampleGroup != selectedWorkspaceAndSampleGroup ){
-                        selectedStudyVars = tempStudyVarName;
-                        selectedWorkspaceAndSampleGroup = tempWorkspaceSampleGroup;
-
-                        var curValue, newColumns;
-
-                        // Grab the choices array
-                        var arrayStudyVarsDisplay   = cbStudyVarName.getCheckedArray( cbStudyVarName.displayField ),
-                            arrayStudyVarsValue     = cbStudyVarName.getCheckedArray( cbStudyVarName.valueField );
-
-                        var field = { name: 'SampleGroup' };
-                        field = new Ext.data.Field(field);
-                        this.recordType.prototype.fields.replace(field);
-                        this.each( function(r){
-                            if ( typeof r.data[field.name] == 'undefined' ){
-                                r.data[field.name] = selectedSampleGroups[
-                                    strWorkspace.getAt(
-                                        strWorkspace.findExact(
-                                            'FileName', r.data['RunName']
-                                        )
-                                    ).get( 'FilePath' )
-                                ][0];
-                            }
-                        });
-
-                        newColumns =
-                            [
-                                LABKEY.ext.OpenCyto.factoryRowNumberer( strTableFiles ),
-                                smCheckBoxFiles,
-                                {
-                                    dataIndex: 'RunName',
-                                    dragable: false,
-                                    filter: {
-                                        options: strTableFiles.collect( 'RunName' ),
-                                        type: 'list'
-                                    },
-                                    header: 'Workspace',
-                                    hideable: false,
-                                    renderer: function(value, metaData, record, rowIndex, colIndex, store) {
-                                        return '<a href=\'' +
-                                            LABKEY.ActionURL.buildURL(
-                                                'flow-run',
-                                                'showRun',
-                                                LABKEY.ActionURL.getContainer(),
-                                                {
-                                                    'runId': record.get('RunId'),
-                                                    'query.showGraphs': 'Thumbnail'
-                                                }
-                                            ) +
-                                            '\'>' + value + '</a>';
-                                    }
-                                },
-                                {
-                                    dataIndex: 'SampleGroup',
-                                    dragable: false,
-                                    filter: {
-                                        options: strTableFiles.collect( 'SampleGroup' ),
-                                        type: 'list'
-                                    },
-                                    header: 'Sample Group',
-                                    hideable: false
-                                },
-                                {
-                                    dataIndex: 'FileName',
-                                    dragable: false,
-                                    filter: {
-                                        type: 'string'
-                                    },
-                                    header: 'File Name',
-                                    hideable: false,
-                                    renderer: function(value, metaData, record, rowIndex, colIndex, store) {
-                                        return '<a href=\'' +
-                                            LABKEY.ActionURL.buildURL(
-                                                'flow-well',
-                                                'showWell',
-                                                LABKEY.ActionURL.getContainer(),
-                                                {
-                                                    wellId: record.get('FileIdLink')
-                                                }
-                                            ) +
-                                            '\'>' + value + '</a>';
-                                    }
-                                }
-                            ];
-
-                        Ext.each( arrayStudyVarsValue, function(c, index){
-                            curValue = LABKEY.QueryKey.encodePart( c );
-
-                            newColumns.push({
-                                dataIndex: curValue,
-                                filter: {
-                                    options: strTableFiles.collect( curValue ),
-                                    type: 'list'
-                                },
-                                header: arrayStudyVarsDisplay[ index ]
-                            });
-                        });
-
-                        pnlTableFiles.reconfigure(
-                            strTableFiles,
-                            new Ext.grid.CustomColumnModel({
-                                columns: newColumns,
-                                defaults: {
-                                    resizable: true,
-                                    sortable: true
-                                },
-                                disallowMoveBefore: 4
-                            })
-                        );
-
-                        if ( flagNotSorting ){
-                            smCheckBoxFiles.selectAll();
-
-                            flagNotSorting = false;
-                            if ( strTableFiles.getCount() == 0 ){
-                                updateInfoStatus( strngNoSamplesMessage, 1 );
-
-                                LABKEY.Query.executeSql({
-                                    schemaName: 'flow',
-                                    sql: this.sql,
-                                    success: function( data ){
-                                        if ( data.rowCount == 0 ){
-                                            // disable all
-                                            btnNext.setDisabled(true);
-                                            pnlTableFiles.getEl().mask(
-                                                'Seems like you either have not imported any FCS files (click ' +
-                                                '<a href=\'' + LABKEY.ActionURL.buildURL('pipeline', 'browse') + '\'>here</a>' +
-                                                ' to do so) or while importing a workspace did not associate it to any FCS files (you then need to first ' +
-                                                '<a href=\'' + LABKEY.ActionURL.buildURL(
-                                                    'flow-run',
-                                                    'showRuns',
-                                                    LABKEY.ActionURL.getContainer(),
-                                                    {
-                                                        'query.FCSAnalysisCount~neq': 0
-                                                    }
-                                                ) + '\'>delete</a>' +
-                                                ' the workspace and then ' +
-                                                '<a href=\'' + LABKEY.ActionURL.buildURL('pipeline', 'browse') + '\'>re-import</a>' +
-                                                ' it).' + strngErrorContactWithLink, 'infoMask'
-                                            );
-                                        } else {
-                                            pnlTableFiles.getEl().unmask();
-                                        }
-                                    }
-                                });
-                            } else {
-                                updateInfoStatus( '' );
-                            }
-                        }
-                    }
-                },
+                load: onStrTableFilesLoad,
                 // See https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=17514
                 // Would have to modify the message, once that's fixed
                 loadexception: function(){
@@ -457,7 +286,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 var snapshot = this.getStore().snapshot || this.getStore().data;
 
                 snapshot.each(function(r, index) {
-                    if( ( ( this.addSelectAllItem && index > 0 ) || !this.addSelectAllItem ) ) {
+                    if ( ( ( this.addSelectAllItem && index > 0 ) || !this.addSelectAllItem ) ){
                         c.push( r.get(this.valueField) );
                     }
                 }, this);
@@ -617,14 +446,14 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
                 LABKEY.ext.OpenCyto.onFailure( errorInfo, options, responseObj );
             },
-            reportId: 'module:OpenCytoPreprocessing/SampleGroups.r',
+            reportId: 'module:OpenCytoPreprocessing/SampleGroups.R',
             success: function( result ) {
                 unmask();
 
                 var errors = result.errors;
                 var outputParams = result.outputParams;
 
-                if (errors && errors.length > 0) {
+                if (errors && errors.length > 0){
                     /*
                     msg : errors[0].replace(/\n/g, '<P>'),
                      */
@@ -639,117 +468,9 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     }
                 } else {
                     if ( outputParams.length > 0 ){
-                        var p = outputParams[0];
 
-                        if ( p.type == 'json' ){
-                            var inputArray = p.value;
+                        parseOutputParams( outputParams );
 
-                            // Convert the computed array into a format that can be consumed by the tree
-                            var names = cbWorkspace.getCheckedArray( cbWorkspace.displayField ), temp;
-
-                            Ext.each( inputArray, function( ws, i, p ){
-                                temp = ws;
-                                ws = {};
-                                ws['children'] = [];
-
-                                for( var sg in temp ){
-                                    ws['children'].push({
-                                        text: sg,
-                                        leaf: true,
-                                        cls: 'file',
-                                        checked: false,
-                                        qtip: temp[sg][0] + ' samples referenced'
-                                    });
-                                };
-
-                                ws['text']      = names[i];
-                                ws['leaf']      = false;
-                                ws['expanded']  = true;
-                                ws['cls']       = 'folder';
-
-                                p[i] = ws;
-                            });
-                            // End of conversion
-
-                            sampleGroupsTree = new Ext.tree.TreePanel({
-                                animate:    true,
-                                autoScroll: true,
-                                border:     false,
-                                enableDD:   false,
-                                lines:      true,
-                                listeners: {
-                                    checkchange: function(node, checked){
-
-                                        // Logic to keep track of selected sample groups and their associated workspaces
-                                        // Also includes a mechanism to check whether the current selection is valid:
-                                        // at most one sample group per workspaces is picked
-
-                                        var path = strWorkspace.getAt(
-                                            strWorkspace.findExact( 'FileName', node.parentNode.text )
-                                        ).get( 'FilePath' );
-
-                                        if ( checked ){
-                                            if ( selectedSampleGroups[path] == undefined ){
-                                                selectedSampleGroups[path] = [];
-                                            } else {
-                                                selectedSampleGroupsViolatedCount ++; // array.length > 0
-                                            }
-                                            selectedSampleGroups[path].push( node.text );
-                                        } else { // unchecked
-                                            if ( selectedSampleGroups[path] != undefined ){
-                                                if ( selectedSampleGroups[path].indexOf( node.text ) >= 0 ){
-                                                    selectedSampleGroups[path].remove( node.text );
-                                                    if ( selectedSampleGroups[path].length == 0 ){
-                                                        delete selectedSampleGroups[path];
-                                                    } else if ( selectedSampleGroups[path].length >= 1 ){
-                                                        selectedSampleGroupsViolatedCount --;
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        checkWorkspacesSelection();
-                                    },
-                                    click: function( node ){
-
-                                        // only one per workspace ?
-                                        /*Ext.each( node.parentNode.childNodes, function(n){
-                                         if ( n != node ){
-                                         n.ui.toggleCheck( false );
-                                         }
-                                         });*/
-
-                                        node.getUI().toggleCheck();
-                                    }
-                                },
-                                loader: new Ext.tree.TreeLoader(), // register a TreeLoader to make use of createNode()
-                                root: new Ext.tree.AsyncTreeNode({
-                                    children:   inputArray,
-                                    draggable:  false,
-                                    expanded :  true
-                                }),
-                                rootVisible: false,
-                                useArrows: true
-                            });
-
-                            TreeFilter = new Ext.ux.tree.TreeFilterX( sampleGroupsTree );
-
-                            pnlTreeHolder.removeAll();
-                            pnlTreeHolder.add( sampleGroupsTree );
-                            pnlTreeHolder.doLayout();
-
-                            selectedSampleGroups = {};
-
-                            lastlySelectedWorkspace = cbWorkspace.getValue();
-                        }
-
-                        if ( outputParams.length > 1 ){
-                            p = outputParams[1];
-
-                            if ( p.type == 'json' ){
-                                sampleGroupsMap = p.value;
-                            }
-                        }
                     } else {
                         LABKEY.ext.OpenCyto.onFailure({
                             exception: 'No sample groups in the chosen workspace were detected.'
@@ -767,7 +488,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
                 LABKEY.ext.OpenCyto.onFailure( errorInfo, options, responseObj );
             },
-            reportId: 'module:OpenCytoPreprocessing/OpenCytoPreprocessing.r',
+            reportId: 'module:OpenCytoPreprocessing/OpenCytoPreprocessing.R',
             success: function( result ){
                 unmask();
 
@@ -775,7 +496,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
                 var errors = result.errors;
 
-                if (errors && errors.length > 0) {
+                if (errors && errors.length > 0){
                     if ( errors[0].indexOf('The report session is invalid') < 0 ){
                         LABKEY.ext.OpenCyto.onFailure({
                             exception: errors[0]
@@ -816,14 +537,14 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
                 LABKEY.ext.OpenCyto.onFailure( errorInfo, options, responseObj );
             },
-            reportId: 'module:OpenCytoPreprocessing/Delete.r',
+            reportId: 'module:OpenCytoPreprocessing/Delete.R',
             success: function( result ) {
                 maskDelete.hide();
 
                 var errors = result.errors;
                 var outputParams = result.outputParams;
 
-                if (errors && errors.length > 0) {
+                if (errors && errors.length > 0){
                     if ( errors[0].indexOf('The report session is invalid') < 0 ){
                         strGatingSet.reload();
 
@@ -951,7 +672,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     layout: {
                         type: 'hbox',
                         align: 'stretchmax'
-                    },
+                    }
                 }
             ],
             listeners: {
@@ -1275,6 +996,293 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         //             Functions           //
         /////////////////////////////////////
 
+        function parseOutputParams( outputParams ){
+            var p = outputParams[0];
+
+            if ( p.type == 'json' ){
+                var inputArray = p.value;
+
+                // Convert the computed array into a format that can be consumed by the tree
+                var names = cbWorkspace.getCheckedArray( cbWorkspace.displayField ), temp;
+
+                Ext.each( inputArray, function( ws, i, p ){
+                    temp = ws;
+                    ws = {};
+                    ws['children'] = [];
+
+                    for( var sg in temp ){
+                        ws['children'].push({
+                            text: sg,
+                            leaf: true,
+                            cls: 'file',
+                            checked: false,
+                            qtip: temp[sg][0] + ' samples referenced'
+                        });
+                    };
+
+                    ws['text']      = names[i];
+                    ws['leaf']      = false;
+                    ws['expanded']  = true;
+                    ws['cls']       = 'folder';
+
+                    p[i] = ws;
+                });
+                // End of conversion
+
+                sampleGroupsTree = new Ext.tree.TreePanel({
+                    animate:    true,
+                    autoScroll: true,
+                    border:     false,
+                    enableDD:   false,
+                    lines:      true,
+                    listeners: {
+                        checkchange: function(node, checked){
+
+                            // Logic to keep track of selected sample groups and their associated workspaces
+                            // Also includes a mechanism to check whether the current selection is valid:
+                            // at most one sample group per workspaces is picked
+
+                            var path = strWorkspace.getAt(
+                                    strWorkspace.findExact( 'FileName', node.parentNode.text )
+                            ).get( 'FilePath' );
+
+                            if ( checked ){
+                                if ( selectedSampleGroups[path] == undefined ){
+                                    selectedSampleGroups[path] = [];
+                                } else {
+                                    selectedSampleGroupsViolatedCount ++; // array.length > 0
+                                }
+                                selectedSampleGroups[path].push( node.text );
+                            } else { // unchecked
+                                if ( selectedSampleGroups[path] != undefined ){
+                                    if ( selectedSampleGroups[path].indexOf( node.text ) >= 0 ){
+                                        selectedSampleGroups[path].remove( node.text );
+                                        if ( selectedSampleGroups[path].length == 0 ){
+                                            delete selectedSampleGroups[path];
+                                        } else if ( selectedSampleGroups[path].length >= 1 ){
+                                            selectedSampleGroupsViolatedCount --;
+                                        }
+                                    }
+                                }
+                            }
+
+                            checkWorkspacesSelection();
+                        },
+                        click: function( node ){
+
+                            // only one per workspace ?
+                            /*Ext.each( node.parentNode.childNodes, function(n){
+                             if ( n != node ){
+                             n.ui.toggleCheck( false );
+                             }
+                             });*/
+
+                            node.getUI().toggleCheck();
+                        }
+                    },
+                    loader: new Ext.tree.TreeLoader(), // register a TreeLoader to make use of createNode()
+                    root: new Ext.tree.AsyncTreeNode({
+                        children:   inputArray,
+                        draggable:  false,
+                        expanded :  true
+                    }),
+                    rootVisible: false,
+                    useArrows: true
+                });
+
+                TreeFilter = new Ext.ux.tree.TreeFilterX( sampleGroupsTree );
+
+                pnlTreeHolder.removeAll();
+                pnlTreeHolder.add( sampleGroupsTree );
+                pnlTreeHolder.doLayout();
+
+                selectedSampleGroups = {};
+
+                lastlySelectedWorkspace = cbWorkspace.getValue();
+            }
+
+            if ( outputParams.length > 1 ){
+                p = outputParams[1];
+
+                if ( p.type == 'json' ){
+                    sampleGroupsMap = p.value;
+                }
+            }
+        };
+
+        function onStrTableFilesLoad(){
+            flagLoading = false;
+
+            cbStudyVarName.setDisabled(false);
+            cbWorkspace.setDisabled(false);
+            tfSampleGroup.setDisabled(false);
+            tfAnalysisName.setDisabled(false);
+            tfAnalysisDescription.setDisabled(false);
+
+            maskStudyVars.hide();
+            maskWorkspaces.hide();
+
+
+            // Check to see if a different set of study variables was picked or if the sample groups changed
+            var tempWorkspaceSampleGroup = '';
+            for (var key in selectedSampleGroups){
+                tempWorkspaceSampleGroup += key + selectedSampleGroups[key][0];
+            }
+
+            var tempStudyVarName = cbStudyVarName.getValue();
+
+            if ( tempStudyVarName != selectedStudyVars || tempWorkspaceSampleGroup != selectedWorkspaceAndSampleGroup ){
+                selectedStudyVars = tempStudyVarName;
+                selectedWorkspaceAndSampleGroup = tempWorkspaceSampleGroup;
+
+                var curValue, newColumns;
+
+                // Grab the choices array
+                var arrayStudyVarsDisplay   = cbStudyVarName.getCheckedArray( cbStudyVarName.displayField ),
+                    arrayStudyVarsValue     = cbStudyVarName.getCheckedArray( cbStudyVarName.valueField ); // not encoded path
+
+                var field = { name: 'SampleGroup' };
+                field = new Ext.data.Field(field);
+                this.recordType.prototype.fields.replace(field);
+                this.each( function(r){
+                    if ( typeof r.data[field.name] == 'undefined' ){
+                        r.data[field.name] = selectedSampleGroups[
+                            strWorkspace.getAt(
+                                strWorkspace.findExact(
+                                        'FileName', r.data['RunName']
+                                )
+                            ).get( 'FilePath' )
+                            ][0];
+                    }
+                });
+
+                newColumns =
+                    [
+                        LABKEY.ext.OpenCyto.factoryRowNumberer( strTableFiles ),
+                        smCheckBoxFiles,
+                        {
+                            dataIndex: 'RunName',
+                            dragable: false,
+                            filter: {
+                                options: strTableFiles.collect( 'RunName' ),
+                                type: 'list'
+                            },
+                            header: 'Workspace',
+                            hideable: false,
+                            renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+                                return '<a href=\'' +
+                                    LABKEY.ActionURL.buildURL(
+                                        'flow-run',
+                                        'showRun',
+                                        LABKEY.ActionURL.getContainer(),
+                                        {
+                                            'runId': record.get('RunId'),
+                                            'query.showGraphs': 'Thumbnail'
+                                        }
+                                    ) +
+                                    '\'>' + value + '</a>';
+                            }
+                        },
+                        {
+                            dataIndex: 'SampleGroup',
+                            dragable: false,
+                            filter: {
+                                options: strTableFiles.collect( 'SampleGroup' ),
+                                type: 'list'
+                            },
+                            header: 'Sample Group',
+                            hideable: false
+                        },
+                        {
+                            dataIndex: 'FileName',
+                            dragable: false,
+                            filter: {
+                                type: 'string'
+                            },
+                            header: 'File Name',
+                            hideable: false,
+                            renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+                                return '<a href=\'' +
+                                    LABKEY.ActionURL.buildURL(
+                                        'flow-well',
+                                        'showWell',
+                                        LABKEY.ActionURL.getContainer(),
+                                        {
+                                            wellId: record.get('FileIdLink')
+                                        }
+                                    ) +
+                                    '\'>' + value + '</a>';
+                            }
+                        }
+                    ];
+
+                Ext.each( arrayStudyVarsValue, function(c, index){
+                    curValue = LABKEY.QueryKey.encodePart( c ); // need to encode for Labkey to consume
+
+                    newColumns.push({
+                        dataIndex: curValue,
+                        filter: {
+                            options: strTableFiles.collect( curValue ),
+                            type: 'list'
+                        },
+                        header: arrayStudyVarsDisplay[ index ]
+                    });
+                });
+
+                pnlTableFiles.reconfigure(
+                    strTableFiles,
+                    new Ext.grid.CustomColumnModel({
+                        columns: newColumns,
+                        defaults: {
+                            resizable: true,
+                            sortable: true
+                        },
+                        disallowMoveBefore: 4
+                    })
+                );
+
+                if ( flagNotSorting ){
+                    smCheckBoxFiles.selectAll();
+
+                    flagNotSorting = false;
+                    if ( strTableFiles.getCount() == 0 ){
+                        updateInfoStatus( strngNoSamplesMessage, 1 );
+
+                        LABKEY.Query.executeSql({
+                            schemaName: 'flow',
+                            sql: this.sql,
+                            success: function( data ){
+                                if ( data.rowCount == 0 ){
+                                    // disable all
+                                    btnNext.setDisabled(true);
+                                    pnlTableFiles.getEl().mask(
+                                        'Seems like you either have not imported any FCS files (click ' +
+                                        '<a href=\'' + LABKEY.ActionURL.buildURL('pipeline', 'browse') + '\'>here</a>' +
+                                        ' to do so) or while importing a workspace did not associate it to any FCS files (you then need to first ' +
+                                        '<a href=\'' + LABKEY.ActionURL.buildURL(
+                                            'flow-run',
+                                            'showRuns',
+                                            LABKEY.ActionURL.getContainer(),
+                                            {
+                                                'query.FCSAnalysisCount~neq': 0
+                                            }
+                                        ) + '\'>delete</a>' +
+                                        ' the workspace and then ' +
+                                        '<a href=\'' + LABKEY.ActionURL.buildURL('pipeline', 'browse') + '\'>re-import</a>' +
+                                        ' it).' + strngErrorContactWithLink, 'infoMask'
+                                    );
+                                } else {
+                                    pnlTableFiles.getEl().unmask();
+                                }
+                            }
+                        });
+                    } else {
+                        updateInfoStatus( '' );
+                    }
+                }
+            }
+        };
+
         function checkWorkspacesSelection(){
             if (
                 selectedSampleGroupsViolatedCount > 0 ||
@@ -1365,7 +1373,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
                 for ( var i = cm.disallowMoveBefore + 1; i < len; i ++ ){
                     if ( ! cols[i].hidden ){
-                        studyVarsArray.push( LABKEY.QueryKey.decodePart( cols[i].dataIndex ) );
+                        studyVarsArray.push( LABKEY.QueryKey.decodePart( cols[i].dataIndex ) ); // need to decode for proper display
                     }
                 }
 
@@ -1379,7 +1387,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     studyVars:              studyVarsArray.join(),
                     allStudyVars:           cbStudyVarName.getAllValuesAsArray().sort().join(),
                     filesNames:             filesNames.sort().join(),
-                    filesIds:               filesIds.sort().join(';'), // semicolor important for Labkey filter creation
+                    filesIds:               filesIds.sort().join(';'), // semicolon important for Labkey filter creation
                     workspacePath:          workspaces.join(),
                     sampleGroupName:        sampleGroups.join(),
                     analysisName:           tfAnalysisName.getValue(),
@@ -1402,7 +1410,12 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                                 tempPath = lcs( tempPath, data.rows[i].RootPath );
                             }
 
-                            cnfParse.inputParams['rootPath'] = dirname( tempPath );
+                            if ( tempPath[ tempPath.length - 1 ] == '/' ){
+                                tempPath = tempPath.substr( 0, tempPath.length - 1 );
+                            } else {
+                                tempPath = dirname( tempPath );
+                            }
+                            cnfParse.inputParams['rootPath'] = tempPath;
 
                             btnNext.setDisabled(true);
 
@@ -1465,7 +1478,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             if ( text != '' ){
                 if ( code == -1 ){
                     cmpStatus.getEl().setStyle( {color: 'black'} );
-                } else if ( code == 1 ) {
+                } else if ( code == 1 ){
                     cmpStatus.getEl().setStyle( {color: 'red'} );
                 }
                 else {
@@ -1515,17 +1528,15 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
                 for ( i = 0; i < len; i ++ ){
                     curLabel = arrayStudyVarsDisplay[i];
-                    curValue = LABKEY.QueryKey.encodePart( arrayStudyVarsValue[i] );
+                    curValue = LABKEY.QueryKey.encodePart( arrayStudyVarsValue[i] ); // need to encode for Labkey to consume
                     curFlag = curLabel.slice(-2,-1);
 
                     if ( curFlag == 'l' ){ // External study variable
                         curLabel = curLabel.slice(0, -11);
                         tempSQL += ', CAST( FCSAnalyses.FCSFile.Sample."' + curLabel + '" AS VARCHAR ) AS "' + curValue + '"';
-                        curLabel += ' (External)';
                     } else if ( curFlag == 'd' ){ // Keyword study variable
                         curLabel = curLabel.slice(0, -10);
                         tempSQL += ', CAST( FCSAnalyses.FCSFile.Keyword."' + curLabel + '" AS VARCHAR ) AS "' + curValue + '"';
-                        curLabel += ' (Keyword)';
                     } else {
                         i = len;
                         LABKEY.ext.OpenCyto.onFailure({
@@ -1575,7 +1586,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 if ( temp != selectedWorkspaceAndSampleGroup ){
 
                     var filterValue = '';
-                    for (var key in selectedSampleGroups) {
+                    for (var key in selectedSampleGroups){
                         filterValue += sampleGroupsMap[key][ selectedSampleGroups[key][0] ].join(';') + ';';
                     }
 
@@ -1647,7 +1658,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
             if ( newIndex == 3 ){
                 btnNext.setText('Process >');
-                if ( flagCreate ) {
+                if ( flagCreate ){
                     btnNext.setDisabled(true);
                 } else {
                     btnNext.setDisabled(false);
