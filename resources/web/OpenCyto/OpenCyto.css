@@ -19,6 +19,10 @@
 
 @charset 'utf-8';
 
+.opencyto {
+    line-height: 100%;
+}
+
 .iconArrowLeft {
     background-image: url(images/arrow-left.gif);
 }
@@ -243,7 +247,7 @@ pre, .ext-mb-text {
 /********************************/
 
 /* Ext.Resizable fix */
-.xresizable-wrap {
+.opencyto .xresizable-wrap {
     margin: 0 auto;
 }
 /********************************/

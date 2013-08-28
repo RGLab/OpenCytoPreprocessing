@@ -130,14 +130,6 @@ tryCatch({
 
                     ws <- wsList[[i]];
 
-                    tempCdfFile <- tempfile(
-                        pattern = 'ncfs',
-                        tmpdir  = gatingSetPath,
-                        fileext = '.nc'
-                    );
-                    # to make sure the temp ncdf file is created in the same partition,
-                    # where it will be saved later to be able to link
-
                     print( paste( 'working on', basename( xmlPathArray[[i]] ) ) );
 
                     sink('/dev/null');
@@ -149,13 +141,15 @@ tryCatch({
                             , isNcdf    = T
                             , path      = fcsFilesParentPath
                             , subset    = filesNamesList
-                            , ncdfFile  = tempCdfFile
+                            , ncdfFile  = tempfile( pattern = 'ncfs', tmpdir = gatingSetPath, fileext = '.nc' )
+                            # to make sure the temp ncdf file is created in the same partition,
+                            # where it will be saved later to be able to link
                         )
                     );
 
                     sink();
 
-                    if ( ( is.null( G[[1]] ) ){
+                    if ( is.null( G[[1]] ) ){
                         txt <- 'The gating set is corrupted, gating hierarchy not present, cannot proceed, aborting';
                         stop('The gating set is corrupted, gating hierarchy not present, cannot proceed, aborting');
                     }
@@ -398,11 +392,15 @@ tryCatch({
         }
     }
 
-    if ( length( list.files( gatingSetPath, pattern = 'FOLDER_LOCKED_TEMP' ) ) == 1 ){
-        unlink( gatingSetPath, force = T, recursive = T );
+    if ( exists('gatingSetPath') ){
+        if ( length( list.files( gatingSetPath, pattern = 'FOLDER_LOCKED_TEMP' ) ) == 1 ){
+            unlink( gatingSetPath, force = T, recursive = T );
+        }
     }
 
-    fileConn <- file( paste0( xmlFilesParentPath,'/', Sys.time(), '_', paste( basename( xmlPathArray ), collapse = ','), '_', strngSampleGroupNames, '.log' ) );
+    if ( exists('xmlFilesParentPath') & exists('xmlPathArray') ){
+        fileConn <- file( paste0( xmlFilesParentPath,'/', Sys.time(), '_', paste( basename( xmlPathArray ), collapse = ','), '_', strngSampleGroupNames, '.log' ) );
+    }
     lg <- paste0( lg, '\n', print( e ) );
 
     if (    grepl( 'duplicate key value violates unique constraint', print( e ), fixed = T ) |
@@ -411,8 +409,10 @@ tryCatch({
         close( fileConn );
         stop( strngDuplicateAnalysisName );
     } else {
-        write( lg, file = fileConn );
-        close( fileConn );
+        if ( exists('fileConn') ){
+            write( lg, file = fileConn );
+            close( fileConn );
+        }
         stop(e);
     }
 });
