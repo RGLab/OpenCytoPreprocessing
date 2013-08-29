@@ -134,10 +134,8 @@ pre, .ext-mb-text {
     padding-left: 5px;
 }
 
-.opencyto .x-form-check-wrap {
-    margin-bottom: 5px;
-    margin-left: 5px;
-    margin-top: 1px;
+.white-background {
+    background-color: white !important;
 }
 
 .opencyto .mask-loading {

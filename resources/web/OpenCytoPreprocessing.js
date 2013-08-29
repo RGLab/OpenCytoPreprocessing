@@ -814,9 +814,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
         var pnlCreate = new Ext.Panel({
             activeItem: 0,
-            bodyStyle: {
-                paddingTop: '3px'
-            },
+            bodyStyle: { paddingTop: '3px' },
             border: false,
             defaults: {
                 autoHeight: true,
@@ -844,6 +842,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             ],
             layout: 'card',
             tbar: new Ext.Toolbar({
+                cls: 'white-background',
                 items: [ btnBack, btnNext, cmpStatus ]
             }),
             title: 'Create'
@@ -907,12 +906,13 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             store: strGatingSet,
             stripeRows: true,
             tbar: new Ext.Toolbar({
+                cls: 'white-background',
                 items: [
                     btnDelete,
                     btnUpdate
                 ]
             }),
-            title: 'Select the analysis to delete',
+            title: 'Select the analysis to edit',
             viewConfig:
             {
                 deferEmptyText: false,
@@ -922,7 +922,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         });
 
 
-        var pnlDelete = {
+        var pnlEdit = {
             border: false,
             defaults: {
                 autoHeight: true,
@@ -966,9 +966,9 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 pnlCreate,
                 {
 //                    iconCls: 'iconDelete',
-                    items: pnlDelete,
+                    items: pnlEdit,
                     layout: 'fit',
-                    title: 'Delete'
+                    title: 'Edit'
                 }
             ],
             layoutOnTabChange: true,
