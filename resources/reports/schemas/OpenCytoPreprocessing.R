@@ -189,7 +189,7 @@ tryCatch({
                     , schemaName    = 'flow'
                     , folderPath    = labkey.url.path
                     , baseUrl       = labkey.url.base
-                    , colSelect     = c('Name', strngAllStudyVars) # needs to be a vector of comma separated strings
+                    , colSelect     = c( 'Name', strngAllStudyVars ) # needs to be a vector of comma separated strings
                     , colNameOpt    = 'fieldname'
                     , colFilter     = makeFilter( c( 'RowId', 'IN', strngFilesIds ) )
                     , showHidden    = T
@@ -317,6 +317,8 @@ tryCatch({
 
             gsid        <- insertedRow$rows[[1]]$gsid;
             container   <- insertedRow$rows[[1]]$container;
+
+            G <- load_gslist( gatingSetPath );
 
             writeProjections(
                   G
