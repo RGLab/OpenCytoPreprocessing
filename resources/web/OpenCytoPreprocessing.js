@@ -107,13 +107,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         var strTableFiles = new LABKEY.ext.Store({
             listeners: {
                 load: onStrTableFilesLoad,
-                // See https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=17514
-                // Would have to modify the message, once that's fixed
-                loadexception: function(){
-                    LABKEY.ext.OpenCyto.onFailure({
-                        exception: 'Either a genuine error or the filter might be too long for the current version of Labkey to handle, known issue.'
-                    });
-                }
+                loadexception: LABKEY.ext.OpenCyto.onFailure
             },
 //                    nullRecord: {
 //                        displayColumn: 'myDisplayColumn',
@@ -153,7 +147,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         var strGatingSet = new LABKEY.ext.Store({
             autoLoad: true,
             listeners: {
-                load: function() {
+                load: function(){
                     pnlTableAnalyses.publish('analysesReload');
 
                     pnlTableAnalyses.autoExpandColumn = 'Description';
@@ -362,7 +356,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 }
             },
             triggerClass:'x-form-clear-trigger',
-            onTriggerClick: function() {
+            onTriggerClick: function(){
                 this.setValue( '' );
                 if ( TreeFilter != undefined ){
                     TreeFilter.clear();

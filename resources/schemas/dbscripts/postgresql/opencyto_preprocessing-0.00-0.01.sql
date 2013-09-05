@@ -19,7 +19,7 @@ CREATE TABLE opencyto_preprocessing.gsTbl
 CREATE TABLE opencyto_preprocessing.projections
 (
     Container ENTITYID  NOT NULL,
-    name      TEXT      NOT NULL,
+    index     INT       NOT NULL,
     path      TEXT      NOT NULL,
     x_axis    VARCHAR(255),
     y_axis    VARCHAR(255),
@@ -27,7 +27,7 @@ CREATE TABLE opencyto_preprocessing.projections
     y_key     VARCHAR(255),
     gsId      INT       NOT NULL,
 
-    CONSTRAINT PK_projections PRIMARY KEY (name, x_axis, y_axis, gsId),
+    CONSTRAINT PK_projections PRIMARY KEY (index, x_axis, y_axis, gsId),
     CONSTRAINT FK_projections_gsTbl FOREIGN KEY (gsId)
         REFERENCES opencyto_preprocessing.gsTbl (gsId)
         ON DELETE CASCADE

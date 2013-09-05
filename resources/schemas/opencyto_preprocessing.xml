@@ -35,8 +35,8 @@
         </ns:description>
         <ns:columns>
             <ns:column columnName='container'/>
-            <ns:column columnName='name'>
-                <ns:columnTitle>Name</ns:columnTitle>
+            <ns:column columnName='index'>
+                <ns:columnTitle>Index</ns:columnTitle>
             </ns:column>
             <ns:column columnName='path'>
                 <ns:columnTitle>Path</ns:columnTitle>

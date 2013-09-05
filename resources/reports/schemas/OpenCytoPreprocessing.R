@@ -217,7 +217,7 @@ tryCatch({
                 lg <- paste0( lg, '\nARCHIVING' );
                 ptm <- proc.time();
 
-                suppressMessages( save_gslist( G, path = gatingSetPath, overwrite = T, cdf = 'move' ) );
+                suppressMessages( G <- save_gslist_labkey( G, path = gatingSetPath, overwrite = T, cdf = 'move' ) );
 
                 tempTime <- proc.time() - ptm;
                 print( tempTime );
@@ -239,13 +239,13 @@ tryCatch({
             writeProjections <- function( G, gsid, ... ){
                 gh <- G[[1]];
                 popNames    <- getNodes( gh, isPath = T );
-                nodeNames   <- getNodes( gh             );
-                res <- lapply( 1:length(nodeNames), function(i){
-                    curPop  <- popNames[i];
-                    curNode <- nodeNames[i];
-                    curChildren <- getChildren( gh, curNode );
+                nodeNames   <- getNodes( gh, prefix = T );
+                res <- lapply( 1:length( popNames ), function(i){
+                    curPop <- popNames[i];
+                    curInd <- as.numeric( unlist( strsplit( nodeNames[i], split = '.', fixed = T ) )[1] );
+                    curChildren <- getChildren( gh, curPop );
                     if ( length( curChildren ) > 0 ){
-                        prjlist <- lapply( curChildren, function(curChild){
+                        prjlist <- lapply( curChildren, function( curChild ){
                             g <- getGate( gh, curChild );
                             if ( ! flowWorkspace:::.isBoolGate( gh, curChild ) ){
                                 param <- parameters( g );
@@ -262,15 +262,15 @@ tryCatch({
                         prj <- unique( prj );
                     } else {
 
-                        g <- getGate( gh, curNode );
-                        if ( ! flowWorkspace:::.isBoolGate( gh, curNode ) ){
+                        g <- getGate( gh, curPop );
+                        if ( ! flowWorkspace:::.isBoolGate( gh, curPop ) ){
                             prj <- as.list( c( ' ', ' ' ) );
                         }
                     }
                     if ( exists('prj') ){
                         prj <- as.data.frame( prj );
                         colnames(prj) <- c('x_axis', 'y_axis');
-                        cbind( name = curNode, path = curPop, prj, gsid = gsid );
+                        cbind( index = curInd, path = curPop, prj, gsid = gsid );
                     }
                 });
 
@@ -317,8 +317,6 @@ tryCatch({
 
             gsid        <- insertedRow$rows[[1]]$gsid;
             container   <- insertedRow$rows[[1]]$container;
-
-            G <- load_gslist( gatingSetPath );
 
             writeProjections(
                   G

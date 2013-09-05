@@ -1,8 +1,8 @@
 SELECT DISTINCT
- projections.path         AS Path,
- projections.name         AS Name,
- projections.gsid         AS AnalysisId
+ projections.path   AS Path,
+ projections.index  AS Index,
+ projections.gsid   AS AnalysisId
 FROM
  projections
 ORDER BY
- projections.path
+ projections.index
