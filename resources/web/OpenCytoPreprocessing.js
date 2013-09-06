@@ -56,7 +56,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         /////////////////////////////////////
         //             Strings             //
         /////////////////////////////////////
-        var strngErrorContactWithLink   = ' Please, contact the <a href=\'mailto:ldashevs@fhcrc.org?Subject=OpenCytoPreprocessing%20Support\'>developer</a>, if you have questions.',
+        var strngErrorContactWithLink   = ' Please, contact support, if you have questions.',
             strngLoadingPhenoData       = 'Loading pheno data for chosen workspaces, sample groups and study variables, please, wait...',
             strngNoSamplesMessage       = 'No files found for the chosen sample group';
 
@@ -566,6 +566,8 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         /////////////////////////////////////
 
         var pnlStudyVars = new Ext.Panel({
+            autoHeight: true,
+            border: false,
             items: {
                 autoHeight: true,
                 border: false,
@@ -582,6 +584,18 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             },
             title: 'Study variables'
         });
+
+        strStudyVarName.on('load', function(){
+            if ( this.getCount() == 0 ){ // at this time 'Select All' has not been added to the store
+                cbStudyVarName.setDisabled(true);
+                pnlStudyVars.getEl().mask(
+                    'Seems like you have not imported any FCS files, click ' +
+                    '<a href=\'' + LABKEY.ActionURL.buildURL('pipeline', 'browse') + '\'>here</a>' +
+                    ' to do so.' + strngErrorContactWithLink, 'infoMask'
+                );
+            }
+        });
+
 
         var pnlTreeHolder = new Ext.Panel({
             items: [],
@@ -771,19 +785,19 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                             boxLabel: 'From workspace',
                             checked: true,
                             inputValue: 1,
-                            name: 'Workspace'
+                            name: 'compensation'
                         },
                         {
                             boxLabel: 'Manual input',
                             disabled: true,
                             inputValue: 2,
-                            name: 'Manual'
+                            name: 'compensation'
                         },
                         {
                             boxLabel: 'Compute automatically',
                             disabled: true,
                             inputValue: 3,
-                            name: 'Automatic'
+                            name: 'compensation'
                         }
                     ]
                 }),
@@ -820,7 +834,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             forceLayout: true,
 //            iconCls: 'iconNew',
             items: [
-                pnlStudyVars,
+                { items: pnlStudyVars },
                 pnlWorkspacesWrapper,
                 {
                     items: pnlTableFiles,
