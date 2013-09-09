@@ -308,6 +308,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         tfSampleGroup.reset();
 
                         tfSampleGroup.setDisabled(true);
+                        cntSampleGroup.setDisabled(true);
 
                         cbWorkspace.focus();
                     } else {
@@ -323,6 +324,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     tfSampleGroup.reset();
 
                     tfSampleGroup.setDisabled(true);
+                    cntSampleGroup.setDisabled(true);
                 }
             },
             store: strWorkspace,
@@ -616,11 +618,17 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         };
         Ext.apply( pnlWorkspace, cnfPanel );
 
-        var pnlSampleGroup = {
-            items: tfSampleGroup,
-            title: 'Search for sample group names:'
-        };
-        Ext.apply( pnlSampleGroup, cnfPanel );
+        var cntSampleGroup = new Ext.Container({
+            disabled: true,
+            items: {
+                autoHeight: true,
+                border: false,
+                headerCssClass: 'simple-panel-header',
+                items: tfSampleGroup,
+                layout: 'fit',
+                title: 'Search for sample group names:'
+            }
+        });
 
         var pnlAnalysisName = {
             items: tfAnalysisName,
@@ -648,7 +656,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             },
             items: [
                 { items: pnlWorkspace },
-                { items: pnlSampleGroup },
+                { items: cntSampleGroup },
                 { items: pnlAnalysisName },
                 { items: pnlAnalysisDescription }
             ],
@@ -1124,6 +1132,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             cbStudyVarName.setDisabled(false);
             cbWorkspace.setDisabled(false);
             tfSampleGroup.setDisabled(false);
+            cntSampleGroup.setDisabled(false);
             tfAnalysisName.setDisabled(false);
             tfAnalysisDescription.setDisabled(false);
 
@@ -1306,14 +1315,15 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         };
 
         function loadTableFiles(){
-            flagNotSorting = true;
-
-            flagLoading = true;
             btnNext.setDisabled(true);
+
+            flagNotSorting = true;
+            flagLoading = true;
 
             cbStudyVarName.setDisabled(true);
             cbWorkspace.setDisabled(true);
             tfSampleGroup.setDisabled(true);
+            cntSampleGroup.setDisabled(true);
             tfAnalysisName.setDisabled(true);
             tfAnalysisDescription.setDisabled(true);
 
@@ -1354,6 +1364,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 LABKEY.Report.execute( cnfSampleGroupsFetching );
             } else {
                 tfSampleGroup.setDisabled(false);
+                cntSampleGroup.setDisabled(false);
                 sampleGroupsTree.show();
             }
         };
@@ -1443,6 +1454,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             cbStudyVarName.setDisabled(true);
             cbWorkspace.setDisabled(true);
             tfSampleGroup.setDisabled(true);
+            cntSampleGroup.setDisabled(true);
             tfAnalysisName.setDisabled(true);
             tfAnalysisDescription.setDisabled(true);
             if ( sampleGroupsTree != undefined ){
@@ -1467,6 +1479,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             cbStudyVarName.setDisabled(false);
             cbWorkspace.setDisabled(false);
             tfSampleGroup.setDisabled(false);
+            cntSampleGroup.setDisabled(false);
             tfAnalysisName.setDisabled(false);
             tfAnalysisDescription.setDisabled(false);
             if ( sampleGroupsTree != undefined ){
