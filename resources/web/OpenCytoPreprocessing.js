@@ -308,7 +308,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         tfSampleGroup.reset();
 
                         tfSampleGroup.setDisabled(true);
-                        cntSampleGroup.setDisabled(true);
+                        pnlSampleGroup.addClass('x-item-disabled');
 
                         cbWorkspace.focus();
                     } else {
@@ -324,7 +324,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     tfSampleGroup.reset();
 
                     tfSampleGroup.setDisabled(true);
-                    cntSampleGroup.setDisabled(true);
+                    pnlSampleGroup.addClass('x-item-disabled');
                 }
             },
             store: strWorkspace,
@@ -618,17 +618,13 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         };
         Ext.apply( pnlWorkspace, cnfPanel );
 
-        var cntSampleGroup = new Ext.Container({
-            disabled: true,
-            items: {
-                autoHeight: true,
-                border: false,
-                headerCssClass: 'simple-panel-header',
-                items: tfSampleGroup,
-                layout: 'fit',
-                title: 'Search for sample group names:'
-            }
-        });
+        var pnlSampleGroup = {
+            cls: 'x-item-disabled',
+            items: tfSampleGroup,
+            title: 'Search for sample group names:'
+        };
+        Ext.apply( pnlSampleGroup, cnfPanel );
+        pnlSampleGroup = new Ext.Panel( pnlSampleGroup );
 
         var pnlAnalysisName = {
             items: tfAnalysisName,
@@ -656,7 +652,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             },
             items: [
                 { items: pnlWorkspace },
-                { items: cntSampleGroup },
+                { items: pnlSampleGroup },
                 { items: pnlAnalysisName },
                 { items: pnlAnalysisDescription }
             ],
@@ -1132,7 +1128,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             cbStudyVarName.setDisabled(false);
             cbWorkspace.setDisabled(false);
             tfSampleGroup.setDisabled(false);
-            cntSampleGroup.setDisabled(false);
+            pnlSampleGroup.removeClass('x-item-disabled');
             tfAnalysisName.setDisabled(false);
             tfAnalysisDescription.setDisabled(false);
 
@@ -1323,7 +1319,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             cbStudyVarName.setDisabled(true);
             cbWorkspace.setDisabled(true);
             tfSampleGroup.setDisabled(true);
-            cntSampleGroup.setDisabled(true);
+            pnlSampleGroup.addClass('x-item-disabled');
             tfAnalysisName.setDisabled(true);
             tfAnalysisDescription.setDisabled(true);
 
@@ -1364,7 +1360,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 LABKEY.Report.execute( cnfSampleGroupsFetching );
             } else {
                 tfSampleGroup.setDisabled(false);
-                cntSampleGroup.setDisabled(false);
+                pnlSampleGroup.removeClass('x-item-disabled');
                 sampleGroupsTree.show();
             }
         };
@@ -1454,7 +1450,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             cbStudyVarName.setDisabled(true);
             cbWorkspace.setDisabled(true);
             tfSampleGroup.setDisabled(true);
-            cntSampleGroup.setDisabled(true);
+            pnlSampleGroup.addClass('x-item-disabled');
             tfAnalysisName.setDisabled(true);
             tfAnalysisDescription.setDisabled(true);
             if ( sampleGroupsTree != undefined ){
@@ -1479,7 +1475,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             cbStudyVarName.setDisabled(false);
             cbWorkspace.setDisabled(false);
             tfSampleGroup.setDisabled(false);
-            cntSampleGroup.setDisabled(false);
+            pnlSampleGroup.removeClass('x-item-disabled');
             tfAnalysisName.setDisabled(false);
             tfAnalysisDescription.setDisabled(false);
             if ( sampleGroupsTree != undefined ){
