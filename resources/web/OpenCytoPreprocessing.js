@@ -301,14 +301,17 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 change: function(){
                     if ( this.getValue() == '' ){
                         btnNext.setDisabled(true);
+
                         if ( TreeFilter != undefined ){
                             TreeFilter.clear();
                             sampleGroupsTree.hide();
                         }
                         tfSampleGroup.reset();
-
                         tfSampleGroup.setDisabled(true);
                         pnlSampleGroup.addClass('x-item-disabled');
+
+                        tfAnalysisName.reset();
+                        tfAnalysisDescription.reset();
 
                         cbWorkspace.focus();
                     } else {
@@ -317,14 +320,17 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 },
                 cleared: function(){
                     btnNext.setDisabled(true);
+
                     if ( TreeFilter != undefined ){
                         TreeFilter.clear();
                         sampleGroupsTree.hide();
                     }
                     tfSampleGroup.reset();
-
                     tfSampleGroup.setDisabled(true);
                     pnlSampleGroup.addClass('x-item-disabled');
+
+                    tfAnalysisName.reset();
+                    tfAnalysisDescription.reset();
                 }
             },
             store: strWorkspace,

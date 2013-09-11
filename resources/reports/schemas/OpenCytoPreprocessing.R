@@ -72,7 +72,7 @@ tryCatch({
         }
 
         currentHashValue <- digest( paste0( strngWorkspacePaths, strngSampleGroupNames, strngFilesIds ) );
-        gatingSetPath <- paste0( xmlFilesParentPath, '/', currentHashValue );
+        gatingSetPath <- file.path( xmlFilesParentPath, currentHashValue );
 
         if ( length( list.files( gatingSetPath, pattern = 'FOLDER_LOCKED_TEMP' ) ) == 1 ){
 
@@ -109,7 +109,7 @@ tryCatch({
                 txt <- 'Success: reusing the already existing data on disk';
             } else { # folder does not exist
                 dir.create( gatingSetPath ); # create a new one
-                file.create( paste0( gatingSetPath, '/FOLDER_LOCKED_TEMP' ) ); # create a 'lock' file
+                file.create( file.path( gatingSetPath, 'FOLDER_LOCKED_TEMP' ) ); # create a 'lock' file
 
                 filesNamesList <- unlist( strsplit( strngFilesNames, split = ',' ) );
                 sampleGroupNameArray <- unlist( strsplit( strngSampleGroupNames, split = ',' ) );
@@ -132,8 +132,6 @@ tryCatch({
 
                     print( paste( 'working on', basename( xmlPathArray[[i]] ) ) );
 
-                    sink('/dev/null');
-
                     suppressMessages(
                         G <- parseWorkspace(
                               ws
@@ -146,8 +144,6 @@ tryCatch({
                             # where it will be saved later to be able to link
                         )
                     );
-
-                    sink();
 
                     if ( is.null( G[[1]] ) ){
                         txt <- 'The gating set is corrupted, gating hierarchy not present, cannot proceed, aborting';
@@ -362,7 +358,7 @@ tryCatch({
 
             txt <- paste( txt, 'and wrote to the db!' );
 
-            unlink( paste0( gatingSetPath, '/FOLDER_LOCKED_TEMP' ), force = T, recursive = T );
+            unlink( file.path( gatingSetPath, 'FOLDER_LOCKED_TEMP' ), force = T, recursive = T );
         }
 
     } else {
@@ -399,7 +395,7 @@ tryCatch({
     }
 
     if ( exists('xmlFilesParentPath') & exists('xmlPathArray') ){
-        fileConn <- file( paste0( xmlFilesParentPath,'/', Sys.time(), '_', paste( basename( xmlPathArray ), collapse = ','), '_', strngSampleGroupNames, '.log' ) );
+        fileConn <- file( file.path( xmlFilesParentPath, paste0( Sys.time(), '_', paste( basename( xmlPathArray ), collapse = ','), '_', strngSampleGroupNames, '.log' ) ) );
     }
     lg <- paste0( lg, '\n', print( e ) );
 

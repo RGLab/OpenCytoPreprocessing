@@ -20,7 +20,7 @@
 @charset 'utf-8';
 
 .opencyto {
-    line-height: 100%;
+    line-height: 100% !important;
 }
 
 .iconArrowLeft {
@@ -167,9 +167,12 @@ pre, .ext-mb-text {
     text-align: center;
 }
 
-/* Safari fix not to cut off the radio button */
+/* Safari fixes not to cut off the radio button */
 .opencyto .x-form-radio {
     margin-left: 2px !important;
+}
+.opencyto .x-form-check-wrap {
+    margin-bottom: 1px;
 }
 
 .opencyto ul.x-tab-strip-top {
@@ -334,5 +337,5 @@ pre, .ext-mb-text {
 /**********************************/
 
 #fancybox-buttons ul {
-    width: 73px;
+    width: 73px !important;
 }
