@@ -15,29 +15,29 @@
 #  limitations under the License.
 
 suppressMessages( library( Rlabkey ) );
+suppressMessages( library( RJSONIO ) );
 
-gspath      <- labkey.url.params$gspath;
-gsid        <- as.numeric( labkey.url.params$gsid );
+gspaths     <- RJSONIO::fromJSON( labkey.url.params$gspaths );
+gsids       <- RJSONIO::fromJSON( labkey.url.params$gsids );
 container   <- labkey.url.params$container;
 
-if ( gspath != '' ){
+for ( i in 1:length( gsids ) ){
 
-    if ( gsid != '' ){
+    gsid    <- gsids[[i]];
+    gspath  <- gspaths[[i]];
 
-        deletedRows <- labkey.deleteRows(
-            toDelete        = data.frame(
-                                  gsid        = gsid,
-                                  container   = container
-                              )
-            , queryName     = 'gstbl'
-            , baseUrl       = labkey.url.base
-            , folderPath    = labkey.url.path
-            , schemaName    = 'opencyto_preprocessing'
-        );
+    deletedRows <- labkey.deleteRows(
+        toDelete        = data.frame(
+                              gsid        = gsid,
+                              container   = container
+                          )
+        , queryName     = 'gstbl'
+        , baseUrl       = labkey.url.base
+        , folderPath    = labkey.url.path
+        , schemaName    = 'opencyto_preprocessing'
+    );
 
-        txt <- 'Analysis removed from the db';
-
-    }
+    txt <- 'Analyses removed';
 
     gsTbl <- labkey.selectRows(
           queryName     = 'gstbl',
@@ -52,9 +52,7 @@ if ( gspath != '' ){
             if ( nrow( gsTbl ) == 0 ) {
                 res <- unlink( gspath, force = T, recursive = T );
 
-                if ( res == 0 ){
-                    txt <- paste( txt, 'and from the file system' );
-                } else {
+                if ( res != 0 ){
                     insertedRow <- labkey.insertRows(
                           toInsert      = do.call( rbind, lapply( deletedRows$rows, data.frame ) )
                         , queryName     = 'gstbl'
@@ -64,8 +62,6 @@ if ( gspath != '' ){
                     )
                     stop( 'Removal of the analysis from the file system failed: should have reinserted the removed row(s)' );
                 }
-            } else {
-                txt <- paste( txt, '- did not attempt to remove from the file system, since other analyses entries rely on it' );
             }
         },
         error = function(e){
@@ -74,7 +70,4 @@ if ( gspath != '' ){
     )
 
     write( txt, file='${txtout:textOutput}' );
-} else {
-    stop( 'Emtpy analysis path provided' );
-}
-
+};

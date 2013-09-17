@@ -19,8 +19,7 @@ suppressMessages( library( RJSONIO ) );
 suppressMessages( library( gdata ) );
 suppressMessages( library( parallel ) );
 
-wsPathsString <- labkey.url.params$wsPath;
-wsPaths <- unlist( strsplit( wsPathsString, split=',' ) );
+wsPaths <- RJSONIO::fromJSON( labkey.url.params$wsPaths );
 
 if ( length( wsPaths ) > 0 ){
 

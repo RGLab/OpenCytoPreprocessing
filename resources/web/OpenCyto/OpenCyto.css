@@ -256,6 +256,11 @@ pre, .ext-mb-text {
 
 /* Ext GridPanel fixes */
 
+/* Fix for the column headers to look better: the pull-down arrow link will not overlap with the text */
+.opencyto .x-grid3-hd-inner {
+    padding-right: 15px;
+}
+
 /* Important fix for proper alignment */
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     .opencyto .x-grid3-cell {

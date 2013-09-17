@@ -147,6 +147,24 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         var strGatingSet = new LABKEY.ext.Store({
             autoLoad: true,
             listeners: {
+                commitcomplete: function(){
+                    pnlTableAnalyses.publish('analysesReload');
+                },
+                commitexception: function(e){
+                    this.rejectChanges();
+
+                    if ( e.indexOf( 'duplicate key value violates unique constraint "uq_gstbl"' ) >= 0 ){
+                        LABKEY.ext.OpenCyto.onFailure({
+                            exception: 'There is already an analysis with the same name, <br/>delete it first, or use a different name.<br/>'
+                        })
+                    } else if ( e.indexOf( 'null value in column "gsname" violates not-null constraint' ) >= 0 ){
+                        LABKEY.ext.OpenCyto.onFailure({
+                            exception: 'Blank analysis name is not allowed.<br/>'
+                        })
+                    }
+
+                    return false;
+                },
                 load: function(){
                     pnlTableAnalyses.publish('analysesReload');
 
@@ -163,19 +181,36 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                                     editor: new Ext.form.TextField(),
                                     header: 'Name',
                                     hideable: false,
+                                    renderer: function( value, metaData, record, rowIndex, colIndex, store ){
+                                        metaData.attr = 'ext:qtip="' + value + '"';
+                                        return value;
+                                    },
+                                    tooltip: 'Name',
                                     width: 160
                                 },
                                 {
                                     dataIndex: 'created',
                                     header: 'Creation Time',
-                                    renderer: Ext.util.Format.dateRenderer('Y-m-d H:i:s'),
+                                    renderer: function( value, metaData, record, rowIndex, colIndex, store ){
+                                        value = Ext.util.Format.date( value, 'Y-m-d H:i:s' );
+                                        metaData.attr = 'ext:qtip="' + value + '"';
+                                        return value;
+                                    },
+                                    tooltip: 'Creation Time',
                                     width: 160
                                 },
                                 {
                                     dataIndex: 'gsdescription',
                                     editor: new Ext.form.TextField(),
                                     header: 'Description',
-                                    id: 'Description'
+                                    id: 'Description',
+                                    renderer: function( value, metaData, record, rowIndex, colIndex, store ){
+                                        if ( Ext.util.Format.undef(value) != '' && value != null ){
+                                            metaData.attr = 'ext:qtip="' + value + '"';
+                                        }
+                                        return value;
+                                    },
+                                    tooltip: 'Description'
                                 }
                             ],
                             defaults: {
@@ -189,12 +224,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
                     smCheckBoxAnalyses.clearSelections();
                 },
-                loadexception: LABKEY.ext.OpenCyto.onFailure,
-                update: function( s, r, o ){
-                    if ( o == Ext.data.Record.EDIT ){
-                        btnUpdate.setDisabled(false);
-                    }
-                }
+                loadexception: LABKEY.ext.OpenCyto.onFailure
             },
             queryName: 'gstbl',
             schemaName: 'opencyto_preprocessing'
@@ -349,7 +379,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                             field.onTriggerClick();
                         }
                         else {
-                            var val = this.getRawValue();
+                            var val = field.getRawValue();
 
                             if ( TreeFilter != undefined ){
                                 TreeFilter.clear();
@@ -365,7 +395,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             },
             triggerClass:'x-form-clear-trigger',
             onTriggerClick: function(){
-                this.setValue( '' );
+                this.reset();
                 if ( TreeFilter != undefined ){
                     TreeFilter.clear();
                 }
@@ -404,16 +434,17 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             disabled: true,
             handler: function(){
 
-                var d = smCheckBoxAnalyses.getSelections()[0].data;
+                var sels = smCheckBoxAnalyses.getSelections(), gsids = [], gspaths = [];
+                Ext.each( sels, function( s ){ gsids.push( s.get('gsid') ) });
+                Ext.each( sels, function( s ){ gspaths.push( s.get('gspath') ) });
 
                 cnfDeleteAnalysis.inputParams = {
-                    gsid:           d.gsid,
-                    gspath:         d.gspath,
-                    container:      d.container,
-                    showSection:    'textOutput' // comment out to show debug output
+                    gsids:          Ext.encode( gsids ),
+                    gspaths:        Ext.encode( gspaths ),
+                    container:      sels[0].get('container')
                 };
 
-                btnDelete.setDisabled( true );
+                btnDelete.setDisabled(true);
 
                 maskDelete.show();
 
@@ -421,18 +452,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             },
 //            iconCls: 'iconDelete',
             text: 'Delete',
-            tooltip: 'Delete the analyses'
-        });
-
-        var btnUpdate = new Ext.Button({
-            disabled: true,
-            handler: function(){
-                strGatingSet.commitChanges();
-                this.setDisabled( true );
-            },
-//            iconCls: 'iconUpdate',
-            text: 'Update',
-            tooltip: 'Update modified values'
+            tooltip: 'Delete an analysis'
         });
 
 
@@ -455,19 +475,14 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 var errors = result.errors;
                 var outputParams = result.outputParams;
 
-                if (errors && errors.length > 0){
+                if ( errors && errors.length > 0 ){
                     /*
                     msg : errors[0].replace(/\n/g, '<P>'),
                      */
 
-                    if ( errors[0].indexOf('The report session is invalid') < 0 ){
-                        LABKEY.ext.OpenCyto.onFailure({
-                            exception: errors[0]
-                        });
-                    } else {
-                        mask( 'Obtaining the available sample groups, please, wait...' );
-                        LABKEY.Report.execute( cnfSampleGroupsFetching );
-                    }
+                    LABKEY.ext.OpenCyto.onFailure({
+                        exception: errors[0]
+                    });
                 } else {
                     if ( outputParams.length > 0 ){
 
@@ -499,29 +514,20 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 var errors = result.errors;
 
                 if (errors && errors.length > 0){
-                    if ( errors[0].indexOf('The report session is invalid') < 0 ){
-                        LABKEY.ext.OpenCyto.onFailure({
-                            exception: errors[0]
-                        });
-                    } else {
-                        btnNext.setDisabled(true);
-
-                        mask( 'Generating and saving the analysis data, please, wait...' );
-                        LABKEY.Report.execute( cnfParse );
-                    }
+                    LABKEY.ext.OpenCyto.onFailure({
+                        exception: errors[0]
+                    });
                 } else {
                     pnlCreate.getLayout().setActiveItem( 1 );
                     btnNext.setText( 'Next >' );
                     btnBack.setDisabled(false);
 
-                    strGatingSet.reload();
-
                     var toDisplay = result.outputParams[0].value;
 
                     if ( toDisplay.indexOf('Seems that another session is already working on the same analysis, cannot proceed!') < 0 ){
                         toDisplay += '\n' + result.console;
+                        strGatingSet.reload();
                     }
-
 
                     Ext.Msg.alert(
                         'Info',
@@ -535,7 +541,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             failure: function( errorInfo, options, responseObj ) {
                 maskDelete.hide();
 
-                strGatingSet.reload();
+                smCheckBoxAnalyses.clearSelections();
 
                 LABKEY.ext.OpenCyto.onFailure( errorInfo, options, responseObj );
             },
@@ -547,17 +553,11 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 var outputParams = result.outputParams;
 
                 if (errors && errors.length > 0){
-                    if ( errors[0].indexOf('The report session is invalid') < 0 ){
-                        strGatingSet.reload();
+                    smCheckBoxAnalyses.clearSelections();
 
-                        LABKEY.ext.OpenCyto.onFailure({
-                            exception: errors[0]
-                        });
-                    } else {
-                        maskDelete.show();
-
-                        LABKEY.Report.execute( cnfDeleteAnalysis );
-                    }
+                    LABKEY.ext.OpenCyto.onFailure({
+                        exception: errors[0]
+                    });
                 } else {
                     var p = outputParams[0];
 
@@ -610,6 +610,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             layout: 'fit',
             style: 'padding-top: 4px;'
         });
+
 
         var cnfPanel = {
             autoHeight: true,
@@ -702,13 +703,13 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         });
 
         var smCheckBoxFiles = new Ext.grid.CheckboxSelectionModel({
+            checkonly: true,
             filterable: false,
             listeners: {
                 selectionchange: updateTableFilesStatus
             },
             sortable: true,
-            width: 23,
-            xtype: 'booleancolumn' // any use ? for filtering ?
+            width: 23
         });
 
         var pnlTableFiles = new Ext.grid.GridPanel({
@@ -730,19 +731,34 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     dataIndex: 'RunName',
                     dragable: false,
                     header: 'Workspace',
-                    hideable: false
+                    hideable: false,
+                    renderer: function( value, metaData, record, rowIndex, colIndex, store ){
+                        metaData.attr = 'ext:qtip="' + value + '"';
+                        return value;
+                    },
+                    tooltip: 'Workspace'
                 },
                 {
                     dataIndex: 'SampleGroup',
                     dragable: false,
                     header: 'Sample Group',
-                    hideable: false
+                    hideable: false,
+                    renderer: function( value, metaData, record, rowIndex, colIndex, store ){
+                        metaData.attr = 'ext:qtip="' + value + '"';
+                        return value;
+                    },
+                    tooltip: 'Sample Group'
                 },
                 {
                     dataIndex: 'FileName',
                     dragable: false,
                     header: 'File Name',
-                    hideable: false
+                    hideable: false,
+                    renderer: function( value, metaData, record, rowIndex, colIndex, store ){
+                        metaData.attr = 'ext:qtip="' + value + '"';
+                        return value;
+                    },
+                    tooltip: 'File Name'
                 }
             ],
 //            enableColumnHide: false,
@@ -754,7 +770,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 msgCls: 'mask-loading'
             },
             listeners: {
-                render: function(){ LABKEY.ext.OpenCyto.initTableQuickTips( this.header ); }
+                render: function(){ LABKEY.ext.OpenCyto.initTableQuickTips( this ); }
             },
             plugins: [
                 new Ext.ux.grid.AutoSizeColumns(),
@@ -819,14 +835,32 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             title: 'Compensation'
         };
 
-        var cmpStatus = new Ext.BoxComponent({
+        var cmpStatus = new Ext.Component({
+            listeners: {
+                render: function(){
+                    new Ext.ToolTip({
+                        target: this.getEl(),
+                        listeners: {
+                            beforeshow: function(tip) {
+                                var msg = this.getEl().dom.innerHTML;
+                                tip.update( Ext.util.Format.htmlEncode( msg ) );
+                                return (msg.length > 0);
+                            },
+                            scope: this
+                        },
+                        renderTo: document.body
+                    });
+                }
+            },
             style: { paddingLeft: '10px' }
         });
 
         var pnlWorkspacesWrapper = new Ext.Panel({
             items: pnlWorkspaces,
             listeners: {
-                activate: function(){ pnlWorkspacesWrapper.doLayout(); }
+                activate: function(){
+                    pnlWorkspacesWrapper.doLayout();
+                }
             }
         });
 
@@ -852,7 +886,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         afterrender: function(){
                             maskFiles = new Ext.LoadMask( this.getEl(), { msgCls: 'mask-loading' } );
                         },
-                        render: function(){ LABKEY.ext.OpenCyto.initTableQuickTips( this.header ); }
+                        render: function(){ LABKEY.ext.OpenCyto.initTableQuickTips( this ); }
                     },
                     title: 'Filter data'
                 },
@@ -868,18 +902,19 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
 
         var smCheckBoxAnalyses = new Ext.grid.CheckboxSelectionModel({
+            checkOnly: true,
             filterable: false,
             header: '<div></div>',
             listeners: {
                 selectionchange: function(){
                     if ( smCheckBoxAnalyses.getCount() > 0 ){
-                        btnDelete.setDisabled( false );
+                        btnDelete.setDisabled(false);
                     } else {
-                        btnDelete.setDisabled( true );
+                        btnDelete.setDisabled(true);
                     }
                 }
             },
-            singleSelect: true,
+            moveEditorOnEnter: false,
             sortable: true,
             width: 23
         });
@@ -893,8 +928,19 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             loadMask: { msg: 'Loading generated analyses, please, wait...', msgCls: 'mask-loading' },
             listeners:
             {
+                afteredit: function(e){
+                    if ( e.field == 'gsname' && e.value == '' ){
+                        strGatingSet.rejectChanges();
+
+                        LABKEY.ext.OpenCyto.onFailure({
+                            exception: 'Blank analysis name is not allowed.<br/>'
+                        })
+                    } else {
+                        strGatingSet.commitChanges();
+                    }
+                },
                 reconfigure: function(){ smCheckBoxAnalyses.clearSelections(); },
-                render: function(){ LABKEY.ext.OpenCyto.initTableQuickTips( this.header ); }
+                render: function(){ LABKEY.ext.OpenCyto.initTableQuickTips( this ); }
             },
             plugins: [
                 new Ext.ux.grid.AutoSizeColumns(),
@@ -918,17 +964,14 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         }
                     ]
                 }),
-                'msgbus'
+                new Ext.ux.MsgBus()
             ],
             selModel: smCheckBoxAnalyses,
             store: strGatingSet,
             stripeRows: true,
             tbar: new Ext.Toolbar({
                 cls: 'white-background',
-                items: [
-                    btnDelete,
-                    btnUpdate
-                ]
+                items: btnDelete
             }),
             title: 'Select the analysis to edit',
             viewConfig:
@@ -1189,6 +1232,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                             header: 'Workspace',
                             hideable: false,
                             renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+                                metaData.attr = 'ext:qtip="' + value + '"';
                                 return '<a href=\'' +
                                     LABKEY.ActionURL.buildURL(
                                         'flow-run',
@@ -1199,8 +1243,9 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                                             'query.showGraphs': 'Thumbnail'
                                         }
                                     ) +
-                                    '\'>' + value + '</a>';
-                            }
+                                    '\' target=\'_blank\'>' + value + '</a>';
+                            },
+                            tooltip: 'Workspace'
                         },
                         {
                             dataIndex: 'SampleGroup',
@@ -1210,7 +1255,12 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                                 type: 'list'
                             },
                             header: 'Sample Group',
-                            hideable: false
+                            hideable: false,
+                            renderer: function( value, metaData, record, rowIndex, colIndex, store ){
+                                metaData.attr = 'ext:qtip="' + value + '"';
+                                return value;
+                            },
+                            tooltip: 'Sample Group'
                         },
                         {
                             dataIndex: 'FileName',
@@ -1221,6 +1271,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                             header: 'File Name',
                             hideable: false,
                             renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+                                metaData.attr = 'ext:qtip="' + value + '"';
                                 return '<a href=\'' +
                                     LABKEY.ActionURL.buildURL(
                                         'flow-well',
@@ -1230,8 +1281,9 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                                             wellId: record.get('FileIdLink')
                                         }
                                     ) +
-                                    '\'>' + value + '</a>';
-                            }
+                                    '\' target=\'_blank\'>' + value + '</a>';
+                            },
+                            tooltip: 'File Name'
                         }
                     ];
 
@@ -1244,7 +1296,12 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                             options: strTableFiles.collect( curValue ),
                             type: 'list'
                         },
-                        header: arrayStudyVarsDisplay[ index ]
+                        header: arrayStudyVarsDisplay[ index ],
+                        renderer: function( value, metaData, record, rowIndex, colIndex, store ){
+                            metaData.attr = 'ext:qtip="' + value + '"';
+                            return value;
+                        },
+                        tooltip: arrayStudyVarsDisplay[ index ]
                     });
                 });
 
@@ -1306,9 +1363,9 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             if (
                 selectedSampleGroupsViolatedCount > 0 ||
                 $.isEmptyObject(selectedSampleGroups) ||
-                tfAnalysisName.getValue() == ''
+                Ext.util.Format.trim( tfAnalysisName.getValue() ) == ''
             ){
-                updateInfoStatus( 'At most one sample group per workspace needs to be picked and an analysis name needs to be specified', -1 );
+                updateInfoStatus( 'At most one sample group per workspace needs to be picked and a non-empty analysis name needs to be specified', -1 );
                 btnNext.setDisabled(true);
             } else {
                 updateInfoStatus( '' );
@@ -1357,8 +1414,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 tfSampleGroup.reset();
 
                 cnfSampleGroupsFetching.inputParams = {
-                    wsPath: cbWorkspace.getCheckedArray().join()
-                    , showSection: 'textOutput' // comment out to show debug output
+                    wsPaths: Ext.encode( cbWorkspace.getCheckedArray() )
                 };
 
                 mask( 'Obtaining the available sample groups, please, wait...' );
@@ -1386,7 +1442,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 btnNext.setText( 'Next >' );
 
             } else {
-                var studyVarsArray = [],
+                var studyVarsArray = [], workspaces = [], sampleGroups = [],
                     cm = pnlTableFiles.getColumnModel(),
                     cols = cm.columns,
                     len = cols.length
@@ -1398,22 +1454,20 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     }
                 }
 
-                var workspaces = [], sampleGroups = [];
                 for ( var key in selectedSampleGroups ){
                     workspaces.push( key );
                     sampleGroups.push( selectedSampleGroups[key][0] );
                 }
 
                 cnfParse.inputParams = {
-                    studyVars:              studyVarsArray.join(),
-                    allStudyVars:           cbStudyVarName.getAllValuesAsArray().sort().join(),
-                    filesNames:             filesNames.sort().join(),
-                    filesIds:               filesIds.sort().join(';'), // semicolon important for Labkey filter creation
-                    workspacePath:          workspaces.join(),
-                    sampleGroupName:        sampleGroups.join(),
+                    studyVars:              Ext.encode( studyVarsArray ),
+                    filesNames:             Ext.encode( filesNames.sort() ),
+                    filesIds:               Ext.encode( filesIds.sort() ),
+                    workspacesPaths:        Ext.encode( workspaces ),
+                    sampleGroupsNames:      Ext.encode( sampleGroups ),
+                    allStudyVarsString:     cbStudyVarName.getAllValuesAsArray().sort().join(),
                     analysisName:           tfAnalysisName.getValue(),
                     analysisDescription:    tfAnalysisDescription.getValue()
-                    , showSection: 'textOutput' // comment out to show debug output
                 };
 
                 LABKEY.Query.selectRows({
@@ -1453,7 +1507,14 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         };
 
         function mask( msg ){
-            cbStudyVarName.setDisabled(true);
+
+            if ( msg.charAt(0) != 'O' ){ // if obtaining Sample Groups, while they are being fetched
+                maskStudyVars.msg = msg; // can go one page back and tingle with the study variables
+                maskStudyVars.show();
+
+                cbStudyVarName.setDisabled(true);
+            }
+
             cbWorkspace.setDisabled(true);
             tfSampleGroup.setDisabled(true);
             pnlSampleGroup.addClass('x-item-disabled');
@@ -1463,10 +1524,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 sampleGroupsTree.setDisabled(true);
             }
 
-            if ( msg.charAt(0) != 'O' ){ // if obtaining Sample Groups, while they are being fetched
-                maskStudyVars.msg = msg; // can go one page back and tingle with the study variables
-                maskStudyVars.show();
-            }
             maskWorkspaces.msg = msg;
             maskWorkspaces.show();
             maskFiles.msg = msg;

@@ -30,12 +30,20 @@ LABKEY.ext.OpenCyto.factoryRowNumberer = function ( store ){
 };
 
 LABKEY.ext.OpenCyto.initTableQuickTips = function( o ){
+    var strngInstruction =
+        '1) click the arrow on the right of a selected column header to access the sorting, filtering and hiding/showing options menu for the column <br/>' +
+        '2) drag and drop column headers to rearrange the order of the columns <br/>' +
+        '3) double click the separator between two column headers to fit the column width to its contents <br/>' +
+        '4) hover over a table cell or a column header to see a text tool tip of the contents';
+
+    if ( o.getXType() == 'editorgrid' ){
+        strngInstruction += '<br/> 5) double click a cell to edit it, if it is editable'
+    }
+
     Ext.QuickTips.register({
-        target: o,
-        text:   '1) click the arrow on the right of a selected column header to access the sorting, filtering and hiding/showing options menu for the column <br/>' +
-                '2) drag and drop column headers to rearrange the order of the columns <br/>' +
-                '3) double click the separator between two column headers to fit the column width to its contents',
-        width: 360
+        target: o.header,
+        text:   strngInstruction,
+        width:  410
     });
 };
 
