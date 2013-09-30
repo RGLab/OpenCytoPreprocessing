@@ -152,6 +152,7 @@ Ext.override(Ext.grid.CheckboxSelectionModel, {
             Ext.fly(this.grid.getView().innerHd).on('mousedown', this.onHdMouseDown, this);
         }, this);
 
+        this.grid.getView().on('refresh', this.manageCheckAll);
         this.on('selectionchange', this.manageCheckAll);
     },
     manageCheckAll: function(){
@@ -160,13 +161,15 @@ Ext.override(Ext.grid.CheckboxSelectionModel, {
         // Manage the 'check all' icon state
         var hd = Ext.fly(this.grid.getView().innerHd).child('.x-grid3-hd-checker');
 
-        var isChecked = hd.hasClass('x-grid3-hd-checker-on');
-        var totalCount = this.grid.getStore().getCount();
+        if ( hd != null ){
+            var isChecked = hd.hasClass('x-grid3-hd-checker-on');
+            var totalCount = this.grid.getStore().getCount();
 
-        if ( selectedCount != totalCount && isChecked ){
-            hd.removeClass('x-grid3-hd-checker-on');
-        } else if ( selectedCount == totalCount && ! isChecked ){
-            hd.addClass('x-grid3-hd-checker-on');
+            if ( selectedCount != totalCount && isChecked ){
+                hd.removeClass('x-grid3-hd-checker-on');
+            } else if ( selectedCount == totalCount && ! isChecked ){
+                hd.addClass('x-grid3-hd-checker-on');
+            }
         }
     }
 });
