@@ -4,5 +4,3 @@ SELECT DISTINCT
  projections.gsid   AS AnalysisId
 FROM
  projections
-ORDER BY
- projections.index
