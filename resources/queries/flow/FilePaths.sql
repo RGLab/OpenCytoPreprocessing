@@ -1,5 +1,5 @@
 SELECT
- FCSFiles.Name AS FileName,
- FCSFiles.Run.FilePathRoot || '/' || FCSFiles.Name AS FilePath
+ Name AS FileName,
+ Run.FilePathRoot || '/' || Name AS FilePath
 FROM
  FCSFiles

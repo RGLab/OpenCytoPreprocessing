@@ -1,6 +1,6 @@
 SELECT DISTINCT
- projections.path   AS Path,
- projections.index  AS Index,
- projections.gsid   AS AnalysisId
+ path   AS Path,
+ index  AS Index,
+ gsid   AS AnalysisId
 FROM
  projections

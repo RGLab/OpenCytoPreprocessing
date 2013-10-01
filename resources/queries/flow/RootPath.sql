@@ -1,7 +1,7 @@
 SELECT DISTINCT
- Runs.FilePathRoot AS RootPath
+ FilePathRoot AS RootPath
 FROM
  Runs
 WHERE
- Runs.FilePathRoot IS NOT NULL AND
- Runs.ProtocolStep = 'Keywords'
+ FilePathRoot IS NOT NULL AND
+ ProtocolStep = 'Keywords'
