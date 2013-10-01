@@ -421,7 +421,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         });
 
         var btnNext = new Ext.Button({
-            iconAlign: 'right',
             text: 'Next >'
         });
 
