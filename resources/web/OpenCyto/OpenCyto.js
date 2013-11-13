@@ -270,6 +270,8 @@ LABKEY.ext.OpenCyto.onFailure = function(errorInfo, options, responseObj){
         }
     }
 
+    Ext.Msg.maxWidth = 900;
+
     Ext.Msg.alert('Error', text + strngErrorContact);
 };
 

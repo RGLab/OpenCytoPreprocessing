@@ -81,19 +81,19 @@ tryCatch({
         # attempt insert, if there is already an entry with the same name
         # 'analysisName' error out and halt before any heavy lifting!
         toInsert <- data.frame(
-              gsname            = analysisName
-            , gspath            = gatingSetPath
-            , gsdescription     = analysisDescription
-            , xmlpaths          = strngWorkspacesPaths
-            , samplegroups      = strngSampleGroupsNames
+            gsname            = analysisName,
+            gspath            = gatingSetPath,
+            gsdescription     = analysisDescription,
+            xmlpaths          = strngWorkspacesPaths,
+            samplegroups      = strngSampleGroupsNames
         );
 
         insertedRow <- labkey.insertRows(
-              toInsert      = toInsert
-            , queryName     = 'gstbl'
-            , schemaName    = 'opencyto_preprocessing'
-            , folderPath    = labkey.url.path
-            , baseUrl       = labkey.url.base
+            toInsert      = toInsert,
+            queryName     = 'gstbl',
+            schemaName    = 'opencyto_preprocessing',
+            folderPath    = labkey.url.path,
+            baseUrl       = labkey.url.base
         );
 
         gsid        <- insertedRow$rows[[1]]$gsid;
@@ -137,12 +137,12 @@ tryCatch({
 
                 suppressMessages(
                     G <- parseWorkspace(
-                          ws
-                        , name      = sampleGroupsNames[[i]]
-                        , isNcdf    = T
-                        , path      = fcsFilesParentPath
-                        , subset    = filesNames
-                        , ncdfFile  = tempfile( pattern = 'ncfs', tmpdir = gatingSetPath, fileext = '.nc' )
+                        ws,
+                        name      = sampleGroupsNames[[i]],
+                        isNcdf    = T,
+                        path      = fcsFilesParentPath,
+                        subset    = filesNames,
+                        ncdfFile  = tempfile( pattern = 'ncfs', tmpdir = gatingSetPath, fileext = '.nc' )
                         # to make sure the temp ncdf file is created in the same partition,
                         # where it will be saved later to be able to link
                     )
@@ -179,14 +179,14 @@ tryCatch({
             ptm <- proc.time();
 
             meta <- labkey.selectRows(
-                  queryName     = 'Files'
-                , schemaName    = 'flow'
-                , folderPath    = labkey.url.path
-                , baseUrl       = labkey.url.base
-                , colSelect     = c( 'Name', labkey.url.params$allStudyVarsString ) # needs to be a vector of comma separated strings
-                , colNameOpt    = 'fieldname'
-                , colFilter     = makeFilter( c( 'RowId', 'IN', strngFilesIds ) )
-                , showHidden    = T
+                queryName     = 'Files',
+                schemaName    = 'flow',
+                folderPath    = labkey.url.path,
+                baseUrl       = labkey.url.base,
+                colSelect     = c( 'Name', labkey.url.params$allStudyVarsString ), # needs to be a vector of comma separated strings
+                colNameOpt    = 'fieldname',
+                colFilter     = makeFilter( c( 'RowId', 'IN', strngFilesIds ) ),
+                showHidden    = T
             );
 
             inds <- which( colnames(meta) != 'RowId' );
@@ -294,36 +294,36 @@ tryCatch({
         };
 
         writeProjections(
-              G
-            , gsid
-            , schemaName    = 'opencyto_preprocessing'
-            , folderPath    = labkey.url.path
-            , baseUrl       = labkey.url.base
+            G,
+            gsid,
+            schemaName    = 'opencyto_preprocessing',
+            folderPath    = labkey.url.path,
+            baseUrl       = labkey.url.base
         );
 
         if ( length( studyVars ) > 0 ){
             labkey.insertRows(
-                  toInsert      = data.frame(
-                                        svname  = studyVars
-                                      , gsid    = gsid
-                                  )
-                , queryName     = 'study_vars'
-                , schemaName    = 'opencyto_preprocessing'
-                , folderPath    = labkey.url.path
-                , baseUrl       = labkey.url.base
+                toInsert      = data.frame(
+                                  svname  = studyVars,
+                                  gsid    = gsid
+                                ),
+                queryName     = 'study_vars',
+                schemaName    = 'opencyto_preprocessing',
+                folderPath    = labkey.url.path,
+                baseUrl       = labkey.url.base
             );
         }
 
         if ( length( filesIds ) > 0 ){
             labkey.insertRows(
-                  toInsert      = data.frame(
-                                        fileid    = filesIds
-                                      , gsid      = gsid
-                                  )
-                , queryName     = 'files'
-                , schemaName    = 'opencyto_preprocessing'
-                , folderPath    = labkey.url.path
-                , baseUrl       = labkey.url.base
+                toInsert      = data.frame(
+                                  fileid    = filesIds,
+                                  gsid      = gsid
+                                ),
+                queryName     = 'files',
+                schemaName    = 'opencyto_preprocessing',
+                folderPath    = labkey.url.path,
+                baseUrl       = labkey.url.base
             );
         }
 
@@ -348,11 +348,11 @@ tryCatch({
                     toDelete        = data.frame(
                                           gsid        = gsid,
                                           container   = container
-                                      )
-                    , queryName     = 'gstbl'
-                    , baseUrl       = labkey.url.base
-                    , folderPath    = labkey.url.path
-                    , schemaName    = 'opencyto_preprocessing'
+                                      ),
+                    queryName     = 'gstbl',
+                    baseUrl       = labkey.url.base,
+                    folderPath    = labkey.url.path,
+                    schemaName    = 'opencyto_preprocessing'
                 );
 
             }

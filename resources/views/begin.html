@@ -20,7 +20,7 @@ vim: ts=2:sw=2:nu:fdc=2:spell
 <!--<script type='text/javascript'>	LABKEY.requiresExt4ClientAPI(); </script>-->
 <script type='text/javascript'>
     if ( window.jQuery == undefined )
-        document.write( decodeURI("%3Cscript src='//code.jquery.com/jquery-latest.min.js' type='text/javascript'%3E%3C/script%3E") );
+        document.write( decodeURI("%3Cscript src='//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js' type='text/javascript'%3E%3C/script%3E") );
 </script>
 
 <script type='text/javascript'>
@@ -42,7 +42,7 @@ LABKEY.Query.getSchemas({
 
         resizeModule = function(w, h){
 
-            LABKEY.Utils.resizeToViewport( OpenCytoPreprocessing, w, -1, null, null, -5 );
+            LABKEY.ext.Utils.resizeToViewport( OpenCytoPreprocessing, w, -1, null, null, -5 );
 
             OpenCytoPreprocessing.resize();
         };
