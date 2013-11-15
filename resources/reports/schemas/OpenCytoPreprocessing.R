@@ -47,6 +47,8 @@ strngWorkspacesPaths    <- paste( xmlFilesPaths, collapse = ',' );
 strngSampleGroupsNames  <- paste( sampleGroupsNames, collapse = ',' );
 strngFilesIds           <- paste( filesIds, collapse = ';' );
 
+strngDuplicateAnalysisName <- 'There is already an analysis with the same name, delete it first or use a different name.';
+
 tryCatch({
 
     if ( exists('gsid') ){
@@ -78,26 +80,19 @@ tryCatch({
 
     } else { # folder does not exist or exists and does not contain a 'lock' file
 
-        # attempt insert, if there is already an entry with the same name
-        # 'analysisName' error out and halt before any heavy lifting!
-        toInsert <- data.frame(
-            gsname            = analysisName,
-            gspath            = gatingSetPath,
-            gsdescription     = analysisDescription,
-            xmlpaths          = strngWorkspacesPaths,
-            samplegroups      = strngSampleGroupsNames
-        );
-
-        insertedRow <- labkey.insertRows(
-            toInsert      = toInsert,
+        # check the database, if there is already an entry with the same name 'analysisName'
+        # if so, error out and halt before any heavy lifting!
+        gsTbl <- labkey.selectRows(
             queryName     = 'gstbl',
             schemaName    = 'opencyto_preprocessing',
+            baseUrl       = labkey.url.base,
             folderPath    = labkey.url.path,
-            baseUrl       = labkey.url.base
+            colFilter     = makeFilter( c( 'gsname', 'EQUALS', analysisName ) )
         );
 
-        gsid        <- insertedRow$rows[[1]]$gsid;
-        container   <- insertedRow$rows[[1]]$container;
+        if ( nrow( gsTbl ) > 0 ){
+            stop( strngDuplicateAnalysisName );
+        }
 
 
         if ( file.exists( gatingSetPath ) ){ # folder exists and does not contain a 'lock' file
@@ -293,6 +288,25 @@ tryCatch({
             labkey.insertRows( queryName = 'projections', toInsert = toInsert, ... );
         };
 
+        toInsert <- data.frame(
+            gsname            = analysisName,
+            gspath            = gatingSetPath,
+            gsdescription     = analysisDescription,
+            xmlpaths          = strngWorkspacesPaths,
+            samplegroups      = strngSampleGroupsNames
+        );
+
+        insertedRow <- labkey.insertRows(
+            toInsert      = toInsert,
+            queryName     = 'gstbl',
+            schemaName    = 'opencyto_preprocessing',
+            folderPath    = labkey.url.path,
+            baseUrl       = labkey.url.base
+        );
+
+        gsid        <- insertedRow$rows[[1]]$gsid;
+        container   <- insertedRow$rows[[1]]$container;
+
         writeProjections(
             G,
             gsid,
@@ -331,7 +345,7 @@ tryCatch({
         print( tempTime );
         lg <- paste0( lg, '\n', paste( capture.output( tempTime ), collapse = '\n' ) );
 
-        txt <- paste( txt, 'and wrote to the db!' );
+        txt <- paste( txt, 'and wrote to the database' );
 
         unlink( file.path( gatingSetPath, 'FOLDER_LOCKED_TEMP' ), force = T, recursive = T );
     }
@@ -370,9 +384,11 @@ tryCatch({
     }
     lg <- paste0( lg, '\n', print( e ) );
 
-    if ( grepl( 'duplicate key value violates unique constraint "uq_gstbl"', print( e ), fixed = T ) ){
+    if  (   grepl( 'duplicate key value violates unique constraint "uq_gstbl"', print( e ), fixed = T ) |
+            grepl( strngDuplicateAnalysisName, print( e ), fixed = T )
+        ){
         close( fileConn );
-        stop( 'There is already an analysis with the same name, delete it first, or use a different name.' );
+        stop( strngDuplicateAnalysisName );
     } else {
         if ( exists('fileConn') ){
             write( lg, file = fileConn );

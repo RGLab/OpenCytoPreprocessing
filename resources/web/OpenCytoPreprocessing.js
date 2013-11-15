@@ -519,7 +519,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     var toDisplay = result.outputParams[0].value;
 
                     if ( toDisplay.indexOf('Seems that another session is already working on the same analysis, cannot proceed!') < 0 ){
-                        toDisplay += '\n' + result.console;
+//                        toDisplay += '\n' + result.console;
 
                         strGatingSet.reload();
                         pnlTableAnalyses.publish('analysesReload');
