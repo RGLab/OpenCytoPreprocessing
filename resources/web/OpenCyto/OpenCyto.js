@@ -47,22 +47,12 @@ LABKEY.ext.OpenCyto.initTableQuickTips = function( o ){
     });
 };
 
-LABKEY.ext.OpenCyto.loadStoreWithArray = function( store, array ) {
-    var len = array.length;
-    for ( var i = 0; i < len; i ++ ) {
-        array[i] = [ array[i] ];
-    }
-    store.loadData( array );
-}
-
 
 /*
  * Set Tab titles centered (should be able to do any other customizations by setting the tabStripInnerStyle config)
  */
 Ext.TabPanel.override({
-
     tabStripInnerStyle : 'text-align: center;',
-
     onRender : function(ct, position){
         Ext.TabPanel.superclass.onRender.call(this, ct, position);
 
@@ -101,7 +91,6 @@ Ext.TabPanel.override({
 
         this.items.each(this.initTab, this);
     },
-
     initTab : function(item, index){
         var before = this.strip.dom.childNodes[index],
                 p = this.getTemplateArgs(item);
@@ -241,6 +230,69 @@ Ext.grid.CustomColumnModel = Ext.extend(Ext.grid.ColumnModel, {
     }
 });
 
+// Can add components with text as well as checkbox-es, which become checkItems
+Ext.override( Ext.layout.ToolbarLayout, {
+    addComponentToMenu : function(menu, component) {
+        if (component instanceof Ext.Toolbar.Separator) {
+            menu.add('-');
+
+        } else if (Ext.isFunction(component.isXType)) {
+            if (component.isXType('splitbutton')) {
+                menu.add(this.createMenuConfig(component, true));
+
+            } else if (component.isXType('button')) {
+                menu.add(this.createMenuConfig(component, !component.menu));
+
+            } else if (component.isXType('buttongroup')) {
+                component.items.each(function(item){
+                    this.addComponentToMenu(menu, item);
+                }, this);
+            } else if ( component.isXType('checkbox')){
+                menu.add(
+                    new Ext.menu.CheckItem({
+                        text: component.boxLabel,
+                        checked: component.checked,
+                        hideOnClick: false,
+                        listeners: {
+                            checkchange: function( ci, state ){
+                                ci.reference.setValue( state );
+                            }
+                        },
+                        reference: component
+                    })
+                );
+            } else if ( component.isXType('component')){
+                if ( component.getEl().dom.innerHTML != '' ){
+                    menu.add(
+                        new Ext.menu.TextItem({
+                            cls: component.initialConfig.cls,
+                            ctCls: 'extra5pxPadding',
+                            listeners: {
+                                render: function(){
+                                    new Ext.ToolTip({
+                                        target: this.getEl(),
+                                        listeners: {
+                                            beforeshow: function(tip) {
+                                                var msg = this.getEl().dom.innerHTML;
+                                                tip.update( Ext.util.Format.htmlEncode( msg ) );
+                                                return (msg.length > 0);
+                                            },
+                                            scope: this
+                                        },
+                                        renderTo: document.body
+                                    });
+                                }
+                            },
+                            text: component.getEl().dom.innerHTML
+                        })
+                    );
+                }
+            }
+        }
+    },
+    triggerWidth: 30
+});
+
 
 LABKEY.ext.OpenCyto.captureEvents = function(observable) {
     Ext.util.Observable.capture(
@@ -248,7 +300,13 @@ LABKEY.ext.OpenCyto.captureEvents = function(observable) {
         function(eventName, o) {
             var ot = 'unknown';
             if ( o != undefined ){
-                ot = o.constructor.xtype;
+                if ( o.constructor != undefined && o.constructor.xtype != undefined ){
+                    ot = o.constructor.xtype;
+                } else if ( o.id != undefined ){
+                    ot = o.id.split('-');
+                    ot.pop();
+                    ot = ot.join('-');
+                }
             }
             console.info( ot + ' fired: ' + eventName);
         },

@@ -112,6 +112,17 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
             scope: this
         });
 
+        if ( this.store && this.addSelectAllItem ){
+            var RecordType = Ext.data.Record.create([this.valueField, this.displayField]);
+            var data = {};
+            data[this.valueField]   = this.selectAllValueField;
+            data[this.displayField] = this.selectAllTextField;
+            this.store.insert(0, [new RecordType(data)]);
+        }
+        if(this.allSelected){
+            this.selectAll();
+        }
+
         this.addClearItem
             ? Ext.form.TwinTriggerField.prototype.initComponent.call(this)
             : Ext.ux.form.ExtendedLovCombo.superclass.initComponent.call(this)
@@ -171,7 +182,8 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
 
         if(v) {
             v = '' + v;
-            if(this.valueField) {
+            if(this.valueField && this.store.getCount()) {
+                this.store.suspendEvents(true);
                 this.store.clearFilter();
                 this.allSelected = true;
                 this.store.each(function(r, index) {
@@ -195,8 +207,8 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
                     this.store.getAt(0).set(this.checkField, this.allSelected);
                 }
 
+                this.store.resumeEvents();
                 this.value = this.getCheckedValue();
-
                 this.setRawValue(this.getCheckedDisplay());
                 if(this.hiddenField) {
                     this.hiddenField.value = this.value;
@@ -261,6 +273,7 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
             }
             if ( this.innerList != undefined ){
                 this.innerList.setWidth( width );
+                this.restrictHeight();
             }
         }
     },
@@ -270,7 +283,8 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
     {
         this.collapse();
         this.allSelected = false;
-        this.reset();                       // clear contents of combobox
+        this.reset();                       // reset contents of combobox, clear any filters as well
+        this.clearValue();
         this.fireEvent('cleared');          // send notification that contents have been cleared
     },
 

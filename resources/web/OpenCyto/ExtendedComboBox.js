@@ -15,10 +15,14 @@
  limitations under the License.
 */
 
+// create namespace
+Ext.ns('Ext.ux.form');
+
 Ext.ux.form.ExtendedComboBox = Ext.extend( Ext.form.ComboBox, {
 
     //True to add the extra Clear trigger button
     addClearItem: true,
+    expandOnFocus: true,
 
     initComponent: function(){
 
@@ -55,10 +59,12 @@ Ext.ux.form.ExtendedComboBox = Ext.extend( Ext.form.ComboBox, {
             this.resizeToFitContent();
         }, this );
 
-        /*this.on('focus', function(){
-         this.initList();
-         this.doQuery('', true);
-         }, this );*/
+        if ( this.expandOnFocus ){
+            this.on('focus', function(){
+                this.initList();
+                this.doQuery('', true);
+            }, this )
+        }
 
         this.addClearItem
             ? Ext.form.TwinTriggerField.prototype.initComponent.call(this)
@@ -100,6 +106,7 @@ Ext.ux.form.ExtendedComboBox = Ext.extend( Ext.form.ComboBox, {
             }
             if ( this.innerList != undefined ){
                 this.innerList.setWidth( width );
+                this.restrictHeight();
             }
         }
     },
@@ -108,7 +115,8 @@ Ext.ux.form.ExtendedComboBox = Ext.extend( Ext.form.ComboBox, {
     onTrigger2Click : function()
     {
         this.collapse();
-        this.reset();                       // clear contents of combobox, clear any filters as well
+        this.reset();                       // reset contents of combobox, clear any filters as well
+        this.clearValue();
         this.fireEvent('cleared');          // send notification that contents have been cleared
     },
 

@@ -85,7 +85,7 @@ pre, .ext-mb-text {
 }
 
 /* Centered text */
-.centered-text, .bold-centered-text, .sortable-list li, .opencyto .x-grid3-hd-row, {
+.centered-text, .bold-centered-text, .sortable-list li, .opencyto .x-grid3-hd-row {
     text-align: center !important;
 }
 
@@ -340,6 +340,14 @@ pre, .ext-mb-text {
     background-position: 0 -15px;
 }
 /**********************************/
+
+.extra5pxPadding {
+    padding: 5px !important;
+}
+
+.extra10pxPaddingLeft {
+    padding-left: 10px !important;
+}
 
 #fancybox-buttons ul {
     width: 73px !important;

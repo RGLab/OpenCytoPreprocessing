@@ -390,25 +390,53 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     }
                 }
             },
-            triggerClass:'x-form-clear-trigger',
             onTriggerClick: function(){
                 this.reset();
                 if ( TreeFilter != undefined ){
                     TreeFilter.clear();
                 }
-            }
+            },
+            triggerClass: 'x-form-clear-trigger'
         });
 
-        var tfAnalysisName = new Ext.form.TextField({
+        var tfAnalysisName = new Ext.form.TriggerField({
             emptyText: 'Type...',
             enableKeyEvents: true,
             listeners: {
-                keyup: checkWorkspacesSelection
-            }
+                keyup: {
+                    buffer: 150,
+                    fn: function(field, e) {
+                        if( Ext.EventObject.ESC == e.getKey() ){
+                            field.onTriggerClick();
+                        }
+
+                        checkWorkspacesSelection();
+                    }
+                }
+            },
+            onTriggerClick: function(){
+                this.reset();
+            },
+            triggerClass: 'x-form-clear-trigger'
         });
 
-        var tfAnalysisDescription = new Ext.form.TextField({
-            emptyText: 'Type...'
+        var tfAnalysisDescription = new Ext.form.TriggerField({
+            emptyText: 'Type...',
+            enableKeyEvents: true,
+            listeners: {
+                keyup: {
+                    buffer: 150,
+                    fn: function(field, e) {
+                        if( Ext.EventObject.ESC == e.getKey() ){
+                            field.onTriggerClick();
+                        }
+                    }
+                }
+            },
+            onTriggerClick: function(){
+                this.reset();
+            },
+            triggerClass: 'x-form-clear-trigger'
         });
 
 
@@ -848,9 +876,10 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         renderTo: document.body
                     });
                 }
-            },
-            style: { paddingLeft: '10px' }
+            }
         });
+
+        cmpStatus.addClass( 'extra10pxPaddingLeft' ); // so that this class does not get propagated to the toolbar's overflow menu
 
         var pnlWorkspacesWrapper = new Ext.Panel({
             items: pnlWorkspaces,
@@ -859,6 +888,15 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     this.doLayout();
                 }
             }
+        });
+
+        var tlbrNavigation = new Ext.Toolbar({
+            cls: 'white-background',
+            defaults: {
+                style: 'padding-top: 1px; padding-bottom: 1px;'
+            },
+            enableOverflow: true,
+            items: [ btnBack, btnNext, cmpStatus ]
         });
 
         var pnlCreate = new Ext.Panel({
@@ -889,10 +927,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 { items: pnlCompensation }
             ],
             layout: 'card',
-            tbar: new Ext.Toolbar({
-                cls: 'white-background',
-                items: [ btnBack, btnNext, cmpStatus ]
-            }),
+            tbar: tlbrNavigation,
             title: 'Create'
         });
 
@@ -1051,6 +1086,23 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         //             Functions           //
         /////////////////////////////////////
 
+        Ext.tree.CustomTreeEventModel = Ext.extend( Ext.tree.TreeEventModel, {
+            onCheckboxClick : function(e, node){
+                if ( node.getUI().isChecked() ){
+                    // Only one sample group per workspace
+                    Ext.each( node.parentNode.childNodes, function(n){
+                        if ( n != node && n.getUI().isChecked() ){
+                            n.getUI().toggleCheck( false );
+                        }
+                    });
+                }
+
+                node.ui.onCheckChange(e);
+
+                tfSampleGroup.reset();
+            }
+        });
+
         function parseOutputParams( outputParams ){
             var p = outputParams[0];
 
@@ -1089,6 +1141,37 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     autoScroll: true,
                     border:     false,
                     enableDD:   false,
+                    initComponent : function(){
+                        Ext.tree.TreePanel.superclass.initComponent.call(this);
+
+                        if(!this.eventModel){
+                            this.eventModel = new Ext.tree.CustomTreeEventModel(this);
+                        }
+
+                        var l = this.loader;
+                        if(!l){
+                            l = new Ext.tree.TreeLoader({
+                                dataUrl: this.dataUrl,
+                                requestMethod: this.requestMethod
+                            });
+                        }else if(Ext.isObject(l) && !l.load){
+                            l = new Ext.tree.TreeLoader(l);
+                        }
+                        this.loader = l;
+
+                        this.nodeHash = {};
+
+                        if(this.root){
+                            var r = this.root;
+                            delete this.root;
+                            this.setRootNode(r);
+                        }
+
+                        this.addEvents('append','remove','movenode','insert','beforeappend','beforeremove','beforemovenode','beforeinsert','beforeload','load','textchange','beforeexpandnode','beforecollapsenode','expandnode','disabledchange','collapsenode','beforeclick','click','containerclick','checkchange','beforedblclick','dblclick','containerdblclick','contextmenu','containercontextmenu','beforechildrenrendered','startdrag','enddrag','dragdrop','beforenodedrop','nodedrop','nodedragover');
+                        if(this.singleExpand){
+                            this.on('beforeexpandnode', this.restrictExpand, this);
+                        }
+                    },
                     lines:      true,
                     listeners: {
                         checkchange: function(node, checked){
@@ -1098,7 +1181,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                             // at most one sample group per workspaces is picked
 
                             var path = strWorkspace.getAt(
-                                    strWorkspace.findExact( 'FileName', node.parentNode.text )
+                                strWorkspace.findExact( 'FileName', node.parentNode.text )
                             ).get( 'FilePath' );
 
                             if ( checked ){
@@ -1124,15 +1207,19 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                             checkWorkspacesSelection();
                         },
                         click: function( node ){
+                            if ( ! node.getUI().isChecked() ){
 
-                            // only one per workspace ?
-                            /*Ext.each( node.parentNode.childNodes, function(n){
-                             if ( n != node ){
-                             n.ui.toggleCheck( false );
-                             }
-                             });*/
+                                // Only one sample group per workspace
+                                Ext.each( node.parentNode.childNodes, function(n){
+                                    if ( n != node && n.getUI().isChecked() ){
+                                        n.getUI().toggleCheck( false );
+                                    }
+                                });
+                            }
 
                             node.getUI().toggleCheck();
+
+                            tfSampleGroup.reset();
                         }
                     },
                     loader: new Ext.tree.TreeLoader(), // register a TreeLoader to make use of createNode()
@@ -1205,7 +1292,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         r.data[field.name] = selectedSampleGroups[
                             strWorkspace.getAt(
                                 strWorkspace.findExact(
-                                        'FileName', r.data['RunName']
+                                    'FileName', r.data['RunName']
                                 )
                             ).get( 'FilePath' )
                             ][0];
@@ -1353,7 +1440,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         function checkWorkspacesSelection(){
             if (
                 selectedSampleGroupsViolatedCount > 0 ||
-                $.isEmptyObject(selectedSampleGroups) ||
+                $.isEmptyObject( selectedSampleGroups ) ||
                 Ext.util.Format.trim( tfAnalysisName.getValue() ) == ''
             ){
                 updateInfoStatus( 'At most one sample group per workspace needs to be picked and a non-empty analysis name needs to be specified', -1 );
@@ -1361,7 +1448,11 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             } else {
                 updateInfoStatus( '' );
                 btnNext.setDisabled(false);
+
+                tlbrNavigation.getLayout().unhideItem( cmpStatus ); // neccesity
             }
+
+            tlbrNavigation.doLayout();
         };
 
         function loadTableFiles(){
