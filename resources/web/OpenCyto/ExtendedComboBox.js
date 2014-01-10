@@ -114,10 +114,12 @@ Ext.ux.form.ExtendedComboBox = Ext.extend( Ext.form.ComboBox, {
     onTrigger1Click: Ext.form.ComboBox.prototype.onTriggerClick,
     onTrigger2Click : function()
     {
-        this.collapse();
-        this.reset();                       // reset contents of combobox, clear any filters as well
-        this.clearValue();
-        this.fireEvent('cleared');          // send notification that contents have been cleared
+        if ( ! this.disabled ){
+            this.collapse();
+            this.reset();                       // reset contents of combobox, clear any filters as well
+            this.clearValue();
+            this.fireEvent('cleared');          // send notification that contents have been cleared
+        }
     },
 
     trigger1Class: Ext.form.ComboBox.prototype.triggerClass,
