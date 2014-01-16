@@ -1,5 +1,8 @@
 Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
 
+    // True to show the drop down list when the text field is clicked, not just the trigger
+    expandOnFocus: true,
+
     //True for use selectAll item
     addSelectAllItem: true,
 
@@ -73,11 +76,16 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
             this.resizeToFitContent();
         }, this );
 
-        // Show drop down when the text field is clicked, not just the trigger
-        this.on('focus', function(){
-            this.initList();
-            this.doQuery('', true);
-        }, this );
+        if ( this.expandOnFocus ){
+            this.on('focus', function(){
+                this.initList();
+                if( this.triggerAction == 'all' ) {
+                    this.doQuery( this.allQuery, true );
+                } else {
+                    this.doQuery( this.getRawValue() );
+                }
+            }, this )
+        }
 
         // install internal event handlers ???
         this.on({
@@ -265,7 +273,10 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
             width += el.getBorderWidth('lr');
             width += el.getPadding('lr');
             s.width = width;
-            width += 3*Ext.getScrollBarWidth() + 60;
+            width += 3 * Ext.getScrollBarWidth() + 60;
+            if ( this.pageSize > 0 && this.pageTb ){
+                width = Math.max( width, this.pageTb.el.child('table').getWidth() );
+            }
             this.listWidth = width;
             this.minListWidth = width;
             if ( this.list != undefined ){
