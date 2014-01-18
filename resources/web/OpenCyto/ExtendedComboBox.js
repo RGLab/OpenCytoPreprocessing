@@ -26,7 +26,9 @@ Ext.ux.form.ExtendedComboBox = Ext.extend( Ext.form.ComboBox, {
     initComponent: function(){
 
         if ( ! this.tpl ) {
-            this.tpl = '<tpl for="."><div class=\'x-combo-list-item\'>{' + (this.displayField || 'text' )+ ':htmlEncode}</div></tpl>';
+            this.tpl = this.qtipField == undefined ?
+                '<tpl for="."><div class=\'x-combo-list-item\'>{' + (this.displayField || 'text' )+ ':htmlEncode}</div></tpl>' :
+                '<tpl for="."><div ext:qtip=\'{' + this.qtipField + ':htmlEncode}\' class=\'x-combo-list-item\'>{' + (this.displayField || 'text' )+ ':htmlEncode}</div></tpl>';
         }
 
         // Add selected value tool tip

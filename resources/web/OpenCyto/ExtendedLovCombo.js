@@ -27,7 +27,7 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
         if( ! this.tpl ) {
             this.tpl =
                 '<tpl for=".">'
-                    + '<tpl if="' + this.valueField + '==\'' + this.selectAllValueField + '\'">'
+                    + '<tpl if="' + this.displayField + '==\'' + this.selectAllTextField + '\'">'
                         + '<div class=\'x-combo-list-item ux-lovcombo-list-item-all\'>'
                             + '<img src=\'' + Ext.BLANK_IMAGE_URL + '\' '
                             + 'class=\'ux-lovcombo-icon ux-lovcombo-icon-'
@@ -35,7 +35,7 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
                             + '<div class=\'ux-lovcombo-item-text\'>{' + (this.displayField || 'text' )+ '}</div>'
                         + '</div>'
                     + '</tpl>'
-                    + '<tpl if="' + this.valueField + '!=\'' + this.selectAllValueField + '\'">'
+                    + '<tpl if="' + this.displayField + '!=\'' + this.selectAllTextField + '\'">'
                         + '<div class=\'x-combo-list-item\'>'
                             + '<img src=\'' + Ext.BLANK_IMAGE_URL + '\' '
                             + 'class=\'ux-lovcombo-icon ux-lovcombo-icon-'
@@ -105,22 +105,23 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
 
         this.store.on({
             'load': function(){
-                if(this.store && this.addSelectAllItem){
-                    var RecordType = Ext.data.Record.create([this.valueField, this.displayField]);
-                    var data = {};
-                    data[this.valueField]   = this.selectAllValueField;
-                    data[this.displayField] = this.selectAllTextField;
-                    this.store.insert(0, [new RecordType(data)]);
-                }
-                if(this.allSelected){
-                    this.selectAll();
-                }
+                this.initSelectAll();
             },
             buffer: 10,
             scope: this
         });
 
-        if ( this.store && this.addSelectAllItem ){
+        this.initSelectAll();
+
+        this.addClearItem
+            ? Ext.form.TwinTriggerField.prototype.initComponent.call(this)
+            : Ext.ux.form.ExtendedLovCombo.superclass.initComponent.call(this)
+        ;
+    },
+
+    // Add the 'Select All' record if appropriate (private)
+    initSelectAll : function(){
+        if(this.store && this.addSelectAllItem && this.store.getCount() > 0 ){
             var RecordType = Ext.data.Record.create([this.valueField, this.displayField]);
             var data = {};
             data[this.valueField]   = this.selectAllValueField;
@@ -130,11 +131,6 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
         if(this.allSelected){
             this.selectAll();
         }
-
-        this.addClearItem
-            ? Ext.form.TwinTriggerField.prototype.initComponent.call(this)
-            : Ext.ux.form.ExtendedLovCombo.superclass.initComponent.call(this)
-        ;
     },
 
     //Select correct action for selected record
