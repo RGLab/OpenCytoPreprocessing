@@ -23,79 +23,88 @@
     line-height: 100% !important;
 }
 
-.iconArrowLeft {
+.opencyto .iconArrowLeft {
     background-image: url(images/arrow-left.gif);
 }
 
-.iconArrowRight {
+.opencyto .iconArrowRight {
     background-image: url(images/arrow-right.gif);
 }
 
-.iconPlot {
+.opencyto .iconPlot {
     background-image: url(images/scatter_plot.gif);
 }
 
-.iconReset {
+.opencyto .iconReset {
     background-image: url(images/reset.png);
 }
 
 
-.iconConfigure {
+.opencyto .iconConfigure {
     background-image: url(../_images/configure.png);
 }
 
-.iconDelete {
+.opencyto .iconDelete {
     background-image: url(../_images/delete.png);
 }
 
-.iconExport {
+.opencyto .iconExport {
     background-image: url(../_images/download.png);
 }
 
-.iconImport {
+.opencyto .iconImport {
     background-image: url(../_images/upload.png);
 }
 
-.iconNew {
+.opencyto .iconNew {
     background-image: url(../_images/folder_new.png);
 }
 
-.iconReload {
+.opencyto .iconReload {
     background-image: url(../_images/reload.png);
 }
 
-.iconUpdate {
+.opencyto .iconUpdate {
     background-image: url(../_images/editprops.png);
 }
 
 
 /* Error code from R */
-pre, .ext-mb-text {
+pre,
+.ext-mb-text {
     white-space: pre-wrap;
 }
 
 /* Class specs */
 
-.right-text {
+.opencyto .right-text {
     text-align: right;
 }
 
-.left-text {
+.opencyto .left-text {
     text-align: left;
 }
 
 /* Centered text */
-.centered-text, .bold-centered-text, .sortable-list li, .opencyto .x-grid3-hd-row {
+.centered-text,
+.bold-centered-text,
+.opencyto .sortable-list li,
+.opencyto .x-grid3-hd-row {
     text-align: center !important;
 }
 
 /* Bold text */
-.bold-text, .bold-centered-text, .sortable-list li, .infoMask div, .opencyto .mask-loading div, .ux-lovcombo-list-item-all {
+.bold-text,
+.bold-centered-text,
+.opencyto .sortable-list li,
+.opencyto .infoMask div,
+.opencyto .mask-loading div,
+.ux-lovcombo-list-item-all {
     font-weight: bold !important;
 }
 
 /* Auto margin */
-.centered-table {
+.opencyto .centered-table {
     margin: auto;
 }
 
@@ -104,22 +113,26 @@ pre, .ext-mb-text {
 }
 
 /* Zero margin */
-.opencyto .x-tab-strip, .sortable-list, .ulList {
+.opencyto .x-tab-strip,
+.opencyto .sortable-list,
+.opencyto .ulList {
     margin: 0;
 }
 
 /* Zero padding */
-.opencyto .x-tab-panel-header, .sortable-list, .ulList {
+.opencyto .x-tab-panel-header,
+.opencyto .sortable-list,
+.opencyto .ulList {
     padding: 0;
 }
 
 /* Hidden class */
-.hidden {
+.opencyto .hidden {
     display: none;
     visibility: hidden;
 }
 
-.simple-panel-header {
+.opencyto .simple-panel-header {
     background-color: white;
     border-bottom-width: 0px !important;
     font-family: verdana, arial, helvetica, sans-serif;
@@ -127,14 +140,14 @@ pre, .ext-mb-text {
     padding-left: 0px;
 }
 
-.simpler-panel-header {
+.opencyto .simpler-panel-header {
     background-color: white;
     font-family: verdana, arial, helvetica, sans-serif;
     padding-bottom: 3px;
     padding-left: 5px;
 }
 
-.white-background {
+.opencyto .white-background {
     background-color: white !important;
 }
 
@@ -156,12 +169,12 @@ pre, .ext-mb-text {
     text-align: center;
 }
 
-.infoMask {
+.opencyto .infoMask {
     width: 100% !important;
     z-index: 999;
 }
 
-.infoMask div {
+.opencyto .infoMask div {
     background-color: white;
     cursor: default;
     text-align: center;
@@ -188,26 +201,31 @@ pre, .ext-mb-text {
 
 
 /* Tweaks for jQuery drag-and-drop in particular and list in general */
-.draggableHandle {
+.opencyto .draggableHandle {
     cursor: move;
 }
 
-.ui-state-highlight {
+.opencyto .ui-state-highlight {
     width: 1em;
     line-height: 1.2em;
 }
 
-.ui-sortable-helper, .sortable-list, .ulList, .opencyto .x-tree-node, .opencyto .x-tree-node-ct {
+.opencyto .ui-sortable-helper,
+.opencyto .sortable-list,
+.opencyto .ulList,
+.opencyto .x-tree-node,
+.opencyto .x-tree-node-ct {
     list-style-type: none;
 }
 
-.sortable-list li, .ulList li {
+.opencyto .sortable-list li,
+.opencyto .ulList li {
     margin: 3px 0px 3px 4px; /* 0.2em 0.3em 0.2em 0.3em */
     padding: 1px;
     float: left;
 }
 
-.sortable-list li {
+.opencyto .sortable-list li {
     font-size: 1em;
 }
 
@@ -244,6 +262,10 @@ pre, .ext-mb-text {
 
 .opencyto .x-tab-right {
     border-bottom-width: 0px !important;
+}
+
+.opencyto .x-tab-strip-over {
+    text-decoration: underline;
 }
 
 /********************************/
@@ -341,14 +363,14 @@ pre, .ext-mb-text {
 }
 /**********************************/
 
-.extra5pxPadding {
+.opencyto .extra5pxPadding {
     padding: 5px !important;
 }
 
-.extra10pxPaddingLeft {
+.opencyto .extra10pxPaddingLeft {
     padding-left: 10px !important;
 }
 
 #fancybox-buttons ul {
-    width: 73px !important;
+    width: 74px !important;
 }

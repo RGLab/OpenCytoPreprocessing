@@ -109,8 +109,14 @@ tryCatch({
 
             txt <- 'Success: reusing the already existing data on disk';
         } else { # folder does not exist
-            dir.create( gatingSetPath ); # create a new one
-            file.create( file.path( gatingSetPath, 'FOLDER_LOCKED_TEMP' ) ); # create a 'lock' file
+            rv <- dir.create( gatingSetPath, showWarnings = TRUE ); # create a new one
+            if ( ! rv ){
+                stop( paste( 'Was unable to create a new analysis folder', gatingSetPath ) );
+            };
+            rv <- file.create( file.path( gatingSetPath, 'FOLDER_LOCKED_TEMP' ) ); # create a 'lock' file
+            if ( ! rv ){
+                stop( paste( 'Was unable to create a needed lock file in', gatingSetPath ) );
+            };
 
             print('PARSING WORKSPACES');
             lg <- paste0( lg, '\nPARSING WORKSPACES' );
