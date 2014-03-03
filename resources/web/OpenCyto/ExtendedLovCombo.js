@@ -21,7 +21,7 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
     //css class for selactAll item : ux-lovcombo-list-item-all
     initComponent: function() {
 
-        // template with checkbox
+        // template with checkbox and 'Select all' item
         if ( ! this.tpl ) {
             this.tpl = new Ext.XTemplate(
                 '<tpl for=".">'
@@ -98,7 +98,7 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
                     add:          this.resizeToFitContent,
                     remove:       this.resizeToFitContent,
                     load:         this.resizeToFitContent,
-                    update:       this.resizeToFitContent,
+                    update:       this.resizeToFitContent.createDelegate(this, [true]),
                     buffer: 10,
                     scope: this
                 }
@@ -155,6 +155,9 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
     },
 
     onTypeAhead: function(){
+        if ( ! this.store.isFiltered() ){   // very important fix
+            return;                         // to prevent typeAhead on click of trigger or input text field
+        }
         if(this.store.getCount() > 0){
             var r = this.store.getAt(0);
             var newValue = r.data[this.displayField];
@@ -188,6 +191,24 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
         }, this);
         this.setValue(va.join(this.separator));
         this.store.clearFilter();
+    },
+
+    /**
+     * Selects all items
+     */
+    selectAll:function() {
+        this.store.suspendEvents(true);
+        this.store.each(function(record){
+            // toggle checked field
+            record.set(this.checkField, true);
+        }, this);
+        this.store.resumeEvents();
+
+        if ( this.store.isFiltered() ) {
+            //display full list
+            this.doQuery(this.allQuery);
+        }
+        this.setValue(this.getCheckedValue());
     },
 
     // Add the 'Select All' record if appropriate (private)
@@ -251,7 +272,6 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
                 this.store.clearFilter();
                 this.allSelected = true;
                 this.store.each(function(r, index) {
-                    v = '' + v;
                     var checked =
                         !(
                             v.search(
@@ -307,7 +327,7 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
     },
 
     //Size the drop-down list to the contents
-    resizeToFitContent: function(){
+    resizeToFitContent: function( versionLight ){
         var el = this.getEl();
         if ( el != undefined && this.rendered ){
             if ( ! this.elMetrics ){
@@ -342,7 +362,9 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
             if ( this.list != undefined && this.innerList != undefined ){
                 this.list.setSize( width );
                 this.innerList.setWidth( width - this.list.getFrameWidth('lr') );
-                this.restrictHeight();
+                if ( ! versionLight ){
+                    this.restrictHeight();
+                }
             }
 
             if( this.resizable && this.resizer ){
@@ -389,10 +411,6 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
                     renderTo:this.footer
                 });
                 this.assetHeight += this.footer.getHeight();
-            }
-
-            if(!this.tpl){
-                this.tpl = '<tpl for="."><div class="'+cls+'-item">{' + this.displayField + '}</div></tpl>';
             }
 
             this.view = new Ext.DataView({
