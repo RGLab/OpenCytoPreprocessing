@@ -1053,7 +1053,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             listeners: {
                 afterrender: {
                     fn: function(){
-                        maskStudyVars = new Ext.LoadMask(
+                        maskDelete = new Ext.LoadMask(
                             this.getEl(),
                             {
                                 msg: 'Deleting the selected analysis and its associated data...',
