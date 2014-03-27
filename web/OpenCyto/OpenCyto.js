@@ -208,7 +208,7 @@ Ext.override(Ext.grid.HeaderDragZone, {
 // Apply class 'x-dd-drop-nodrop' for anything being attempted to be dropped to the first 'disallowMoveBefore' positions
 Ext.override(Ext.grid.HeaderDropZone, {
     positionIndicator : function(h, n, e){
-        if ( this.grid.colModel.disallowMoveBefore != undefined ){
+        if ( this.grid.colModel.disallowMoveBefore ){
             if ( this.view.getCellIndex(n) <= this.grid.colModel.disallowMoveBefore ){
                 return false;
             }
@@ -327,21 +327,27 @@ LABKEY.ext.OpenCyto.captureEvents = function(observable) {
         function(eventName, o) {
             if ( eventName != 'mouseout' && eventName != 'mouseover' ){
                 var ot = 'unknown';
-                if ( o != undefined ){
-                    if ( o.combo != undefined ){
+                if ( o ){
+                    if ( o.combo ){
                         o = o.combo;
                     }
-                    if ( o.constructor != undefined ){
-                        if ( o.constructor.xtype != undefined ){
+                    if ( o.length > 0 ){
+                        o = o[0];
+                        if ( o.store ){
+                            o = o.store;
+                        }
+                    }
+                    if ( o.constructor ){
+                        if ( o.constructor.xtype ){
                             ot = o.constructor.xtype;
-                        } else if (o.constructor.ptype != undefined ){
+                        } else if (o.constructor.ptype ){
                             ot = o.constructor.ptype;
                         }
-                    } else if ( o.id != undefined ){
+                    } else if ( o.id ){
                         ot = o.id.split('-');
                         ot.pop();
                         ot = ot.join('-');
-                    } else if ( o.target != undefined && o.target.className != undefined ){
+                    } else if ( o.target && o.target.className ){
                         ot = o.target.className.split(' ');
                         ot = ot[0];
                         ot = ot.split('-')
@@ -363,7 +369,7 @@ LABKEY.ext.OpenCyto.onFailure = function(errorInfo, options, responseObj){
         text += errorInfo.exception;
     }
     else {
-        if ( responseObj != undefined ){
+        if ( responseObj ){
             text += responseObj.statusText;
         } else {
             text += errorInfo.statusText + ( errorInfo.timedout == true ? ', timed out.' : '' );
