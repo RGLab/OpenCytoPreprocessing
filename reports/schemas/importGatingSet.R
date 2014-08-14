@@ -17,7 +17,7 @@ importGatingSet <- function( labkey.url.base, labkey.url.path, path, analysisNam
     if ( path == '' ){
         stop('Path cannot be empty, exiting...');
     } else {
-        path <- path.expand( path );
+        path <- normalizePath( path );
         if ( substr( path, nchar( path ), nchar( path ) ) == '/' ){
             path <- substr( path, 1, nchar( path ) - 1 );
         }
@@ -45,7 +45,20 @@ importGatingSet <- function( labkey.url.base, labkey.url.path, path, analysisNam
     tryCatch({
         sql <- "SELECT DISTINCT Runs.FilePathRoot AS Path FROM Runs WHERE Runs.FCSFileCount != 0 AND Runs.ProtocolStep = 'Keywords'";
 
-        rootPath <- getLongestCommonSubstring( labkey.executeSql( baseUrl = labkey.url.base, folderPath = labkey.url.path, schemaName = 'flow', sql = sql )$Path );
+        paths <-
+            labkey.executeSql(
+                baseUrl     = labkey.url.base,
+                folderPath  = labkey.url.path,
+                schemaName  = 'flow',
+                sql         = sql
+            )$Path;
+
+        if ( length( paths ) == 0 ){
+            stop( "No FCS files were found, check the 'Runs' table in the 'flow' schema, import FCS files first" );
+        }
+
+        rootPath <- getLongestCommonSubstring( paths );
+
         if ( substr( rootPath, nchar( rootPath ), nchar( rootPath ) ) == '/' ){
             rootPath <- substr( rootPath, 1, nchar( rootPath ) - 1 );
         } else {
@@ -71,7 +84,8 @@ importGatingSet <- function( labkey.url.base, labkey.url.path, path, analysisNam
 
         colnames( meta )[ which( colnames( meta ) == 'name' ) ] <- 'Name';
         write.csv( meta, file = paste0( file.path( rootPath, basename( path ) ), '.csv' ), row.names = F );
-        readline( paste0( 'Now import the generated file, ', paste0( file.path( rootPath, basename( path ) ), '.csv' ), ', into Labkey via "Samples" menu and join to the imported FCS files, press ENTER when done to proceed.' ) );
+        cat( paste0( 'Now import the generated file, ', paste0( file.path( rootPath, basename( path ) ), '.csv' ), ', into Labkey via "Samples" menu and join to the imported FCS files, press ENTER when done to proceed.' ) );
+        readline();
 
         colNames <- colnames(meta);
         strngStudyVars <- '';
@@ -96,7 +110,7 @@ importGatingSet <- function( labkey.url.base, labkey.url.path, path, analysisNam
 
         strngWorkspacePaths <- sum( file.info( list.files( path, full.names = T ) )$size ); # file size
 
-        strngSampleGroupNames <- paste0( getNodes( G[[1]], showHidden = T ), collapse = ',' ); # all of the populations in the gating hierarchy
+        strngSampleGroupNames <- paste0( getNodes( G[[1]], order = 'tsort', showHidden = T ), collapse = ',' ); # all of the populations in the gating hierarchy
 
         strngFilesIds <- paste0( sort( meta$RowId ), collapse = ';' );
 
@@ -135,42 +149,40 @@ importGatingSet <- function( labkey.url.base, labkey.url.path, path, analysisNam
         }
 
         writeProjections <- function( G, gsid, ... ){
-                gh <- G[[1]];
-                popNames    <- getNodes( gh, isPath = T );
-                nodeNames   <- getNodes( gh, prefix = T );
-                res <- lapply( 1:length( popNames ), function(i){
-                    curPop <- popNames[i];
-                    curInd <- as.numeric( unlist( strsplit( nodeNames[i], split = '.', fixed = T ) )[1] );
-                    curChildren <- getChildren( gh, curPop );
-                    if ( length( curChildren ) > 0 ){
-                        prjlist <- lapply( curChildren, function( curChild ){
-                            g <- getGate( gh, curChild );
-                            if ( ! flowWorkspace:::.isBoolGate( gh, curChild ) ){
-                                param <- parameters( g );
+            gh <- G[[1]];
+            popNames <- getNodes( gh, order = 'tsort' ); # hidden nodes are not shown by default
+            res <- lapply( 1:length( popNames ), function(i){
+                curPop <- popNames[i];
+                curChildren <- getChildren( gh, curPop, showHidden = F );
+                if ( length( curChildren ) > 0 ){
+                    prjlist <- lapply( curChildren, function( curChild ){
+                        if ( ! flowWorkspace:::.isBoolGate( gh, curChild ) ){
+                            param <- parameters( getGate( gh, curChild ) );
 
-                                if ( length( param ) == 1 ){
-                                    param <- c( param, 'SSC-A' );
-                                }
-                                return( param );
-                            } else {
-                                return( NULL );
+                            if ( length( param ) == 1 ){
+                                param <- c( param, 'SSC-A' );
                             }
-                        });
-                        prj <- do.call( rbind, prjlist );
-                        prj <- unique( prj );
-                    } else {
-
-                        g <- getGate( gh, curPop );
+                            return( param );
+                        } else {
+                            return( NULL );
+                        }
+                    });
+                    prj <- do.call( rbind, prjlist );
+                    prj <- unique( prj );
+                } else {
+                    if ( curPop != 'root' & i != 1 ){
                         if ( ! flowWorkspace:::.isBoolGate( gh, curPop ) ){
                             prj <- as.list( c( ' ', ' ' ) );
                         }
                     }
-                    if ( exists('prj') ){
-                        prj <- as.data.frame( prj );
-                        colnames(prj) <- c('x_axis', 'y_axis');
-                        cbind( index = curInd, path = curPop, prj, gsid = gsid );
-                    }
-                });
+                    
+                }
+                if ( exists('prj') ){
+                    prj <- as.data.frame( prj );
+                    colnames(prj) <- c('x_axis', 'y_axis');
+                    cbind( index = i, path = curPop, prj, gsid = gsid );
+                }
+            });
 
             toInsert <- do.call( rbind, res );
 

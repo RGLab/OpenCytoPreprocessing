@@ -6,7 +6,7 @@
         <dependency path='OpenCyto/gridfilters/css/GridFilters.css'/>
         <dependency path='OpenCyto/OpenCyto.css'/>
 
-        <dependency path='Ext3'/>
+        <dependency path='clientapi/ext3'/>
 
         <dependency path='Ext.ux.form.LovCombo.js'/>
         <dependency path='OpenCyto/ExtendedComboBox.js'/>

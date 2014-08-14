@@ -233,17 +233,14 @@ tryCatch({
 
         writeProjections <- function( G, gsid, ... ){
             gh <- G[[1]];
-            popNames    <- getNodes( gh, isPath = T );
-            nodeNames   <- getNodes( gh, prefix = T );
+            popNames <- getNodes( gh, order = 'tsort' ); # hidden nodes are not shown by default
             res <- lapply( 1:length( popNames ), function(i){
                 curPop <- popNames[i];
-                curInd <- as.numeric( unlist( strsplit( nodeNames[i], split = '.', fixed = T ) )[1] );
-                curChildren <- getChildren( gh, curPop );
+                curChildren <- getChildren( gh, curPop, showHidden = F );
                 if ( length( curChildren ) > 0 ){
                     prjlist <- lapply( curChildren, function( curChild ){
-                        g <- getGate( gh, curChild );
                         if ( ! flowWorkspace:::.isBoolGate( gh, curChild ) ){
-                            param <- parameters( g );
+                            param <- parameters( getGate( gh, curChild ) );
 
                             if ( length( param ) == 1 ){
                                 param <- c( param, 'SSC-A' );
@@ -256,16 +253,17 @@ tryCatch({
                     prj <- do.call( rbind, prjlist );
                     prj <- unique( prj );
                 } else {
-
-                    g <- getGate( gh, curPop );
-                    if ( ! flowWorkspace:::.isBoolGate( gh, curPop ) ){
-                        prj <- as.list( c( ' ', ' ' ) );
+                    if ( curPop != 'root' & i != 1 ){
+                        if ( ! flowWorkspace:::.isBoolGate( gh, curPop ) ){
+                            prj <- as.list( c( ' ', ' ' ) );
+                        }
                     }
+
                 }
                 if ( exists('prj') ){
                     prj <- as.data.frame( prj );
                     colnames(prj) <- c('x_axis', 'y_axis');
-                    cbind( index = curInd, path = curPop, prj, gsid = gsid );
+                    cbind( index = i, path = curPop, prj, gsid = gsid );
                 }
             });
 

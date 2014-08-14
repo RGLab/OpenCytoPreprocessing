@@ -559,10 +559,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         pnlTableAnalyses.publish('analysesReload');
                     }
 
-                    Ext.Msg.alert(
-                        'Info',
-                        toDisplay
-                    );
+                    Ext.Msg.alert( 'Info', toDisplay );
                 }
             }
         };
@@ -591,7 +588,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 } else {
                     var p = outputParams[0];
 
-                    Ext.Msg.alert('Info', p.value);
+                    Ext.Msg.alert( 'Info', p.value );
                 }
 
                 strGatingSet.reload();
@@ -1842,6 +1839,23 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             }
         };
 
+        $('#' + config.webPartDivId)
+            .parents('tr')
+            .prev()
+            .find('.labkey-wp-title-text')
+            .wrap(
+                '<a href=\'' +
+                LABKEY.ActionURL.buildURL(
+                    'reports',
+                    'runReport',
+                    LABKEY.ActionURL.getContainer(),
+                    {
+                        reportId: 'module:OpenCytoPreprocessing/reports/schemas/OpenCytoPreprocessing.R',
+                        tabId: 'Source'
+                    }
+                ) +
+                '\' target=\'_blank\' title=\'Click to open the R source code in a new window\'></a>'
+            );
 
         // jQuery-related
 
