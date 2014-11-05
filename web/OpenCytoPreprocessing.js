@@ -1339,7 +1339,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                                     LABKEY.ActionURL.buildURL(
                                         'flow-run',
                                         'showRun',
-                                        LABKEY.ActionURL.getContainer(),
+                                        null,
                                         {
                                             'runId': record.get('RunId'),
                                             'query.showGraphs': 'Thumbnail'
@@ -1378,7 +1378,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                                     LABKEY.ActionURL.buildURL(
                                         'flow-well',
                                         'showWell',
-                                        LABKEY.ActionURL.getContainer(),
+                                        null,
                                         {
                                             wellId: record.get('FileIdLink')
                                         }
@@ -1438,7 +1438,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                                     '<a href=\'' + LABKEY.ActionURL.buildURL(
                                         'flow-run',
                                         'showRuns',
-                                        LABKEY.ActionURL.getContainer(),
+                                        null,
                                         {
                                             'query.FCSAnalysisCount~neq': 0
                                         }
@@ -1848,7 +1848,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 LABKEY.ActionURL.buildURL(
                     'reports',
                     'runReport',
-                    LABKEY.ActionURL.getContainer(),
+                    null,
                     {
                         reportId: 'module:OpenCytoPreprocessing/reports/schemas/OpenCytoPreprocessing.R',
                         tabId: 'Source'
