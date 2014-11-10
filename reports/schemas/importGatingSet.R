@@ -110,7 +110,7 @@ importGatingSet <- function( labkey.url.base, labkey.url.path, path, analysisNam
 
         strngWorkspacePaths <- sum( file.info( list.files( path, full.names = T ) )$size ); # file size
 
-        strngSampleGroupNames <- paste0( getNodes( G[[1]], order = 'tsort', showHidden = T ), collapse = ',' ); # all of the populations in the gating hierarchy
+        strngSampleGroupNames <- paste0( getNodes( G[[1]], order = 'tsort', showHidden = T ), collapse = ',' ); # all of the populations' full paths in the gating hierarchy
 
         strngFilesIds <- paste0( sort( meta$RowId ), collapse = ';' );
 
