@@ -124,10 +124,10 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         var strStudyVarName = new Ext.data.ArrayStore({
             data: [],
             fields: ['Flag', 'Display', 'Value'],
+            hasMultiSort: true,
             listeners: {
                 exception: LABKEY.ext.OpenCyto.onFailure
             },
-            hasMultiSort: true,
             multiSortInfo: {
                 sorters: [
                     {
@@ -273,7 +273,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     LABKEY.Filter.create( 'Name', 'DISPLAY;BS;MS', LABKEY.Filter.Types.CONTAINS_NONE_OF ),
                     LABKEY.Filter.create(
                         'Name',
-                        [ '$', 'LASER', 'EXPORT', 'CST', 'CYTOMETER', 'FJ_', 'CREATOR', 'TUBE NAME', 'WINDOW EXTENSION', 'SPILL', 'BD$' ],
+                        [ '$', 'LASER', 'EXPORT', 'CST', 'CYTOMETER', 'FJ_', 'CREATOR', 'TUBE NAME', 'WINDOW EXTENSION', 'SPILL', 'BD$', 'flowCore' ],
                         LABKEY.Filter.Types.DOES_NOT_START_WITH
                     )
                 ],
@@ -626,7 +626,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 
         strStudyVarName.on('load', function(){
             if ( this.getCount() == 0 ){ // at this time 'Select All' has not been added to the store
-                cbStudyVarName.setDisabled(true);
+                cbStudyVarName.setDisabled( true );
                 pnlStudyVars.getEl().mask(
                     'Seems like you have not imported any FCS files, click ' +
                     '<a href=\'' + LABKEY.ActionURL.buildURL('pipeline', 'browse') + '\'>here</a>' +
@@ -751,14 +751,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         var pnlTableFiles = new Ext.grid.GridPanel({
             autoScroll: true,
             border: false,
-//        colModel: new Ext.ux.grid.LockingColumnModel([
-//            {
-//                dataIndex: 'FileName',
-//                header: 'File Name',
-//                resizable: true,
-//                sortable: true
-//            }
-//        ]),
             columnLines: true,
             columns: [
                 LABKEY.ext.OpenCyto.factoryRowNumberer( strTableFiles ),
@@ -818,7 +810,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
             store: strTableFiles,
             stripeRows: true,
             title: 'Files',
-//                    view: new Ext.ux.grid.LockingGridView(),
             viewConfig: {
                 columnsText: 'Show/hide columns',
                 deferEmptyText: false,
@@ -1276,12 +1267,12 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
         function onStrTableFilesLoad(){
             flagLoading = false;
 
-            cbStudyVarName.setDisabled(false);
-            cbWorkspace.setDisabled(false);
-            tfSampleGroup.setDisabled(false);
-            pnlSampleGroup.setDisabledViaClass(false);
-            tfAnalysisName.setDisabled(false);
-            tfAnalysisDescription.setDisabled(false);
+            cbStudyVarName.setDisabled( false );
+            cbWorkspace.setDisabled( false );
+            tfSampleGroup.setDisabled( false );
+            pnlSampleGroup.setDisabledViaClass( false );
+            tfAnalysisName.setDisabled( false );
+            tfAnalysisDescription.setDisabled( false );
 
             maskStudyVars.hide();
             maskWorkspaces.hide();
@@ -1389,7 +1380,7 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                         }
                     ];
 
-                Ext.each( arrayStudyVarsValue, function(c, index){
+                Ext.each( arrayStudyVarsValue, function( c, index ){
                     curValue = LABKEY.QueryKey.encodePart( c ); // need to encode for Labkey to consume
 
                     newColumns.push({

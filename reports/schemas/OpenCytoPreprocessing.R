@@ -26,6 +26,7 @@ suppressMessages( library( flowIncubator ) );
 suppressMessages( library( flowWorkspace ) );
 suppressMessages( library( ncdfFlow ) );
 suppressMessages( library( Rlabkey ) );
+co <- labkey.setCurlOptions( sslversion = 1, ssl.verifyhost = 2 );
 suppressMessages( library( digest ) );
 suppressMessages( library( Rlibstree ) );
 
@@ -243,7 +244,11 @@ tryCatch({
                             param <- parameters( getGate( gh, curChild ) );
 
                             if ( length( param ) == 1 ){
-                                param <- c( param, 'SSC-A' );
+                                if ( param != 'SSC-A' ){
+                                    param <- c( param, 'SSC-A' );
+                                } else {
+                                    param <- c( param, 'FSC-A' );
+                                }
                             }
                             return( param );
                         } else {
@@ -401,3 +406,4 @@ tryCatch({
         stop(e);
     }
 });
+

@@ -1,6 +1,23 @@
+# vim: sw=4:ts=4:nu:nospell:fdc=4
+#
+#  Copyright 2013 Fred Hutchinson Cancer Research Center
+#
+#  Licensed under the Apache License, Version 2.0 (the 'License');
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an 'AS IS' BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
 suppressMessages( library( flowIncubator ) );
 suppressMessages( library( flowWorkspace ) );
 suppressMessages( library( Rlabkey ) );
+co <- labkey.setCurlOptions( sslversion = 1, ssl.verifyhost = 2 );
 suppressMessages( library( digest ) );
 suppressMessages( library( Rlibstree ) );
 
@@ -8,6 +25,10 @@ importGatingSet <- function( labkey.url.base, labkey.url.path, path, analysisNam
 
     if ( labkey.url.base == '' ){
         stop('The Labkey server address cannot be empty, exiting...');
+    }
+    labkey.url.base <- gsub( 'http:', 'https:', labkey.url.base );
+    if ( length( grep('^https://', labkey.url.base ) ) == 0 ){
+        labkey.url.base <- paste0( 'https://', labkey.url.base );
     }
 
     if ( labkey.url.path == '' ){
@@ -26,14 +47,9 @@ importGatingSet <- function( labkey.url.base, labkey.url.path, path, analysisNam
         }
     }
 
-    if ( is.null( analysisName ) ){
+    if ( analysisName == '' | is.null( analysisName ) ){
         analysisName <- basename( path );
         message( paste0( 'Using the name of the specified gating set file for the analysis name: "', analysisName, '"' ) );
-    } else {
-        if ( analysisName == '' ){
-            analysisName <- basename( path );
-            message( paste0( 'Using the name of the specified gating set file for the analysis name: "', analysisName, '"' ) );
-        }
     }
 
     if ( is.null( analysisDescription ) ){
@@ -69,8 +85,6 @@ importGatingSet <- function( labkey.url.base, labkey.url.path, path, analysisNam
             suppressMessages( G <- load_gslist( path ) );
         } else { # gating set
             suppressMessages( G <- load_gs( path ) );
-
-            # setNode( G, 'boundary', T ); # Enable this fix, if needed
 
             fs <- getData( G );
             if ( class( fs ) == 'flowSet' ){
@@ -160,7 +174,11 @@ importGatingSet <- function( labkey.url.base, labkey.url.path, path, analysisNam
                             param <- parameters( getGate( gh, curChild ) );
 
                             if ( length( param ) == 1 ){
-                                param <- c( param, 'SSC-A' );
+                                if ( param != 'SSC-A' ){
+                                    param <- c( param, 'SSC-A' );
+                                } else {
+                                    param <- c( param, 'FSC-A' );
+                                }
                             }
                             return( param );
                         } else {
@@ -304,3 +322,4 @@ importGatingSet <- function( labkey.url.base, labkey.url.path, path, analysisNam
 };
 
 print( 'importGatingSet( labkey.url.base, labkey.url.path, path, analysisName, analysisDescription ) defined' );
+

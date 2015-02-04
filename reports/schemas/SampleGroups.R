@@ -60,3 +60,4 @@ if ( length( wsPaths ) > 0 ){
 
 write( RJSONIO::toJSON( x = sampleGroupsList, asIs = T ), '${jsonout:outArray}' );
 write( RJSONIO::toJSON( x = sampleGroups, asIs = T ), '${jsonout:outArray}' );
+
