@@ -165,8 +165,8 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                     return false;
                 },
                 load: function(){
+                    pnlTableAnalyses.publish('analysesReload');
                     pnlTableAnalyses.autoExpandColumn = 'Description';
-
                     pnlTableAnalyses.reconfigure(
                         strGatingSet,
                         new Ext.grid.CustomColumnModel({
@@ -556,7 +556,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
 //                        toDisplay += '\n' + result.console;
 
                         strGatingSet.reload();
-                        pnlTableAnalyses.publish('analysesReload');
                     }
 
                     Ext.Msg.alert( 'Info', toDisplay );
@@ -592,7 +591,6 @@ LABKEY.ext.OpenCytoPreprocessing = Ext.extend( Ext.Panel, {
                 }
 
                 strGatingSet.reload();
-                pnlTableAnalyses.publish('analysesReload');
             }
         };
 
