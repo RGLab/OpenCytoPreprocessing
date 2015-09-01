@@ -21,7 +21,7 @@ Ext.ns('Ext.ux.form');
 Ext.ux.form.ExtendedComboBox = Ext.extend( Ext.form.ComboBox, {
 
     addClearItem: true,     // true to add the extra Clear trigger button
-    expandOnFocus: true,    // show the drop down list when the text field is clicked, not just the trigger
+    expandOnClick: true,    // show the drop down list when the text field is clicked, not just the trigger
 
     initComponent: function(){
 
@@ -55,7 +55,7 @@ Ext.ux.form.ExtendedComboBox = Ext.extend( Ext.form.ComboBox, {
                     renderTo: document.body
                 });
 
-                if ( this.expandOnFocus ){
+                if ( this.expandOnClick ){
                     this.mon( this.getEl(), {
                         click: this.onTrigger1Click,
                         scope: this
