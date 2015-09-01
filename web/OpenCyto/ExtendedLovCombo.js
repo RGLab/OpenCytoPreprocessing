@@ -1,7 +1,7 @@
 Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
 
     // True to show the drop down list when the text field is clicked, not just the trigger
-    expandOnFocus: true,
+    expandOnClick: true,
 
     //True for use selectAll item
     addSelectAllItem: true,
@@ -57,22 +57,9 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
                     renderTo: document.body
                 });
 
-                if ( this.expandOnFocus ){
+                if ( this.expandOnClick ){
                     this.mon( this.getEl(), {
-                        click: function(){
-                            if ( this.isExpanded() ){
-                                this.collapse();
-                                this.el.focus();
-                            } else {
-                                this.onFocus({});
-                                if ( this.triggerAction == 'all' ){
-                                    this.doQuery( this.allQuery, true );
-                                } else {
-                                    this.doQuery( this.getRawValue() );
-                                }
-                                this.el.focus();
-                            }
-                        },
+                        click: this.onTrigger1Click,
                         scope: this
                     });
                 }
