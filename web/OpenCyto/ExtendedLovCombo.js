@@ -116,6 +116,22 @@ Ext.ux.form.ExtendedLovCombo = Ext.extend( Ext.ux.form.LovCombo, {
         ;
     },
 
+    onBeforeLoad: function(){
+        if ( this.addSelectAllItem ){
+            this.selectAllItem.addClass( this.disabledClass );
+            this.mun( this.selectAllItem, 'click', this.onViewClick, this );
+        }
+        Ext.ux.form.ExtendedLovCombo.superclass.onBeforeLoad.call(this);
+    },
+
+    onLoad: function(){
+        if ( this.addSelectAllItem && ! this.store.isLoading ){
+            this.selectAllItem.removeClass( this.disabledClass );
+            this.mon( this.selectAllItem, 'click', this.onViewClick, this );
+        }
+        Ext.ux.form.ExtendedLovCombo.superclass.onLoad.call(this);
+    },
+
     onBeforeQuery: function(qe) {
         var ar = this.getRawValue().trim().split( new RegExp( '\\s*' + RegExp.escape( this.separator ) + '\\s*' ) );
         var token = ar.pop();
